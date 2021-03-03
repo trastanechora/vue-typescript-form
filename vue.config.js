@@ -4,5 +4,5 @@ module.exports = {
       open: true
     }
   },
-  transpileDependencies: ["vuetify"]
+  transpileDependencies: ['vuetify']
 };
