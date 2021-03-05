@@ -76,3 +76,5 @@ export interface SidebarMenuItem {
   title: string;
   to: string;
 }
+
+export type VForm = Vue & { validate: () => boolean; reset: () => void; resetValidation: () => void };
