@@ -1,27 +1,55 @@
 <template>
   <v-layout column>
-    <v-card class="mx-auto mt-10 py-10" max-width="600">
-      <!-- <v-img
-        class="white--text align-end login-box-logo"
-        height="200px"
-        :src="require(`~/assets/img/logo/alana.png`)"
-      /> -->
-
+    <!-- REGISTER FORM -->
+    <v-card v-if="isRegister" class="mx-auto py-5 mt-10" max-width="600">
+      <v-card-title class="primary--text px-7">
+        Register
+      </v-card-title>
       <v-card-text class="text--primary login-box-content px-7">
-        <v-form ref="loginForm" v-model="valid" lazy-validation class="pa-0">
+        <v-form ref="registerForm" v-model="validRegister" lazy-validation class="pa-0">
           <v-card-text>
             <v-layout row>
               <v-flex lg12 sm12 xs12>
-                <v-text-field outlined clearable label="Username" type="text" autocomplete="off"></v-text-field>
+                <v-text-field
+                  v-model="registerUsername"
+                  outlined
+                  clearable
+                  label="Username"
+                  type="text"
+                  autocomplete="off"
+                  :rules="notEmpty('Username')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                ></v-text-field>
               </v-flex>
               <v-flex lg12 sm12 xs12>
                 <v-text-field
+                  v-model="registerPassword"
                   outlined
                   clearable
                   label="Password"
-                  :type="showPassword ? 'text' : 'password'"
-                  :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="showRegisterPassword ? 'text' : 'password'"
+                  :append-icon="showRegisterPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   autocomplete="off"
+                  :rules="notEmpty('Password')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  @click:append="showRegisterPassword = !showRegisterPassword"
+                ></v-text-field>
+              </v-flex>
+              <v-flex lg12 sm12 xs12>
+                <v-text-field
+                  v-model="confirmPassword"
+                  outlined
+                  clearable
+                  label="Konfirmasi Password"
+                  :type="showRegisterPassword ? 'text' : 'password'"
+                  :append-icon="showRegisterPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  autocomplete="off"
+                  :rules="notEmpty('Konfirmasi Password')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  @click:append="showRegisterPassword = !showRegisterPassword"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -30,7 +58,88 @@
       </v-card-text>
 
       <v-card-actions class="px-7">
-        <v-btn class="primary full-width transform-none">
+        <v-btn
+          color="primary"
+          class="full-width transform-none"
+          :disabled="isLoading || !validRegister"
+          :loading="isLoading"
+          @click="doRegister"
+        >
+          Daftar
+        </v-btn>
+      </v-card-actions>
+
+      <v-card-actions class="px-7">
+        <v-layout>
+          <v-flex xs5 class="mt-3"><hr /></v-flex>
+          <v-flex xs2><p class="mb-0 text-center">Atau</p></v-flex>
+          <v-flex xs5 class="mt-3"><hr /></v-flex>
+        </v-layout>
+      </v-card-actions>
+
+      <v-card-actions class="px-7">
+        <v-btn
+          text
+          color="primary"
+          class="transform-none mx-auto px-12"
+          @click="changeFormType('login')"
+          :disabled="isLoading"
+          :loading="isLoading"
+        >
+          Masuk ke Akun yang Sudah Ada
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+    <!-- LOGIN FORM -->
+    <v-card v-else class="mx-auto mt-10 py-5" max-width="600">
+      <v-card-title class="primary--text px-7">
+        Login
+      </v-card-title>
+      <v-card-text class="text--primary login-box-content px-7">
+        <v-form ref="loginForm" v-model="validLogin" lazy-validation class="pa-0">
+          <v-card-text>
+            <v-layout row>
+              <v-flex lg12 sm12 xs12>
+                <v-text-field
+                  v-model="loginUsername"
+                  outlined
+                  clearable
+                  label="Username"
+                  type="text"
+                  autocomplete="off"
+                  :rules="notEmpty('Username')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                ></v-text-field>
+              </v-flex>
+              <v-flex lg12 sm12 xs12>
+                <v-text-field
+                  v-model="loginPassword"
+                  outlined
+                  clearable
+                  label="Password"
+                  :type="showLoginPassword ? 'text' : 'password'"
+                  :append-icon="showLoginPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  autocomplete="off"
+                  :rules="notEmpty('Password')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  @click:append="showLoginPassword = !showLoginPassword"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+        </v-form>
+      </v-card-text>
+
+      <v-card-actions class="px-7">
+        <v-btn
+          color="primary"
+          class="full-width transform-none"
+          :disabled="isLoading || !validLogin"
+          :loading="isLoading"
+          @click="doLogin"
+        >
           Masuk
         </v-btn>
       </v-card-actions>
@@ -43,12 +152,16 @@
         </v-layout>
       </v-card-actions>
 
-      <!-- <v-card-actions class="px-7 pb-10 wrapper-action">
-        <div id="my-signin2" data-onsuccess="onSignIn" @click="checkClick"></div>
-      </v-card-actions> -->
       <v-card-actions class="px-7">
-        <v-btn class="primary transform-none mx-auto px-12">
-          Daftar
+        <v-btn
+          text
+          color="primary"
+          class="transform-none mx-auto px-12"
+          @click="changeFormType('register')"
+          :disabled="isLoading"
+          :loading="isLoading"
+        >
+          Daftar Akun Baru
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -57,112 +170,97 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { LoginDataField, VForm } from '../../@types';
-// import { notEmptyRules } from '../../@utils';
-// declare const window: any;
+import { VForm } from '@/@types';
+import { notEmptyRules } from '@/@utils';
 
-// @Component({
-//   layout: 'none'
-// })
 @Component
 export default class LoginPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  showPassword: boolean = false;
-  // valid: boolean = true;
-  // clicked: boolean = false;
-  // isFreeze: boolean = false;
-  // loginData: LoginDataField = {
-  //   username: {
-  //     label: 'Username',
-  //     value: null,
-  //     required: true,
-  //     rules: notEmptyRules('Username')
-  //   },
-  //   password: {
-  //     label: 'Password',
-  //     value: null,
-  //     required: true,
-  //     hide: true,
-  //     rules: notEmptyRules('Password')
-  //   }
-  // };
+  isRegister: boolean = false;
+  validLogin: boolean = true;
+  showLoginPassword: boolean = false;
+  validRegister: boolean = true;
+  showRegisterPassword: boolean = false;
+  // Login data
+  loginUsername: string = '';
+  loginPassword: string = '';
+  // Register data
+  registerUsername: string = '';
+  registerPassword: string = '';
+  confirmPassword: string = '';
+
+  /* ------------------------------------
+  => Setter and Getter
+  ** (Adopt store variables to local state)
+  ------------------------------------ */
+  get isLoading(): boolean {
+    return this.$store.state.auth.isLoading;
+  }
+
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
   // async mounted(): Promise<void> {
-  //   await this.insertGapiScript();
+  //   await console.warn('this.isLoading', this.isLoading);
+  //   await console.warn('this.$store.state.auth.isLoading', this.$store.state.auth);
   // }
+
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  // checkClick(): void {
-  //   this.clicked = true;
-  // }
-  // insertGapiScript(): void {
-  //   const script = document.createElement('script');
-  //   script.src = 'https://apis.google.com/js/platform.js';
-  //   script.onload = async () => {
-  //     await this.initializeGoogleSignIn();
-  //   };
-  //   document.body.appendChild(script);
-  // }
-  // async initializeGoogleSignIn(): Promise<void> {
-  //   await window.gapi.load('auth2', () => {
-  //     window.gapi.auth2.init({
-  //       client_id: process.env.GOOGLE_CLIENT_ID
-  //     });
-  //   });
-  //   await window.gapi.load('signin2');
-  //   this.renderButton();
-  // }
-  // renderButton(): void {
-  //   window.gapi.signin2.render('my-signin2', {
-  //     width: 260,
-  //     scope: 'profile email',
-  //     height: 50,
-  //     longtitle: true,
-  //     theme: 'dark',
-  //     onsuccess: this.onSignIn
-  //   });
-  // }
-  // doLogin(): void {
-  //   this.isFreeze = true;
-  //   const form = this.$refs.loginForm as VForm;
-  //   if (form.validate()) {
-  //     this.$store
-  //       .dispatch('auth/doLogin', {
-  //         username: this.loginData.username.value,
-  //         password: this.loginData.password.value
-  //       })
-  //       .then(async () => {
-  //         await this.$router.push(`${this.$route.query.route ? this.$route.query.route : '/'}`);
-  //         form.reset();
-  //       })
-  //       .catch(err => {
-  //         console.warn('failed', err);
-  //       });
-  //   }
-  //   this.isFreeze = false;
-  // }
-  // onSignIn(googleUser: Unknown): void {
-  //   if (this.clicked) {
-  //     const idToken = googleUser.getAuthResponse().id_token;
-  //     const form = this.$refs.loginForm as VForm;
-  //     this.$store
-  //       .dispatch('auth/doLogin', {
-  //         idToken
-  //       })
-  //       .then(async () => {
-  //         await this.$router.push(`${this.$route.query.route ? this.$route.query.route : '/'}`);
-  //         form.reset();
-  //       })
-  //       .catch(err => {
-  //         console.warn('failed >>', err);
-  //       });
-  //   }
-  // }
+  changeFormType(type: string): void {
+    const loginForm = this.$refs.loginForm as VForm;
+    const registerForm = this.$refs.registerForm as VForm;
+    if (type === 'login') {
+      registerForm.reset();
+      this.isRegister = false;
+    } else {
+      loginForm.reset();
+      this.isRegister = true;
+    }
+  }
+
+  doLogin(): void {
+    const form = this.$refs.loginForm as VForm;
+    if (form.validate()) {
+      this.$store
+        .dispatch('login', {
+          username: this.loginUsername,
+          password: this.loginPassword
+        })
+        .then(async () => {
+          // await this.$router.push('/profile');
+          form.reset();
+        })
+        .catch(err => {
+          console.warn('failed to login:', err);
+        });
+    }
+  }
+
+  doRegister(): void {
+    const form = this.$refs.registerForm as VForm;
+    if (form.validate()) {
+      this.$store
+        .dispatch('auth/register', {
+          username: this.registerUsername,
+          password: this.registerPassword
+        })
+        .then(async () => {
+          this.isRegister = false;
+          form.reset();
+        })
+        .catch(err => {
+          console.warn('failed to register:', err);
+        });
+    }
+  }
+
+  notEmpty(identifier: string): any[] {
+    return notEmptyRules(identifier);
+  }
 }
 </script>
 
@@ -181,27 +279,6 @@ export default class LoginPage extends Vue {
 }
 .transform-none {
   text-transform: none;
-}
-#my-signin2 {
-  >>> .abcRioButton {
-    border-radius: 4px;
-  }
-  >>> .abcRioButtonIcon {
-    border-radius: 4px;
-  }
-  margin: auto;
-  >>> .abcRioButton {
-    background-color: var(--v-primary-base)
-  }
-  >>> .abcRioButtonContentWrapper span {
-    display: none;
-  }
-  >>> .abcRioButtonContentWrapper:after {
-    content: 'Masuk dengan Google';
-    padding-top: 11px;
-    position: absolute;
-    left: 70px;
-    font-weight: 500;
-  }
+  letter-spacing: normal;
 }
 </style>
