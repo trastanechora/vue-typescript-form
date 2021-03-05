@@ -1,0 +1,47 @@
+import Store, { UserState, User } from '@/@types';
+import { USER_ENDPOINT } from '@/@api';
+
+/* ------------------------------------------------
+  => State
+  ----------------------------------------------- */
+const state = (): UserState => ({
+  isLoading: false,
+  currentUser: {
+    id: '',
+    username: ''
+  },
+  userList: []
+});
+
+/* ------------------------------------------------
+  => Mutations
+  ----------------------------------------------- */
+const mutations = {
+  setLoading(state: UserState, params: boolean): void {
+    state.isLoading = params;
+  },
+  setCurrentUser(state: UserState, param: User): void {
+    state.currentUser = param;
+  },
+  setUserList(state: UserState, param: User[]): void {
+    state.userList = param;
+  }
+};
+
+/* ------------------------------------------------
+  => Actions
+  ----------------------------------------------- */
+const actions: any = {
+  async getUsers(store: Store<UserState> | any): Promise<any> {
+    await store.commit('setLoading', true);
+    const users = await USER_ENDPOINT.getUsers();
+    await store.commit('setUserList', users);
+    await store.commit('setLoading', false);
+  }
+};
+
+export default {
+  state,
+  mutations,
+  actions
+};
