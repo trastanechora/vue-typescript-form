@@ -99,7 +99,7 @@ export default class AppBar extends Vue {
   }
 
   switchLanguage(param: string): void {
-    this.$store.dispatch('changeLanguage', param);
+    this.$store.dispatch('ui/changeLanguage', param);
   }
 }
 </script>
