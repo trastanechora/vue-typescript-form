@@ -48,6 +48,7 @@ export const USER_ENDPOINT: any = {
       const trans = db.transaction(['users'], 'readonly');
 
       const store = trans.objectStore('users');
+      console.warn('USER_ENDPOINT | store', store);
       const users: any = [];
 
       store.openCursor().onsuccess = (e: any) => {
@@ -58,6 +59,7 @@ export const USER_ENDPOINT: any = {
         }
       };
 
+      console.warn('USER_ENDPOINT | users', users);
       trans.oncomplete = () => {
         resolve(users);
       };

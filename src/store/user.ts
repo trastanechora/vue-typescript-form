@@ -35,8 +35,10 @@ const actions: any = {
   async getUsers(store: Store<UserState> | any): Promise<any> {
     await store.commit('setLoading', true);
     const users = await USER_ENDPOINT.getUsers();
+    console.warn('users', users);
     await store.commit('setUserList', users);
     await store.commit('setLoading', false);
+    return users;
   }
 };
 
