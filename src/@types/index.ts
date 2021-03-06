@@ -8,3 +8,4 @@ export default Store;
 export * from './ui';
 export * from './auth';
 export * from './user';
+export * from './i18n';
