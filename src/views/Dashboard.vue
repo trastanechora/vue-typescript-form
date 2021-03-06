@@ -1,21 +1,6 @@
 <template>
   <v-layout class="admin-container">
-    <v-navigation-drawer clipped permanent class="admin-drawer">
-      <v-list>
-        <div v-for="(item, index) in menuItems" :key="index">
-          <v-list-item @click="changeView(item.to)">
-            <template>
-              <v-list-item-action>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title v-text="item.title" />
-              </v-list-item-content>
-            </template>
-          </v-list-item>
-        </div>
-      </v-list>
-    </v-navigation-drawer>
+    <AdminDrawer />
     <v-layout v-if="show === 'data'" class="admin-view full-width">
       Chart!
     </v-layout>
@@ -24,7 +9,14 @@
         <template v-slot:[`item.userAction`]="{ item }">
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="showDialog(item)">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
+                @click="showEditDialog(item)"
+              >
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </template>
@@ -32,7 +24,14 @@
           </v-tooltip>
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="showDialog(item)">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
+                @click="showDeleteDialog(item)"
+              >
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
             </template>
@@ -41,16 +40,35 @@
         </template></v-data-table
       >
     </v-layout>
+    <!-- <v-dialog v-model="editDialog" transition="dialog-bottom-transition" max-width="600">
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark>Opening from the bottom</v-toolbar>
+          <v-card-text>
+            <div class="text-h2 pa-12">Hello world!</div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn text @click="dialog.value = false">Close</v-btn>
+            <v-btn text @click="dialog.value = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog> -->
+    <DialogUser :dialog="dialog" :type="dialogState" :user="selectedUser" :close-dialog="closeDialog" />
   </v-layout>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { User, TableHeader } from '@/@types';
 import ChartPie from '@/components/ChartPie.vue';
+import AdminDrawer from '@/components/AdminDrawer.vue';
+import DialogUser from '@/components/DialogUser.vue';
 
 @Component({
   components: {
+    AdminDrawer,
+    DialogUser,
     ChartPie
   }
 })
@@ -59,18 +77,17 @@ export default class LoginPage extends Vue {
   => Local State Declaration
   ------------------------------------ */
   show: any = 'data';
-  menuItems: any = [
-    {
-      icon: 'mdi-view-dashboard',
-      title: 'Beranda',
-      to: 'data'
-    },
-    {
-      icon: 'mdi-account-key',
-      title: 'Pengaturan Akses',
-      to: 'user'
-    }
-  ];
+  dialog: boolean = false;
+  dialogState: string = '';
+  selectedUser: User = {
+    uuid: '',
+    username: '',
+    displayName: '',
+    role: '',
+    voteGiven: false,
+    voteValue: '',
+    imgUrl: ''
+  };
 
   headers: TableHeader[] = [
     { text: 'UUID', align: 'start', value: 'uuid', sortable: false },
@@ -103,28 +120,37 @@ export default class LoginPage extends Vue {
   async mounted(): Promise<void> {
     this.show = this.$route.query.show;
     await this.getUserList();
-    console.warn('test', this.$route.query.show);
   }
 
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  changeView(param: string): void {
-    if (this.show !== param) {
-      this.show = param;
-      this.$router.push(`/dashboard?show=${param}`);
-    }
+  getUserList(): void {
+    this.$store.dispatch('user/getUsers');
   }
 
-  getUserList(): void {
-    this.$store
-      .dispatch('user/getUsers')
-      .then(async () => {
-        console.warn('User list is ready!');
-      })
-      .catch(err => {
-        console.warn('failed to login:', err);
-      });
+  showEditDialog(user: User): void {
+    this.selectedUser = user;
+    this.dialog = true;
+    this.dialogState = 'edit';
+  }
+
+  showDeleteDialog(user: User): void {
+    this.selectedUser = user;
+    this.dialog = true;
+    this.dialogState = 'delete';
+  }
+
+  closeDialog(): void {
+    this.dialog = false;
+  }
+
+  /* ------------------------------------
+  => Watcher
+  ------------------------------------ */
+  @Watch('$route.query.show')
+  async handleOnLoad(newValue: string): Promise<void> {
+    this.show = newValue;
   }
 }
 </script>
