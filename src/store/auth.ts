@@ -63,13 +63,31 @@ const actions: any = {
     await store.commit('setLoading', true);
     return USER_ENDPOINT.saveUser(params)
       .then((res: any) => {
-        console.warn('success');
         store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Register success, please login!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
         return res;
       })
       .catch((err: any) => {
-        console.warn('failed');
         store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: `Register failed: ${err}`,
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
         throw err;
       });
   },
