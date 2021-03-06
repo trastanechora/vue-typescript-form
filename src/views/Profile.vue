@@ -4,12 +4,12 @@
       <v-list>
         <v-list-item>
           <v-list-item-avatar>
-            <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
+            <img :src="profile.imgUrl" alt="John" />
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title>John Leider</v-list-item-title>
-            <v-list-item-subtitle>Founder of Vuetify</v-list-item-subtitle>
+            <v-list-item-title>{{ profile.displayName }}</v-list-item-title>
+            <v-list-item-subtitle>{{ profile.role }} | {{ profile.username }}</v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-action>
@@ -25,16 +25,16 @@
       <v-list>
         <v-list-item>
           <v-list-item-action>
-            <v-switch v-model="message"></v-switch>
+            <v-switch v-model="$vuetify.theme.dark"></v-switch>
           </v-list-item-action>
-          <v-list-item-title>Enable messages</v-list-item-title>
+          <v-list-item-title>Dark Mode</v-list-item-title>
         </v-list-item>
 
-        <v-list-item>
+        <v-list-item @click="changeLanguage">
           <v-list-item-action>
-            <v-switch v-model="hints"></v-switch>
+            <v-switch :value="isBahasaIndonesia"></v-switch>
           </v-list-item-action>
-          <v-list-item-title>Enable hints</v-list-item-title>
+          <v-list-item-title>Enable Bahasa Indonesia</v-list-item-title>
         </v-list-item>
       </v-list>
 
@@ -54,6 +54,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { User } from '@/@types';
 
 @Component
 export default class ProfilePage extends Vue {
@@ -63,5 +64,24 @@ export default class ProfilePage extends Vue {
   fav: boolean = false;
   message: boolean = false;
   hints: boolean = false;
+
+  /* ------------------------------------
+  => Setter and Getter
+  ** (Adopt store variables to local state)
+  ------------------------------------ */
+  get profile(): User {
+    return this.$store.state.user.currentUser;
+  }
+
+  get isBahasaIndonesia(): User {
+    return this.$store.state.i18n.isBahasaIndonesia;
+  }
+
+  /* ------------------------------------
+  => Methods
+  ------------------------------------ */
+  changeLanguage(): void {
+    this.$store.dispatch('i18n/changeLanguage', this.isBahasaIndonesia ? 'EN' : 'ID');
+  }
 }
 </script>
