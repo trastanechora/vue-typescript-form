@@ -12,14 +12,9 @@ export interface User {
 }
 
 export interface RegisterUserData {
-  uuid: string;
   username: string;
   password: string;
   displayName: string;
-  role: string;
-  voteGiven: boolean;
-  voteValue: string;
-  imgUrl: string;
 }
 
 /* ------------------------------------
