@@ -101,3 +101,61 @@
     </v-card>
   </v-layout>
 </template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { User } from '@/@types';
+
+@Component
+export default class LoginPage extends Vue {
+  /* ------------------------------------
+  => Local State Declaration
+  ------------------------------------ */
+  isRegister: boolean = false;
+  validLogin: boolean = true;
+  showLoginPassword: boolean = false;
+  validRegister: boolean = true;
+  showRegisterPassword: boolean = false;
+  // Login data
+  loginUsername: string = '';
+  loginPassword: string = '';
+  // Register data
+  registerUsername: string = '';
+  registerPassword: string = '';
+  confirmPassword: string = '';
+
+  /* ------------------------------------
+  => Setter and Getter
+  ** (Adopt store variables to local state)
+  ------------------------------------ */
+  get isLoading(): boolean {
+    return this.$store.state.user.isLoading;
+  }
+
+  get userList(): User[] {
+    return this.$store.state.user.userList;
+  }
+
+  /* ------------------------------------
+  => Mounted (Lifecycle)
+  ------------------------------------ */
+  async mounted(): Promise<void> {
+    await this.getUserList();
+    await console.warn('Check userList', this.userList);
+  }
+
+  /* ------------------------------------
+  => Methods
+  ------------------------------------ */
+  getUserList(): void {
+    this.$store
+      .dispatch('user/getUsers')
+      .then(async () => {
+        console.warn('User list is ready!');
+      })
+      .catch(err => {
+        console.warn('failed to login:', err);
+      });
+  }
+}
+</script>

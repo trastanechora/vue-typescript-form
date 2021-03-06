@@ -170,6 +170,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { uuid } from 'vue-uuid';
 import { VForm } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
@@ -225,18 +226,19 @@ export default class LoginPage extends Vue {
   doLogin(): void {
     const form = this.$refs.loginForm as VForm;
     if (form.validate()) {
-      this.$store
-        .dispatch('login', {
-          username: this.loginUsername,
-          password: this.loginPassword
-        })
-        .then(async () => {
-          // await this.$router.push('/profile');
-          form.reset();
-        })
-        .catch(err => {
-          console.warn('failed to login:', err);
-        });
+      console.warn(uuid.v1());
+      // this.$store
+      //   .dispatch('auth/login', {
+      //     username: this.loginUsername,
+      //     password: this.loginPassword
+      //   })
+      //   .then(async () => {
+      //     // await this.$router.push('/profile');
+      //     form.reset();
+      //   })
+      //   .catch(err => {
+      //     console.warn('failed to login:', err);
+      //   });
     }
   }
 
