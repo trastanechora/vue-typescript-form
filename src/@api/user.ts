@@ -1,8 +1,9 @@
+import { uuid } from 'vue-uuid';
 const DB_NAME = 'userdb';
 const DB_VERSION = 1;
 let DB: any;
 
-import { RegisterUserData, AuthData } from '@/@types';
+import { RegisterUserData, User, AuthData } from '@/@types';
 
 export const USER_ENDPOINT: any = {
   /* ------------------------------------
@@ -89,15 +90,54 @@ export const USER_ENDPOINT: any = {
   ------------------------------------ */
   async saveUser(userdata: RegisterUserData): Promise<void> {
     const db: any = await this.getDb();
+    const parsedUserData = {
+      ...userdata,
+      uuid: uuid.v1(),
+      role: userdata.username[0] === '$' ? 'admin' : 'user',
+      voteGiven: false,
+      voteValue: 'N/A',
+      imgUrl: `https://picsum.photos/id/${Math.floor(Math.random() * 1000) + 1}/200`
+    };
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const trans = db.transaction(['users'], 'readwrite');
 
       const store = trans.objectStore('users');
-      store.put(userdata);
+      store.put(parsedUserData);
 
       trans.oncomplete = () => {
         resolve();
+      };
+
+      trans.onerror = () => {
+        reject('username already exist!');
+      };
+    });
+  },
+
+  /* ------------------------------------
+  => [PUT] Edit User
+  ------------------------------------ */
+  async editUser(user: User): Promise<User> {
+    const db: any = await this.getDb();
+
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['users'], 'readwrite');
+      const userStore = trans.objectStore('users');
+
+      const getUserRequest = userStore.openCursor();
+
+      getUserRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.username === user.username) {
+            userStore.put(user);
+            resolve(user);
+          }
+          result.continue();
+        } else {
+          reject('Password atau Username salah!');
+        }
       };
     });
   },
@@ -105,7 +145,7 @@ export const USER_ENDPOINT: any = {
   /* ------------------------------------
   => [POST] Login User
   ------------------------------------ */
-  async loginUser(params: AuthData): Promise<void> {
+  async loginUser(params: AuthData): Promise<User> {
     const db: any = await this.getDb();
 
     return new Promise((resolve, reject) => {
@@ -118,7 +158,6 @@ export const USER_ENDPOINT: any = {
         const result = e.target.result;
         if (result) {
           if (result.value.username === params.username && result.value.password === params.password) {
-            console.warn('the result is:', result.value);
             resolve(result.value);
           }
           result.continue();
