@@ -1,26 +1,13 @@
 <template>
   <v-app-bar fixed app>
-    <!-- <v-toolbar-title v-text="title" /> -->
     <v-btn id="home-btn" text class="transform-none ma-2" to="/">
       <v-toolbar-title v-text="title" />
     </v-btn>
     <v-spacer />
-    <!-- <v-btn id="my-bookings-btn" text class="transform-none ma-2">
-      {{ languageSetting.myBookings }}
-    </v-btn>
-    <v-btn id="services-btn" text class="transform-none ma-2">
-      {{ languageSetting.services }}
-    </v-btn>
-    <v-btn id="about-us-btn" text class="transform-none ma-2">
-      {{ languageSetting.aboutUs }}
-    </v-btn>
-    <v-btn id="contact-btn" text class="transform-none ma-2">
-      {{ languageSetting.contact }}
-    </v-btn> -->
     <v-btn id="about-us-btn" text class="transform-none ma-2" to="/vote">
       Vote
     </v-btn>
-    <v-btn id="dashboard-btn" text class="transform-none ma-2" to="/dashboard">
+    <v-btn id="dashboard-btn" text class="transform-none ma-2" to="/dashboard?show=data">
       Dashbord
     </v-btn>
     <v-btn id="profile-btn" text class="transform-none ma-2" to="/profile">
@@ -62,7 +49,21 @@
         </v-list>
       </v-card>
     </v-menu>
-    <v-btn id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/login">
+    <v-btn
+      v-if="isLogin"
+      id="account-btn"
+      depressed
+      rounded
+      color="primary"
+      class="transform-none ma-2"
+      @click="logout"
+    >
+      <v-avatar size="24" class="mr-2">
+        <img left :src="profilePictureUrl" alt="John" />
+      </v-avatar>
+      Logout
+    </v-btn>
+    <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/login">
       <v-icon left>
         mdi-account-circle
       </v-icon>
@@ -88,7 +89,15 @@ export default class AppBar extends Vue {
   ** (Adopt store variables to local state)
   ------------------------------------ */
   get languageSetting(): boolean {
-    return this.$store.state.ui.languageSetting.header;
+    return this.$store.state.i18n.languageSetting.header;
+  }
+
+  get isLogin(): boolean {
+    return this.$store.state.auth.isLogin;
+  }
+
+  get profilePictureUrl(): string {
+    return this.$store.state.user.currentUser.imgUrl;
   }
 
   /* ------------------------------------
@@ -99,7 +108,13 @@ export default class AppBar extends Vue {
   }
 
   switchLanguage(param: string): void {
-    this.$store.dispatch('ui/changeLanguage', param);
+    this.$store.dispatch('i18n/changeLanguage', param);
+  }
+
+  logout(): void {
+    this.$store.dispatch('auth/logout').then(() => {
+      this.$router.push('/login');
+    });
   }
 }
 </script>
