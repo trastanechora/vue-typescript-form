@@ -1,4 +1,4 @@
-import Store, { AuthState, AuthData } from '@/@types';
+import Store, { AuthState, AuthData, RegisterUserData } from '@/@types';
 import { USER_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
@@ -27,20 +27,68 @@ const mutations = {
 const actions: any = {
   async login(store: Store<AuthState> | any, params: AuthData): Promise<any> {
     await store.commit('setLoading', true);
-    const data = params;
-    console.warn('login data:', data);
-    await store.commit('setLoading', false);
+    return USER_ENDPOINT.loginUser(params)
+      .then((res: any) => {
+        store.commit('setLoginStatus', true);
+        store.commit('user/setCurrentUser', res, { root: true });
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Login Berhasil!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        return true;
+      })
+      .catch((err: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: err,
+            color: 'error',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        throw false;
+      });
   },
-  async register(store: Store<AuthState> | any, params: AuthData): Promise<any> {
+  async register(store: Store<AuthState> | any, params: RegisterUserData): Promise<any> {
     await store.commit('setLoading', true);
-    console.warn('register data:', params);
-    USER_ENDPOINT.saveUser(params);
-    await store.commit('setLoading', false);
+    return USER_ENDPOINT.saveUser(params)
+      .then((res: any) => {
+        console.warn('success');
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        console.warn('failed');
+        store.commit('setLoading', false);
+        throw err;
+      });
   },
   async logout(store: Store<AuthState> | any): Promise<any> {
     await store.commit('setLoading', true);
-    console.warn('Logging out..');
+    store.commit('user/setCurrentUser', { uuid: '', username: '' }, { root: true });
+    store.commit('setLoginStatus', false);
     await store.commit('setLoading', false);
+    store.commit(
+      'ui/setSnackbar',
+      {
+        open: true,
+        message: 'Logout Berhasil!',
+        color: 'green',
+        timeout: 4000
+      },
+      { root: true }
+    );
+    return true;
   }
 };
 

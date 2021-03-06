@@ -2,8 +2,24 @@
 => Store User related types
 ------------------------------------ */
 export interface User {
-  id: string;
+  uuid: string;
   username: string;
+  displayName: string;
+  role: string;
+  voteGiven: boolean;
+  voteValue: string;
+  imgUrl: string;
+}
+
+export interface RegisterUserData {
+  uuid: string;
+  username: string;
+  password: string;
+  displayName: string;
+  role: string;
+  voteGiven: boolean;
+  voteValue: string;
+  imgUrl: string;
 }
 
 /* ------------------------------------
