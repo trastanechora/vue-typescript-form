@@ -7,8 +7,13 @@ import { USER_ENDPOINT } from '@/@api';
 const state = (): UserState => ({
   isLoading: false,
   currentUser: {
-    id: '',
-    username: ''
+    uuid: '',
+    username: '',
+    displayName: '',
+    role: 'user',
+    voteGiven: false,
+    voteValue: 'N/A',
+    imgUrl: ''
   },
   userList: []
 });
