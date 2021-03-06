@@ -144,27 +144,5 @@ export default class HomePage extends Vue {
   get userList(): User[] {
     return this.$store.state.user.userList;
   }
-
-  /* ------------------------------------
-  => Mounted (Lifecycle)
-  ------------------------------------ */
-  async mounted(): Promise<void> {
-    await this.getUserList();
-    await console.warn('Check userList', this.userList);
-  }
-
-  /* ------------------------------------
-  => Methods
-  ------------------------------------ */
-  getUserList(): void {
-    this.$store
-      .dispatch('user/getUsers')
-      .then(async () => {
-        console.warn('User list is ready!');
-      })
-      .catch(err => {
-        console.warn('failed to login:', err);
-      });
-  }
 }
 </script>
