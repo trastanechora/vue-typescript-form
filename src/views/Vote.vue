@@ -1,6 +1,6 @@
 <template>
-  <v-layout class="px-10 mt-10">
-    <v-flex v-for="(item, index) in voteList" :key="index" class="px-2">
+  <v-layout class="px-10 mt-10" wrap>
+    <v-flex v-for="(item, index) in voteList" :key="index" class="px-2 mb-3" xs6>
       <v-hover v-slot="{ hover }">
         <v-card class="mx-auto" color="grey lighten-4" max-width="600">
           <v-img :aspect-ratio="16 / 9" src="https://cdn.vuetifyjs.com/images/cards/kitchen.png">
