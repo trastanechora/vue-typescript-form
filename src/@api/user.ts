@@ -2,17 +2,21 @@ const DB_NAME = 'userdb';
 const DB_VERSION = 1;
 let DB: any;
 
+import { RegisterUserData, AuthData } from '@/@types';
+
 export const USER_ENDPOINT: any = {
+  /* ------------------------------------
+  => Check IndexedDB
+  ------------------------------------ */
   async getDb() {
     return new Promise((resolve, reject) => {
       if (DB) {
         return resolve(DB);
       }
-      console.log('OPENING DB', DB);
       const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = e => {
-        console.log('Error opening db', e);
+        console.log('Error opening DB!', e);
         reject('Error');
       };
 
@@ -22,25 +26,41 @@ export const USER_ENDPOINT: any = {
       };
 
       request.onupgradeneeded = (e: any) => {
-        console.log('onupgradeneeded');
+        console.log('DB Upgrade success!');
         const db: any = e.target.result;
-        db.createObjectStore('users', { autoIncrement: true, keyPath: 'id' });
+        const objectStore = db.createObjectStore('users', { keyPath: 'uuid' });
+        objectStore.createIndex('username', 'username', { unique: true });
+        objectStore.createIndex('password', 'password', { unique: false });
+        objectStore.createIndex('role', 'role', { unique: false });
+        objectStore.createIndex('displayName', 'displayName', { unique: false });
+        objectStore.createIndex('voteGiven', 'voteGiven', { unique: false });
+        objectStore.createIndex('voteValue', 'voteValue', { unique: false });
+        objectStore.createIndex('imgUrl', 'imgUrl', { unique: false });
       };
     });
   },
+
+  /* ------------------------------------
+  => [DELETE] Delete User
+  ------------------------------------ */
   async deleteUser(user: any): Promise<void> {
     const db: any = await this.getDb();
 
     return new Promise(resolve => {
       const trans = db.transaction(['users'], 'readwrite');
+
+      const store = trans.objectStore('users');
+      store.delete(user.uuid);
+
       trans.oncomplete = () => {
         resolve();
       };
-
-      const store = trans.objectStore('users');
-      store.delete(user.id);
     });
   },
+
+  /* ------------------------------------
+  => [GET] Get List of Users
+  ------------------------------------ */
   async getUsers(): Promise<void> {
     const db: any = await this.getDb();
 
@@ -48,7 +68,6 @@ export const USER_ENDPOINT: any = {
       const trans = db.transaction(['users'], 'readonly');
 
       const store = trans.objectStore('users');
-      console.warn('USER_ENDPOINT | store', store);
       const users: any = [];
 
       store.openCursor().onsuccess = (e: any) => {
@@ -59,24 +78,54 @@ export const USER_ENDPOINT: any = {
         }
       };
 
-      console.warn('USER_ENDPOINT | users', users);
       trans.oncomplete = () => {
         resolve(users);
       };
     });
   },
 
-  async saveUser(user: any): Promise<void> {
+  /* ------------------------------------
+  => [POST] Register New User
+  ------------------------------------ */
+  async saveUser(userdata: RegisterUserData): Promise<void> {
     const db: any = await this.getDb();
 
     return new Promise(resolve => {
       const trans = db.transaction(['users'], 'readwrite');
+
+      const store = trans.objectStore('users');
+      store.put(userdata);
+
       trans.oncomplete = () => {
         resolve();
       };
+    });
+  },
 
-      const store = trans.objectStore('users');
-      store.put(user);
+  /* ------------------------------------
+  => [POST] Login User
+  ------------------------------------ */
+  async loginUser(params: AuthData): Promise<void> {
+    const db: any = await this.getDb();
+
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['users'], 'readonly');
+      const userStore = trans.objectStore('users');
+
+      const getUserRequest = userStore.openCursor();
+
+      getUserRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.username === params.username && result.value.password === params.password) {
+            console.warn('the result is:', result.value);
+            resolve(result.value);
+          }
+          result.continue();
+        } else {
+          reject('Password atau Username salah!');
+        }
+      };
     });
   }
 };
