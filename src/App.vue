@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <AppBar />
+    <Snackbar />
     <v-main>
-      <!-- <HelloWorld /> -->
       <router-view />
     </v-main>
   </v-app>
@@ -10,14 +10,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import HelloWorld from './components/HelloWorld.vue';
-import AppBar from './components/AppBar.vue';
+import Snackbar from '@/components/Snackbar.vue';
+import AppBar from '@/components/AppBar.vue';
 
 export default Vue.extend({
   name: 'App',
 
   components: {
-    // HelloWorld,
+    Snackbar,
     AppBar
   }
 });
