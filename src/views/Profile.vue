@@ -25,14 +25,14 @@
       <v-list>
         <v-list-item>
           <v-list-item-action>
-            <v-switch v-model="message" color="purple"></v-switch>
+            <v-switch v-model="message"></v-switch>
           </v-list-item-action>
           <v-list-item-title>Enable messages</v-list-item-title>
         </v-list-item>
 
         <v-list-item>
           <v-list-item-action>
-            <v-switch v-model="hints" color="purple"></v-switch>
+            <v-switch v-model="hints"></v-switch>
           </v-list-item-action>
           <v-list-item-title>Enable hints</v-list-item-title>
         </v-list-item>
@@ -51,3 +51,17 @@
     </v-card>
   </div>
 </template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
+@Component
+export default class ProfilePage extends Vue {
+  /* ------------------------------------
+  => Local State Declaration
+  ------------------------------------ */
+  fav: boolean = false;
+  message: boolean = false;
+  hints: boolean = false;
+}
+</script>
