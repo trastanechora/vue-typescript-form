@@ -183,7 +183,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { uuid } from 'vue-uuid';
 import { VForm } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
@@ -215,14 +214,6 @@ export default class LoginPage extends Vue {
   }
 
   /* ------------------------------------
-  => Mounted (Lifecycle)
-  ------------------------------------ */
-  // async mounted(): Promise<void> {
-  //   await console.warn('this.isLoading', this.isLoading);
-  //   await console.warn('this.$store.state.auth.isLoading', this.$store.state.auth);
-  // }
-
-  /* ------------------------------------
   => Methods
   ------------------------------------ */
   changeFormType(type: string): void {
@@ -245,13 +236,9 @@ export default class LoginPage extends Vue {
           username: this.loginUsername,
           password: this.loginPassword
         })
-        .then(async (res: any) => {
-          console.warn('[LOGIN Page] Login success!', res);
+        .then(async () => {
           await this.$router.push('/profile');
           form.reset();
-        })
-        .catch(err => {
-          console.warn('[LOGIN Page] failed to login:', err);
         });
     }
   }
@@ -263,19 +250,11 @@ export default class LoginPage extends Vue {
         .dispatch('auth/register', {
           username: this.registerUsername,
           displayName: this.registerDisplayName,
-          password: this.registerPassword,
-          uuid: uuid.v1(),
-          role: this.registerUsername[0] === '$' ? 'admin' : 'user',
-          voteGiven: false,
-          voteValue: 'N/A',
-          imgUrl: `https://picsum.photos/id/${Math.floor(Math.random() * 1000) + 1}/200`
+          password: this.registerPassword
         })
         .then(async () => {
           this.isRegister = false;
           form.reset();
-        })
-        .catch(err => {
-          console.warn('failed to register:', err);
         });
     }
   }
