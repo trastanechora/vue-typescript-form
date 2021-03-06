@@ -24,6 +24,19 @@
               </v-flex>
               <v-flex lg12 sm12 xs12>
                 <v-text-field
+                  v-model="registerDisplayName"
+                  outlined
+                  clearable
+                  label="Display Name"
+                  type="text"
+                  autocomplete="off"
+                  :rules="notEmpty('Display Name')"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                ></v-text-field>
+              </v-flex>
+              <v-flex lg12 sm12 xs12>
+                <v-text-field
                   v-model="registerPassword"
                   outlined
                   clearable
@@ -191,6 +204,7 @@ export default class LoginPage extends Vue {
   registerUsername: string = '';
   registerPassword: string = '';
   confirmPassword: string = '';
+  registerDisplayName: string = '';
 
   /* ------------------------------------
   => Setter and Getter
@@ -226,19 +240,19 @@ export default class LoginPage extends Vue {
   doLogin(): void {
     const form = this.$refs.loginForm as VForm;
     if (form.validate()) {
-      console.warn(uuid.v1());
-      // this.$store
-      //   .dispatch('auth/login', {
-      //     username: this.loginUsername,
-      //     password: this.loginPassword
-      //   })
-      //   .then(async () => {
-      //     // await this.$router.push('/profile');
-      //     form.reset();
-      //   })
-      //   .catch(err => {
-      //     console.warn('failed to login:', err);
-      //   });
+      this.$store
+        .dispatch('auth/login', {
+          username: this.loginUsername,
+          password: this.loginPassword
+        })
+        .then(async (res: any) => {
+          console.warn('[LOGIN Page] Login success!', res);
+          await this.$router.push('/profile');
+          form.reset();
+        })
+        .catch(err => {
+          console.warn('[LOGIN Page] failed to login:', err);
+        });
     }
   }
 
@@ -248,7 +262,13 @@ export default class LoginPage extends Vue {
       this.$store
         .dispatch('auth/register', {
           username: this.registerUsername,
-          password: this.registerPassword
+          displayName: this.registerDisplayName,
+          password: this.registerPassword,
+          uuid: uuid.v1(),
+          role: this.registerUsername[0] === '$' ? 'admin' : 'user',
+          voteGiven: false,
+          voteValue: 'N/A',
+          imgUrl: `https://picsum.photos/id/${Math.floor(Math.random() * 1000) + 1}/200`
         })
         .then(async () => {
           this.isRegister = false;
