@@ -9,13 +9,13 @@
           <v-icon left>
             mdi-account
           </v-icon>
-          Users
+          Pie Chart
         </v-tab>
         <v-tab>
           <v-icon left>
             mdi-lock
           </v-icon>
-          Option 2
+          Bar Chart
         </v-tab>
         <v-tab>
           <v-icon left>

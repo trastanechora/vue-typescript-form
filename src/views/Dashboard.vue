@@ -72,7 +72,7 @@ import DialogUser from '@/components/DialogUser.vue';
     ChartPie
   }
 })
-export default class LoginPage extends Vue {
+export default class DashboardPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */

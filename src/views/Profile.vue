@@ -27,33 +27,22 @@
           <v-list-item-action>
             <v-switch v-model="$vuetify.theme.dark"></v-switch>
           </v-list-item-action>
-          <v-list-item-title>Dark Mode</v-list-item-title>
+          <v-list-item-title>{{ languageSetting.darkMode }}</v-list-item-title>
         </v-list-item>
 
         <v-list-item @click="changeLanguage">
           <v-list-item-action>
-            <v-switch :value="isBahasaIndonesia"></v-switch>
+            <v-switch :value="lang"></v-switch>
           </v-list-item-action>
-          <v-list-item-title>Enable Bahasa Indonesia</v-list-item-title>
+          <v-list-item-title>{{ languageSetting.enableBahasa }}</v-list-item-title>
         </v-list-item>
       </v-list>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn text @click="menu = false">
-          Cancel
-        </v-btn>
-        <v-btn color="primary" text @click="menu = false">
-          Save
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { User } from '@/@types';
 
 @Component
@@ -62,8 +51,7 @@ export default class ProfilePage extends Vue {
   => Local State Declaration
   ------------------------------------ */
   fav: boolean = false;
-  message: boolean = false;
-  hints: boolean = false;
+  lang: boolean = false;
 
   /* ------------------------------------
   => Setter and Getter
@@ -73,15 +61,30 @@ export default class ProfilePage extends Vue {
     return this.$store.state.user.currentUser;
   }
 
-  get isBahasaIndonesia(): User {
-    return this.$store.state.i18n.isBahasaIndonesia;
+  get languageSetting(): ProfilePage {
+    return this.$store.state.i18n.languageSetting.profilePage;
+  }
+
+  /* ------------------------------------
+  => Mounted (Lifecycle)
+  ------------------------------------ */
+  async mounted(): Promise<void> {
+    this.lang = this.$store.state.i18n.isBahasaIndonesia;
   }
 
   /* ------------------------------------
   => Methods
   ------------------------------------ */
   changeLanguage(): void {
-    this.$store.dispatch('i18n/changeLanguage', this.isBahasaIndonesia ? 'EN' : 'ID');
+    this.$store.dispatch('i18n/changeLanguage', this.$store.state.i18n.isBahasaIndonesia ? 'EN' : 'ID');
+  }
+
+  /* ------------------------------------
+  => Watcher
+  ------------------------------------ */
+  @Watch('$store.state.i18n.isBahasaIndonesia')
+  async handleOnLanguageChange(newValue: boolean): Promise<void> {
+    this.lang = newValue;
   }
 }
 </script>
