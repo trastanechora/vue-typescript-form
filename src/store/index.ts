@@ -6,6 +6,7 @@ import ui from './ui';
 import auth from './auth';
 import user from './user';
 import i18n from './i18n';
+import chart from './chart';
 
 Vue.use(Vuex);
 
@@ -31,6 +32,10 @@ export default new Vuex.Store({
     i18n: {
       namespaced: true,
       ...i18n
+    },
+    chart: {
+      namespaced: true,
+      ...chart
     }
   }
 });
