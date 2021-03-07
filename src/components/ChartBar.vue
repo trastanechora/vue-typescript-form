@@ -3,15 +3,30 @@ import { Bar } from 'vue-chartjs';
 
 export default {
   extends: Bar,
+  computed: {
+    chartData: function() {
+      return this.$store.state.chart.chartData;
+    }
+  },
   mounted() {
+    console.warn('chartData', this.chartData);
+    const labelList = this.chartData.map(data => {
+      return data.label;
+    });
+    const valueList = this.chartData.map(data => {
+      return data.value;
+    });
+    const colorList = this.chartData.map(data => {
+      return data.color;
+    });
     this.renderChart(
       {
-        labels: ['Angular', 'React', 'Vue', 'Svelte'],
+        labels: labelList,
         datasets: [
           {
             label: 'Vote',
-            backgroundColor: ['#b02f28', '#00D8FF', '#2f993d', '#ad5a17'],
-            data: [20, 25, 30, 15]
+            backgroundColor: colorList,
+            data: valueList
           }
         ]
       },

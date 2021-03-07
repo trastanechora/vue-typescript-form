@@ -2,10 +2,28 @@
   <v-layout class="admin-container">
     <AdminDrawer />
     <v-layout v-if="show === 'data'" class="admin-view full-width">
-      Chart!
+      <v-data-table :headers="chartHeaders" :items="chartData" :items-per-page="10" class="elevation-1 full-width">
+        <template v-slot:[`item.userAction`]="{ item }">
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
+                @click="showChartEditDialog(item)"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </template>
+            <span>Edit</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
     </v-layout>
     <v-layout v-else class="admin-view">
-      <v-data-table :headers="headers" :items="userList" :items-per-page="10" class="elevation-1 full-width">
+      <v-data-table :headers="userHeaders" :items="userList" :items-per-page="10" class="elevation-1 full-width">
         <template v-slot:[`item.userAction`]="{ item }">
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
@@ -40,34 +58,23 @@
         </template></v-data-table
       >
     </v-layout>
-    <!-- <v-dialog v-model="editDialog" transition="dialog-bottom-transition" max-width="600">
-      <template>
-        <v-card>
-          <v-toolbar color="primary" dark>Opening from the bottom</v-toolbar>
-          <v-card-text>
-            <div class="text-h2 pa-12">Hello world!</div>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn text @click="dialog.value = false">Close</v-btn>
-            <v-btn text @click="dialog.value = false">Close</v-btn>
-          </v-card-actions>
-        </v-card>
-      </template>
-    </v-dialog> -->
     <DialogUser :dialog="dialog" :type="dialogState" :user="selectedUser" :close-dialog="closeDialog" />
+    <DialogChart :dialog="chartDialog" :chart="selectedChart" :close-dialog="closeDialog" />
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { User, TableHeader } from '@/@types';
+import { User, TableHeader, Chart } from '@/@types';
 import ChartPie from '@/components/ChartPie.vue';
 import AdminDrawer from '@/components/AdminDrawer.vue';
+import DialogChart from '@/components/DialogChart.vue';
 import DialogUser from '@/components/DialogUser.vue';
 
 @Component({
   components: {
     AdminDrawer,
+    DialogChart,
     DialogUser,
     ChartPie
   }
@@ -78,7 +85,15 @@ export default class DashboardPage extends Vue {
   ------------------------------------ */
   show: any = 'data';
   dialog: boolean = false;
+  chartDialog: boolean = false;
   dialogState: string = '';
+  selectedChart: Chart = {
+    id: '',
+    label: '',
+    value: 0,
+    color: ''
+  };
+
   selectedUser: User = {
     uuid: '',
     username: '',
@@ -89,7 +104,18 @@ export default class DashboardPage extends Vue {
     imgUrl: ''
   };
 
-  headers: TableHeader[] = [
+  chartHeaders: TableHeader[] = [
+    { text: 'Framework Name', value: 'label' },
+    { text: 'Popularity', value: 'value' },
+    { text: 'Color', value: 'color' },
+    {
+      text: 'Tindakan',
+      value: 'userAction',
+      sortable: false
+    }
+  ];
+
+  userHeaders: TableHeader[] = [
     { text: 'UUID', align: 'start', value: 'uuid', sortable: false },
     { text: 'Display Name', value: 'displayName' },
     { text: 'Username', value: 'username' },
@@ -112,6 +138,10 @@ export default class DashboardPage extends Vue {
 
   get userList(): User[] {
     return this.$store.state.user.userList;
+  }
+
+  get chartData(): Chart[] {
+    return this.$store.state.chart.chartData;
   }
 
   /* ------------------------------------
@@ -141,8 +171,14 @@ export default class DashboardPage extends Vue {
     this.dialogState = 'delete';
   }
 
+  showChartEditDialog(chart: Chart): void {
+    this.chartDialog = true;
+    this.selectedChart = chart;
+  }
+
   closeDialog(): void {
     this.dialog = false;
+    this.chartDialog = false;
   }
 
   /* ------------------------------------

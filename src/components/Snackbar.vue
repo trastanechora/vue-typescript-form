@@ -13,7 +13,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
-export default class GlobalSnackbar extends Vue {
+export default class Snackbar extends Vue {
   /* ------------------------------------
   => Setter and Getter
   ** (Adopt store variables to local state)

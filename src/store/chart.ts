@@ -4,23 +4,28 @@ import Store, { ChartState, Chart } from '@/@types';
 => State
 ----------------------------------------------- */
 const state = (): ChartState => ({
+  isLoading: false,
   chartData: [
     {
+      id: '1',
       label: 'Angular',
       value: 20,
       color: '#b02f28'
     },
     {
+      id: '2',
       label: 'React',
       value: 25,
       color: '#00D8FF'
     },
     {
+      id: '3',
       label: 'Vue',
       value: 30,
       color: '#2f993d'
     },
     {
+      id: '4',
       label: 'Svelte',
       value: 15,
       color: '#ad5a17'
@@ -32,6 +37,9 @@ const state = (): ChartState => ({
 => Mutations
 ----------------------------------------------- */
 const mutations = {
+  setLoading(state: ChartState, param: boolean): void {
+    state.isLoading = param;
+  },
   setChartData(state: ChartState, param: Chart[]): void {
     state.chartData = param;
   }
@@ -41,8 +49,20 @@ const mutations = {
 => Actions
 ----------------------------------------------- */
 const actions = {
-  updateChartData(store: Store<ChartState> | any, param: Chart[]): void {
-    store.commit('setChartData', param);
+  updateChartData(store: Store<ChartState> | any, param: Chart): Promise<boolean> {
+    const newChartData = store.state.chartData.map((chart: Chart) => {
+      if (chart.id === param.id) {
+        return param;
+      } else {
+        return chart;
+      }
+    });
+    return new Promise(resolve => {
+      store.commit('setLoading', true);
+      store.commit('setChartData', newChartData);
+      store.commit('setLoading', false);
+      resolve(true);
+    });
   }
 };
 

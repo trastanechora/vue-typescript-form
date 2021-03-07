@@ -63,9 +63,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, _, next) => {
   const storeString = localStorage.getItem('vuex') || '{}';
-  console.warn('storeString', storeString);
   const store = JSON.parse(storeString);
-  console.warn('store', store);
   if (to.matched.some(record => record.meta.auth)) {
     if (store && !store.auth.isLogin) {
       next('/login');

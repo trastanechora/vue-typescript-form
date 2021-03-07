@@ -2,21 +2,47 @@
   <v-dialog v-model="dialog" transition="dialog-bottom-transition" max-width="600">
     <template>
       <v-card>
-        <v-toolbar color="primary" dark>{{ type === 'edit' ? 'Edit User' : 'Delete User' }}</v-toolbar>
+        <v-toolbar color="primary" dark>Edit Chart</v-toolbar>
         <v-card-text>
-          <div v-if="type === 'edit'" class="mt-4">
-            <v-form ref="editUserForm" v-model="valid" lazy-validation class="pa-0">
+          <div class="mt-4">
+            <v-form ref="editChartForm" v-model="valid" lazy-validation class="pa-0">
               <v-card-text>
                 <v-layout row>
                   <v-flex lg12 sm12 xs12>
                     <v-text-field
-                      v-model="displayName"
+                      v-model="label"
                       outlined
                       clearable
-                      label="Display Name"
+                      label="Nama Framework"
                       type="text"
                       autocomplete="off"
-                      :rules="notEmpty('Display Name')"
+                      :rules="notEmpty('Nama Framework')"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex lg12 sm12 xs12>
+                    <v-text-field
+                      v-model="value"
+                      outlined
+                      clearable
+                      label="Popularitas"
+                      type="text"
+                      autocomplete="off"
+                      :rules="notEmpty('Popularitas')"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex lg12 sm12 xs12>
+                    <v-text-field
+                      v-model="color"
+                      outlined
+                      clearable
+                      label="Warna pada Chart"
+                      type="text"
+                      autocomplete="off"
+                      :rules="notEmpty('Warna chart')"
                       :disabled="isLoading"
                       :loading="isLoading"
                     ></v-text-field>
@@ -25,12 +51,10 @@
               </v-card-text>
             </v-form>
           </div>
-          <div v-else class="mt-4">Are you Sure to delete the user?</div>
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn text @click="closeDialog">Cancel</v-btn>
-          <v-btn v-if="type === 'edit'" text @click="editUser">Edit</v-btn>
-          <v-btn v-else text @click="deleteUser">Delete</v-btn>
+          <v-btn text @click="editChart">Edit</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -39,22 +63,19 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { VForm, User } from '@/@types';
+import { VForm, Chart } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
 @Component
-export default class DialogUser extends Vue {
+export default class DialogChart extends Vue {
   /* ------------------------------------
   => Props declaration
   ------------------------------------ */
   @Prop({ required: true, type: Boolean })
   readonly dialog!: boolean;
 
-  @Prop({ required: true, type: String })
-  readonly type!: string;
-
   @Prop({ required: true, type: Object })
-  readonly user!: User;
+  readonly chart!: Chart;
 
   @Prop({
     required: false,
@@ -68,37 +89,35 @@ export default class DialogUser extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  displayName: string = '';
   valid: boolean = true;
+  label: string = '';
+  value: number = 0;
+  color: string = '';
 
   /* ------------------------------------
   => Setter and Getter
   ** (Adopt store variables to local state)
   ------------------------------------ */
   get isLoading(): boolean {
-    return this.$store.state.user.isLoading;
+    return this.$store.state.chart.isLoading;
   }
 
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  editUser(): void {
-    const editUserForm = this.$refs.editUserForm as VForm;
-    if (editUserForm.validate()) {
-      const data: User = {
-        ...this.user
+  editChart(): void {
+    const editChartForm = this.$refs.editChartForm as VForm;
+    if (editChartForm.validate()) {
+      const data: Chart = {
+        id: this.chart.id,
+        label: this.label,
+        value: this.value,
+        color: this.color
       };
-      data.displayName = this.displayName;
-      this.$store.dispatch('user/editUser', data).then(() => {
+      this.$store.dispatch('chart/updateChartData', data).then(() => {
         this.closeDialog();
       });
     }
-  }
-
-  deleteUser(): void {
-    this.$store.dispatch('user/deleteUser', this.user).then(() => {
-      this.closeDialog();
-    });
   }
 
   notEmpty(identifier: string): any[] {
@@ -110,8 +129,10 @@ export default class DialogUser extends Vue {
   ------------------------------------ */
   @Watch('dialog')
   async handleOnLoad(newValue: boolean): Promise<void> {
-    if (newValue && this.type === 'edit') {
-      this.displayName = this.user.displayName;
+    if (newValue) {
+      this.label = this.chart.label;
+      this.value = this.chart.value;
+      this.color = this.chart.color || 'black';
     }
   }
 }
