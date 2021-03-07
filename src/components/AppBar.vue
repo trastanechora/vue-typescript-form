@@ -4,13 +4,13 @@
       <v-toolbar-title v-text="title" />
     </v-btn>
     <v-spacer />
-    <v-btn id="about-us-btn" text class="transform-none ma-2" to="/vote">
+    <v-btn v-if="roleUser === 'user'" id="about-us-btn" text class="transform-none ma-2" to="/vote">
       Vote
     </v-btn>
-    <v-btn id="dashboard-btn" text class="transform-none ma-2" to="/dashboard?show=data">
-      Dashbord
+    <v-btn v-if="roleUser === 'admin'" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard?show=data">
+      Admin Panel
     </v-btn>
-    <v-btn id="profile-btn" text class="transform-none ma-2" to="/profile">
+    <v-btn v-if="isLogin" id="profile-btn" text class="transform-none ma-2" to="/profile">
       Profile
     </v-btn>
     <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
@@ -61,7 +61,7 @@
       <v-avatar size="24" class="mr-2">
         <img left :src="profilePictureUrl" alt="John" />
       </v-avatar>
-      Logout
+      {{ languageSetting.logout }}
     </v-btn>
     <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/login">
       <v-icon left>
@@ -98,6 +98,10 @@ export default class AppBar extends Vue {
 
   get profilePictureUrl(): string {
     return this.$store.state.user.currentUser.imgUrl;
+  }
+
+  get roleUser(): string {
+    return this.$store.state.user.currentUser.role;
   }
 
   /* ------------------------------------
