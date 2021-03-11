@@ -1,5 +1,4 @@
-import Store, { AuthState, AuthData, RegisterUserData } from '@/@types';
-import { USER_ENDPOINT } from '@/@api';
+import Store, { AuthState, AuthData } from '@/@types';
 
 /* ------------------------------------------------
   => State
@@ -25,76 +24,42 @@ const mutations = {
   => Actions
   ----------------------------------------------- */
 const actions: any = {
-  async login(store: Store<AuthState> | any, params: AuthData): Promise<any> {
+  async login(store: Store<AuthState> | any, params: AuthData): Promise<boolean> {
     await store.commit('setLoading', true);
-    return USER_ENDPOINT.loginUser(params)
-      .then((res: any) => {
+    return new Promise((resolve, reject) => {
+      if (params.username === 'admin' && params.password === 'password') {
         store.commit('setLoginStatus', true);
-        store.commit('user/setCurrentUser', res, { root: true });
-        store.commit('setLoading', false);
         store.commit(
           'ui/setSnackbar',
           {
             open: true,
-            message: 'Login Berhasil!',
+            message: 'Login berhasil, selamat datang!',
             color: 'green',
             timeout: 4000
           },
           { root: true }
         );
-        return true;
-      })
-      .catch((err: any) => {
         store.commit('setLoading', false);
+        resolve(true);
+      } else {
         store.commit(
           'ui/setSnackbar',
           {
             open: true,
-            message: err,
-            color: 'error',
-            timeout: 4000
-          },
-          { root: true }
-        );
-        throw false;
-      });
-  },
-  async register(store: Store<AuthState> | any, params: RegisterUserData): Promise<any> {
-    await store.commit('setLoading', true);
-    return USER_ENDPOINT.saveUser(params)
-      .then((res: any) => {
-        store.commit('setLoading', false);
-        store.commit(
-          'ui/setSnackbar',
-          {
-            open: true,
-            message: 'Register success, please login!',
-            color: 'green',
-            timeout: 4000
-          },
-          { root: true }
-        );
-        return res;
-      })
-      .catch((err: any) => {
-        store.commit('setLoading', false);
-        store.commit(
-          'ui/setSnackbar',
-          {
-            open: true,
-            message: `Register failed: ${err}`,
+            message: 'Maaf login gagal, username atau password salah',
             color: 'red',
             timeout: 4000
           },
           { root: true }
         );
-        throw err;
-      });
+        store.commit('setLoading', false);
+        reject(false);
+      }
+    });
   },
   async logout(store: Store<AuthState> | any): Promise<any> {
     await store.commit('setLoading', true);
-    store.commit('user/setCurrentUser', { uuid: '', username: '' }, { root: true });
-    store.commit('setLoginStatus', false);
+    await store.commit('setLoginStatus', false);
     await store.commit('setLoading', false);
     store.commit(
       'ui/setSnackbar',
