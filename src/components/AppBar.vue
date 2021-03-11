@@ -4,51 +4,12 @@
       <v-toolbar-title v-text="title" />
     </v-btn>
     <v-spacer />
-    <v-btn v-if="roleUser === 'user'" id="about-us-btn" text class="transform-none ma-2" to="/vote">
-      Vote
-    </v-btn>
-    <v-btn v-if="roleUser === 'admin'" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard?show=data">
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard">
       Admin Panel
-    </v-btn>
-    <v-btn v-if="isLogin" id="profile-btn" text class="transform-none ma-2" to="/profile">
-      Profile
     </v-btn>
     <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
       <v-icon>mdi-theme-light-dark</v-icon>
     </v-btn>
-    <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn id="language-menu" depressed small fab class="transform-none ma-2" v-bind="attrs" v-on="on">
-          <v-icon>mdi-web</v-icon>
-        </v-btn>
-      </template>
-
-      <v-card>
-        <v-list>
-          <v-list-item>
-            <v-list-item-avatar>
-              <v-icon>mdi-web</v-icon>
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title>{{ languageSetting.selectLang }}</v-list-item-title>
-              <v-list-item-subtitle>{{ languageSetting.comingLang }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-
-        <v-divider></v-divider>
-
-        <v-list>
-          <v-list-item id="language-en" link @click="switchLanguage('EN')">
-            <v-list-item-title v-text="languageSetting.english"></v-list-item-title>
-          </v-list-item>
-          <v-list-item id="language-id" link @click="switchLanguage('ID')">
-            <v-list-item-title v-text="languageSetting.bahasa"></v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-card>
-    </v-menu>
     <v-btn
       v-if="isLogin"
       id="account-btn"
@@ -58,16 +19,16 @@
       class="transform-none ma-2"
       @click="logout"
     >
-      <v-avatar size="24" class="mr-2">
-        <img left :src="profilePictureUrl" alt="John" />
-      </v-avatar>
-      {{ languageSetting.logout }}
-    </v-btn>
-    <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/login">
       <v-icon left>
-        mdi-account-circle
+        mdi-exit-to-app
       </v-icon>
-      {{ languageSetting.registerLogin }}
+      Keluar
+    </v-btn>
+    <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/admin">
+      <v-icon left>
+        mdi-key-chain-variant
+      </v-icon>
+      Login Admin
     </v-btn>
   </v-app-bar>
 </template>
@@ -117,7 +78,7 @@ export default class AppBar extends Vue {
 
   logout(): void {
     this.$store.dispatch('auth/logout').then(() => {
-      this.$router.push('/login');
+      this.$router.push('/admin');
     });
   }
 }
