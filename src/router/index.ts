@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
-import Vote from '../views/Vote.vue';
 import Dashboard from '../views/Dashboard.vue';
+import AddForm from '../views/AddForm.vue';
 import Login from '../views/Login.vue';
-import Profile from '../views/Profile.vue';
 import Forbidden from '../views/Forbidden.vue';
 import NotFound from '../views/NotFound.vue';
 
@@ -17,31 +16,25 @@ const routes: Array<RouteConfig> = [
     component: Home
   },
   {
-    path: '/vote',
-    name: 'Vote',
-    component: Vote
-  },
-  {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
     meta: {
-      auth: true,
-      permission: 'admin'
+      auth: true
     }
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile,
+    path: '/dashboard/add',
+    name: 'Add New Form',
+    component: AddForm,
     meta: {
       auth: true
     }
+  },
+  {
+    path: '/admin',
+    name: 'Login',
+    component: Login
   },
   {
     path: '/forbidden',
@@ -66,17 +59,9 @@ router.beforeEach((to, _, next) => {
   const store = JSON.parse(storeString);
   if (to.matched.some(record => record.meta.auth)) {
     if (store && !store.auth.isLogin) {
-      next('/login');
+      next('/forbidden');
     } else {
-      if (to.matched.some(record => record.meta.permission)) {
-        if (store.user.currentUser.role === to.meta.permission) {
-          next();
-        } else {
-          next('/forbidden');
-        }
-      } else {
-        next();
-      }
+      next();
     }
   } else {
     next();

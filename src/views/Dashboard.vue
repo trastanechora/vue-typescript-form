@@ -1,126 +1,52 @@
 <template>
   <v-layout class="admin-container">
-    <AdminDrawer />
-    <v-layout v-if="show === 'data'" class="admin-view full-width">
-      <v-data-table :headers="chartHeaders" :items="chartData" :items-per-page="10" class="elevation-1 full-width">
-        <template v-slot:[`item.userAction`]="{ item }">
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                :loading="isLoading"
-                :disabled="isLoading"
-                v-bind="attrs"
-                v-on="on"
-                @click="showChartEditDialog(item)"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-            <span>Edit</span>
-          </v-tooltip>
-        </template>
-      </v-data-table>
+    <v-layout wrap class="admin-view full-width">
+      <v-flex xs12 class="mb-4">
+        <v-btn rounded color="primary" outlined to="/dashboard/add"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
+      </v-flex>
+      <v-flex xs12>
+        <v-data-table :headers="formHeaders" :items="chartData" :items-per-page="10" class="elevation-1 full-width">
+          <template v-slot:[`item.userAction`]="{ item }">
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  :loading="isLoading"
+                  :disabled="isLoading"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="showChartEditDialog(item)"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+              </template>
+              <span>Edit</span>
+            </v-tooltip>
+          </template>
+        </v-data-table>
+      </v-flex>
     </v-layout>
-    <v-layout v-else class="admin-view">
-      <v-data-table :headers="userHeaders" :items="userList" :items-per-page="10" class="elevation-1 full-width">
-        <template v-slot:[`item.userAction`]="{ item }">
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                :loading="isLoading"
-                :disabled="isLoading"
-                v-bind="attrs"
-                v-on="on"
-                @click="showEditDialog(item)"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-            <span>Edit</span>
-          </v-tooltip>
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                :loading="isLoading"
-                :disabled="isLoading"
-                v-bind="attrs"
-                v-on="on"
-                @click="showDeleteDialog(item)"
-              >
-                <v-icon>mdi-trash-can</v-icon>
-              </v-btn>
-            </template>
-            <span>Delete</span>
-          </v-tooltip>
-        </template></v-data-table
-      >
-    </v-layout>
-    <DialogUser :dialog="dialog" :type="dialogState" :user="selectedUser" :close-dialog="closeDialog" />
-    <DialogChart :dialog="chartDialog" :chart="selectedChart" :close-dialog="closeDialog" />
   </v-layout>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { User, TableHeader, Chart } from '@/@types';
-import ChartPie from '@/components/ChartPie.vue';
-import AdminDrawer from '@/components/AdminDrawer.vue';
-import DialogChart from '@/components/DialogChart.vue';
-import DialogUser from '@/components/DialogUser.vue';
+import { Component, Vue } from 'vue-property-decorator';
+import { TableHeader, Form } from '@/@types';
 
-@Component({
-  components: {
-    AdminDrawer,
-    DialogChart,
-    DialogUser,
-    ChartPie
-  }
-})
+@Component
 export default class DashboardPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  show: any = 'data';
-  dialog: boolean = false;
-  chartDialog: boolean = false;
-  dialogState: string = '';
-  selectedChart: Chart = {
-    id: '',
-    label: '',
-    value: 0,
-    color: ''
-  };
-
-  selectedUser: User = {
-    uuid: '',
-    username: '',
-    displayName: '',
-    role: '',
-    voteGiven: false,
-    voteValue: '',
-    imgUrl: ''
-  };
-
-  chartHeaders: TableHeader[] = [
-    { text: 'Framework Name', value: 'label' },
-    { text: 'Popularity', value: 'value' },
-    { text: 'Color', value: 'color' },
-    {
-      text: 'Tindakan',
-      value: 'userAction',
-      sortable: false
-    }
-  ];
-
-  userHeaders: TableHeader[] = [
-    { text: 'UUID', align: 'start', value: 'uuid', sortable: false },
-    { text: 'Display Name', value: 'displayName' },
-    { text: 'Username', value: 'username' },
-    { text: 'role', value: 'role' },
-    { text: 'voteGiven', value: 'voteGiven' },
+  formHeaders: TableHeader[] = [
+    { text: 'Label', value: 'label' },
+    { text: 'Jumlah Pertanyaan', value: 'questionCount' },
+    { text: 'Jumlah Responden', value: 'respondentCount' },
+    { text: 'Status', value: 'status' },
+    { text: 'Batas Waktu', value: 'dueDate' },
+    { text: 'Tanggal Dibuat', value: 'createdDate' },
+    { text: 'Diedit Terakhir', value: 'updatedDate' },
+    { text: 'Link', value: 'link' },
     {
       text: 'Tindakan',
       value: 'userAction',
@@ -136,20 +62,15 @@ export default class DashboardPage extends Vue {
     return this.$store.state.user.isLoading;
   }
 
-  get userList(): User[] {
-    return this.$store.state.user.userList;
-  }
-
-  get chartData(): Chart[] {
-    return this.$store.state.chart.chartData;
+  get formList(): Form[] {
+    return this.$store.state.form.formList;
   }
 
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
-  async mounted(): Promise<void> {
-    this.show = this.$route.query.show;
-    await this.getUserList();
+  mounted(): void {
+    // await this.getUserList();
   }
 
   /* ------------------------------------
@@ -158,51 +79,5 @@ export default class DashboardPage extends Vue {
   getUserList(): void {
     this.$store.dispatch('user/getUsers');
   }
-
-  showEditDialog(user: User): void {
-    this.selectedUser = user;
-    this.dialog = true;
-    this.dialogState = 'edit';
-  }
-
-  showDeleteDialog(user: User): void {
-    this.selectedUser = user;
-    this.dialog = true;
-    this.dialogState = 'delete';
-  }
-
-  showChartEditDialog(chart: Chart): void {
-    this.chartDialog = true;
-    this.selectedChart = chart;
-  }
-
-  closeDialog(): void {
-    this.dialog = false;
-    this.chartDialog = false;
-  }
-
-  /* ------------------------------------
-  => Watcher
-  ------------------------------------ */
-  @Watch('$route.query.show')
-  async handleOnLoad(newValue: string): Promise<void> {
-    this.show = newValue;
-  }
 }
 </script>
-<style>
-.full-width {
-  width: 100%;
-}
-.admin-container {
-  height: 100vh;
-  padding-left: 256px;
-}
-.admin-drawer {
-  position: fixed;
-  padding-top: 56px;
-}
-.admin-view {
-  padding: 40px 20px;
-}
-</style>

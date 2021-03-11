@@ -1,112 +1,9 @@
 <template>
   <v-layout column>
-    <!-- REGISTER FORM -->
-    <v-card v-if="isRegister" class="mx-auto py-5 mt-10" max-width="600">
-      <v-card-title class="primary--text px-7">
-        Register
-      </v-card-title>
-      <v-card-text class="text--primary login-box-content px-7">
-        <v-form ref="registerForm" v-model="validRegister" lazy-validation class="pa-0">
-          <v-card-text>
-            <v-layout row>
-              <v-flex lg12 sm12 xs12>
-                <v-text-field
-                  v-model="registerUsername"
-                  outlined
-                  clearable
-                  label="Username"
-                  type="text"
-                  autocomplete="off"
-                  :rules="notEmpty('Username')"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                ></v-text-field>
-              </v-flex>
-              <v-flex lg12 sm12 xs12>
-                <v-text-field
-                  v-model="registerDisplayName"
-                  outlined
-                  clearable
-                  label="Display Name"
-                  type="text"
-                  autocomplete="off"
-                  :rules="notEmpty('Display Name')"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                ></v-text-field>
-              </v-flex>
-              <v-flex lg12 sm12 xs12>
-                <v-text-field
-                  v-model="registerPassword"
-                  outlined
-                  clearable
-                  label="Password"
-                  :type="showRegisterPassword ? 'text' : 'password'"
-                  :append-icon="showRegisterPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  autocomplete="off"
-                  :rules="notEmpty('Password')"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                  @click:append="showRegisterPassword = !showRegisterPassword"
-                ></v-text-field>
-              </v-flex>
-              <v-flex lg12 sm12 xs12>
-                <v-text-field
-                  v-model="confirmPassword"
-                  outlined
-                  clearable
-                  label="Konfirmasi Password"
-                  :type="showRegisterPassword ? 'text' : 'password'"
-                  :append-icon="showRegisterPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  autocomplete="off"
-                  :rules="notEmpty('Konfirmasi Password')"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                  @click:append="showRegisterPassword = !showRegisterPassword"
-                ></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </v-form>
-      </v-card-text>
-
-      <v-card-actions class="px-7">
-        <v-btn
-          color="primary"
-          class="full-width transform-none"
-          :disabled="isLoading || !validRegister"
-          :loading="isLoading"
-          @click="doRegister"
-        >
-          Daftar
-        </v-btn>
-      </v-card-actions>
-
-      <v-card-actions class="px-7">
-        <v-layout>
-          <v-flex xs5 class="mt-3"><hr /></v-flex>
-          <v-flex xs2><p class="mb-0 text-center">Atau</p></v-flex>
-          <v-flex xs5 class="mt-3"><hr /></v-flex>
-        </v-layout>
-      </v-card-actions>
-
-      <v-card-actions class="px-7">
-        <v-btn
-          text
-          color="primary"
-          class="transform-none mx-auto px-12"
-          @click="changeFormType('login')"
-          :disabled="isLoading"
-          :loading="isLoading"
-        >
-          Masuk ke Akun yang Sudah Ada
-        </v-btn>
-      </v-card-actions>
-    </v-card>
     <!-- LOGIN FORM -->
-    <v-card v-else class="mx-auto mt-10 py-5" max-width="600">
+    <v-card class="mx-auto mt-10 py-5" max-width="600">
       <v-card-title class="primary--text px-7">
-        Login
+        Masuk sebagai Admin
       </v-card-title>
       <v-card-text class="text--primary login-box-content px-7">
         <v-form ref="loginForm" v-model="validLogin" lazy-validation class="pa-0">
@@ -156,27 +53,6 @@
           Masuk
         </v-btn>
       </v-card-actions>
-
-      <v-card-actions class="px-7">
-        <v-layout>
-          <v-flex xs5 class="mt-3"><hr /></v-flex>
-          <v-flex xs2><p class="mb-0 text-center">Atau</p></v-flex>
-          <v-flex xs5 class="mt-3"><hr /></v-flex>
-        </v-layout>
-      </v-card-actions>
-
-      <v-card-actions class="px-7">
-        <v-btn
-          text
-          color="primary"
-          class="transform-none mx-auto px-12"
-          @click="changeFormType('register')"
-          :disabled="isLoading"
-          :loading="isLoading"
-        >
-          Daftar Akun Baru
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-layout>
 </template>
@@ -191,19 +67,11 @@ export default class LoginPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  isRegister: boolean = false;
   validLogin: boolean = true;
   showLoginPassword: boolean = false;
-  validRegister: boolean = true;
-  showRegisterPassword: boolean = false;
   // Login data
   loginUsername: string = '';
   loginPassword: string = '';
-  // Register data
-  registerUsername: string = '';
-  registerPassword: string = '';
-  confirmPassword: string = '';
-  registerDisplayName: string = '';
 
   /* ------------------------------------
   => Setter and Getter
@@ -216,18 +84,6 @@ export default class LoginPage extends Vue {
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  changeFormType(type: string): void {
-    const loginForm = this.$refs.loginForm as VForm;
-    const registerForm = this.$refs.registerForm as VForm;
-    if (type === 'login') {
-      registerForm.reset();
-      this.isRegister = false;
-    } else {
-      loginForm.reset();
-      this.isRegister = true;
-    }
-  }
-
   doLogin(): void {
     const form = this.$refs.loginForm as VForm;
     if (form.validate()) {
@@ -237,23 +93,7 @@ export default class LoginPage extends Vue {
           password: this.loginPassword
         })
         .then(async () => {
-          await this.$router.push('/profile');
-          form.reset();
-        });
-    }
-  }
-
-  doRegister(): void {
-    const form = this.$refs.registerForm as VForm;
-    if (form.validate()) {
-      this.$store
-        .dispatch('auth/register', {
-          username: this.registerUsername,
-          displayName: this.registerDisplayName,
-          password: this.registerPassword
-        })
-        .then(async () => {
-          this.isRegister = false;
+          await this.$router.push('/dashboard');
           form.reset();
         });
     }
