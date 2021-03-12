@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <AppBar />
+    <!-- <AppBar /> -->
     <Snackbar />
     <v-main>
       <router-view />
@@ -11,14 +11,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import Snackbar from '@/components/Snackbar.vue';
-import AppBar from '@/components/AppBar.vue';
+// import AppBar from '@/components/AppBar.vue';
 
 export default Vue.extend({
   name: 'App',
 
   components: {
-    Snackbar,
-    AppBar
+    Snackbar
+    // AppBar
   }
 });
 </script>
@@ -32,6 +32,6 @@ export default Vue.extend({
   padding-top: 56px;
 }
 .admin-view {
-  padding: 40px 20px;
+  padding: 0 20px;
 }
 </style>
