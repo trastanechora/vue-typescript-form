@@ -4,27 +4,7 @@
       <v-flex xs12 class="mb-4">
         <v-btn rounded color="primary" outlined to="/dashboard/add"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
       </v-flex>
-      <v-flex xs12>
-        <v-data-table :headers="formHeaders" :items="chartData" :items-per-page="10" class="elevation-1 full-width">
-          <template v-slot:[`item.userAction`]="{ item }">
-            <v-tooltip right>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  :loading="isLoading"
-                  :disabled="isLoading"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="showChartEditDialog(item)"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-              </template>
-              <span>Edit</span>
-            </v-tooltip>
-          </template>
-        </v-data-table>
-      </v-flex>
+      <v-flex xs12> </v-flex>
     </v-layout>
   </v-layout>
 </template>
