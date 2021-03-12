@@ -43,7 +43,7 @@ export default class AppBar extends Vue {
   ------------------------------------ */
   menu: boolean = false;
   drawer: boolean = false;
-  title: string = 'Dev Survey';
+  title: string = 'Form App';
 
   /* ------------------------------------
   => Setter and Getter
