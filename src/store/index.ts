@@ -9,7 +9,7 @@ import form from './form';
 Vue.use(Vuex);
 
 const dataState = createPersistedState({
-  paths: ['auth.isLogin', 'i18n']
+  paths: ['auth.isLogin', 'form']
 });
 
 export default new Vuex.Store({
