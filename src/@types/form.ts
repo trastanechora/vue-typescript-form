@@ -2,12 +2,17 @@
 => Store Form related types
 ------------------------------------ */
 export enum QuestionType {
+  EMPTY = '',
   TEXT_FIELD = 'text_field',
   TEXT_AREA = 'text_area',
-  SWITCH = 'switch',
   SELECT = 'select',
   RADIO = 'radio',
-  CHECKBOX = 'checkbox'
+  RADIO_ROW = 'radio_row',
+  CHECKBOX = 'checkbox',
+  CHECKBOX_ROW = 'checkbox_row',
+  SCALE = 'scale',
+  DATE = 'date',
+  TIME = 'time'
 }
 
 export enum FormStatus {
@@ -20,24 +25,39 @@ export enum FormStatus {
 export interface Option {
   text: string;
   value: string | number;
+  otherValue?: string;
+  icon?: string;
+}
+
+export interface QuestionTypeObject {
+  label: string;
+  value: QuestionType;
+  icon?: string;
 }
 export interface Question {
-  key: number;
-  order: number;
-  type: QuestionType;
+  key: string;
   text: string;
-  options: Option[];
+  type: QuestionTypeObject;
+  required: boolean;
+  description?: string;
+  options?: Option[];
+}
+
+export interface QuestionSection {
+  title: string;
+  questionList: Question[];
 }
 
 export interface Answer {
   key: number;
-  type: QuestionType;
+  type: QuestionTypeObject;
   value: string | number | Option;
 }
 
 export interface Respondent {
   answers: Answer[];
 }
+
 export interface Form {
   uuid: string;
   label: string;
@@ -49,7 +69,7 @@ export interface Form {
   questionCount: number;
   status: FormStatus;
   link: string;
-  questions: Question[];
+  questions: QuestionSection[];
   respondents: Respondent[];
 }
 
@@ -59,5 +79,6 @@ export interface Form {
 export interface FormState {
   isLoading: boolean;
   selectedForm: Form;
+  questionTypeList: QuestionTypeObject[];
   formList: Form[];
 }
