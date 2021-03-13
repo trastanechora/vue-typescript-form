@@ -35,12 +35,7 @@ const actions = {
     store.commit('closeSnackbar');
   },
   showSnackbar(store: Store<UiState> | any, params: Snackbar): void {
-    store.commit('setSnackbar', {
-      snackbarOpen: true,
-      snackbarMessage: params.message,
-      snackTimeout: params.timeout === 0 ? 0 : params.timeout > 0 ? params.timeout : 4000,
-      snackbarColor: params.color ? params.color : ''
-    });
+    store.commit('setSnackbar', params);
   }
 };
 
