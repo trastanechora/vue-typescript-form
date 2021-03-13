@@ -49,6 +49,7 @@ export interface QuestionSection {
 }
 
 export interface Respondent {
+  uuid: string;
   formKey: string;
   answers: any;
   submitDate: string;
@@ -58,14 +59,14 @@ export interface Form {
   uuid: string;
   label: string;
   description: string;
-  createdDate: string;
-  updatedDate: string;
+  createdAt: string;
+  updatedAt: string;
   dueDate: string;
-  respondentCount: number;
   questionCount: number;
   status: FormStatus;
   link: string;
   questions: QuestionSection[];
+  respondentCount?: number;
 }
 
 /* ------------------------------------
