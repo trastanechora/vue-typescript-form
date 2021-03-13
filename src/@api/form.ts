@@ -38,9 +38,9 @@ export const FORM_ENDPOINT: any = {
       };
     });
   },
-  // /* ------------------------------------
-  // => [GET] Get List of Forms
-  // ------------------------------------ */
+  /* ------------------------------------
+  => [GET] Get List of Forms
+  ------------------------------------ */
   async getForms(): Promise<any> {
     const db: any = await this.getDb();
     return new Promise(resolve => {
@@ -59,9 +59,31 @@ export const FORM_ENDPOINT: any = {
       };
     });
   },
-  // /* ------------------------------------
-  // => [POST] Insert New Form
-  // ------------------------------------ */
+  /* ------------------------------------
+  => [GET] Get Form by UUID
+  ------------------------------------ */
+  async getFormById(id: string): Promise<Form> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['forms'], 'readonly');
+      const formStore = trans.objectStore('forms');
+      const getFormRequest = formStore.openCursor();
+      getFormRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.uuid === id) {
+            resolve(result.value);
+          }
+          result.continue();
+        } else {
+          reject('Form tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
+  => [POST] Insert New Form
+  ------------------------------------ */
   async saveForm(formData: Form): Promise<void> {
     const db: any = await this.getDb();
     return new Promise((resolve, reject) => {
@@ -73,6 +95,31 @@ export const FORM_ENDPOINT: any = {
       };
       trans.onerror = () => {
         reject('Menambahkan form gagal, mohon periksa kembali!');
+      };
+    });
+  },
+  /* ------------------------------------
+  => [PUT] Edit Form and Submit Response
+  ------------------------------------ */
+  async editForm(formData: Form): Promise<Form> {
+    console.warn('formData', formData);
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['forms'], 'readwrite');
+      const formStore = trans.objectStore('forms');
+      const getFormRequest = formStore.openCursor();
+      getFormRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.uuid === formData.uuid) {
+            console.warn('result', result.value);
+            formStore.put(formData);
+            resolve(formData);
+          }
+          result.continue();
+        } else {
+          reject('Form tidak dapat ditemukan!');
+        }
       };
     });
   }
