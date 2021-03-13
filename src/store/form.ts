@@ -1,4 +1,5 @@
 import Store, { FormState, Form, FormStatus, QuestionType } from '@/@types';
+import { FORM_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
   => State
@@ -47,8 +48,8 @@ const state = (): FormState => ({
     uuid: '',
     label: '',
     description: '',
-    createdDate: '',
-    updatedDate: '',
+    createdAt: '',
+    updatedAt: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -72,11 +73,14 @@ const mutations = {
   setLoading(state: FormState, param: boolean): void {
     state.isLoading = param;
   },
-  setSelectedForm(state: FormState, params: Form): void {
-    state.selectedForm = params;
+  setSelectedForm(state: FormState, param: Form): void {
+    state.selectedForm = param;
   },
-  addForm(state: FormState, params: Form): void {
-    state.formList.push(params);
+  setFormList(state: FormState, params: Form[]): void {
+    state.formList = params;
+  },
+  addForm(state: FormState, param: Form): void {
+    state.formList.push(param);
   }
 };
 
@@ -88,39 +92,48 @@ const actions: any = {
     await store.commit('setLoading', true);
     return new Promise(resolve => {
       store.commit('setSelectedForm', params);
-      // Pinjam dulu
-      store.commit(
-        'ui/setSnackbar',
-        {
-          open: true,
-          message: 'Form berhasil disimpan',
-          color: 'green',
-          timeout: 4000
-        },
-        { root: true }
-      );
-      // Pinjam dulu
       store.commit('setLoading', false);
       resolve(true);
     });
   },
+  async getForms(store: Store<FormState> | any): Promise<void> {
+    await store.commit('setLoading', true);
+    const forms = await FORM_ENDPOINT.getForms();
+    console.warn('new list form nih!', forms);
+    await store.commit('setFormList', forms);
+    await store.commit('setLoading', false);
+  },
   async saveForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
     await store.commit('setLoading', true);
-    return new Promise(resolve => {
-      store.commit('addForm', params);
-      store.commit(
-        'ui/setSnackbar',
-        {
-          open: true,
-          message: 'Form berhasil disimpan',
-          color: 'green',
-          timeout: 4000
-        },
-        { root: true }
-      );
-      store.commit('setLoading', false);
-      resolve(true);
-    });
+    return FORM_ENDPOINT.saveForm(params)
+      .then((res: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Form berhasil disimpan!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: `Form gagal disimpan: ${err}`,
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        throw err;
+      });
   }
 };
 
