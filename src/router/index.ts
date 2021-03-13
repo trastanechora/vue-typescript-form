@@ -7,6 +7,7 @@ import Login from '@/views/Login.vue';
 import Forbidden from '@/views/Forbidden.vue';
 import NotFound from '@/views/NotFound.vue';
 import Questionnaire from '@/views/Questionnaire.vue';
+import Response from '@/views/Response.vue';
 import Admin from '@/layout/Admin.vue';
 
 Vue.use(VueRouter);
@@ -25,7 +26,6 @@ const routes: Array<RouteConfig> = [
 
   {
     path: '/dashboard',
-    name: 'Dashboard',
     component: Admin,
     meta: {
       auth: true
@@ -33,23 +33,21 @@ const routes: Array<RouteConfig> = [
     children: [
       {
         path: '',
+        name: 'Dashboard',
         component: Dashboard
       },
       {
-        path: 'add',
+        path: 'form',
         name: 'Add New Form',
         component: AddForm
+      },
+      {
+        path: ':id',
+        name: 'View Response',
+        component: Response
       }
     ]
   },
-  // {
-  //   path: '/dashboard/add',
-  //   name: 'Add New Form',
-  //   component: AddForm,
-  //   meta: {
-  //     auth: true
-  //   }
-  // },
   {
     path: '/admin',
     name: 'Login',
