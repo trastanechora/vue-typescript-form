@@ -244,9 +244,6 @@ export default class AddFormPage extends Vue {
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
   }
-  test(): void {
-    console.warn('TEST!');
-  }
   deleteQuestion(selectedQuestion: Question): void {
     const newQuestionSection = this.formData.questions.map((quesitonSection: QuestionSection) => {
       const newQuestionList = quesitonSection.questionList.reduce(function(result: Question[], question: Question) {

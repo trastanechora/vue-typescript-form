@@ -77,7 +77,7 @@
                 </v-layout>
               </v-form>
               <v-form
-                v-if="currentQuestion.type.value === 'radio'"
+                v-if="currentQuestion.type.value === 'radio' || currentQuestion.type.value === 'checkbox'"
                 ref="radioForm"
                 v-model="valid"
                 lazy-validation
@@ -88,18 +88,27 @@
                     <hr class="my-6" />
                     <v-layout wrap>
                       <v-flex v-for="(option, index) in currentQuestion.options" :key="index" xs12>
-                        <v-text-field
-                          v-model="option.text"
-                          filled
-                          clearable
-                          :label="`Pilihan ${index + 1}`"
-                          type="text"
-                          autocomplete="off"
-                          class="required"
-                          :rules="notEmpty(`Pilihan ${index + 1}`)"
-                          :disabled="isLoading"
-                          :loading="isLoading"
-                        ></v-text-field>
+                        <v-row no-gutters>
+                          <v-col cols="10">
+                            <v-text-field
+                              v-model="option.text"
+                              filled
+                              clearable
+                              :label="`Pilihan ${index + 1}`"
+                              type="text"
+                              autocomplete="off"
+                              class="required"
+                              :rules="notEmpty(`Pilihan ${index + 1}`)"
+                              :disabled="isLoading"
+                              :loading="isLoading"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="2" class="my-2 px-1"
+                            ><v-btn color="primary" text @click="deleteOption(option)">
+                              <v-icon left>mdi-delete</v-icon> Hapus
+                            </v-btn></v-col
+                          >
+                        </v-row>
                       </v-flex>
                       <v-flex xs12>
                         <v-btn
@@ -134,7 +143,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator';
-import { VForm, Question, QuestionType, QuestionTypeObject } from '@/@types';
+import { VForm, Question, QuestionType, QuestionTypeObject, Option } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 @Component
 export default class DialogQuestion extends Vue {
@@ -254,6 +263,15 @@ export default class DialogQuestion extends Vue {
       text: '',
       value: ''
     });
+  }
+  deleteOption(selectedOption: Option): void {
+    const newOptionList = this.currentQuestion.options!.reduce(function(result: Option[], option: Option) {
+      if (selectedOption.text !== option.text) {
+        result.push(option);
+      }
+      return result;
+    }, []);
+    this.currentQuestion.options = newOptionList;
   }
   /* ------------------------------------
   => Mounted (Lifecycle)
