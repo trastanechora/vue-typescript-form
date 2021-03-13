@@ -5,38 +5,90 @@
         <v-form ref="questionnaireForm" v-model="valid" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 class="mb-3">
-              {{ formData }}
-            </v-flex>
-            <v-flex xs12 class="mb-3">
               <v-card class="mx-auto" width="100%">
                 <v-card-text>
-                  <p class="display-1">
+                  <p class="display-1 primary--text">
                     {{ formData.label }}
                   </p>
                   <p>{{ formData.description }}</p>
                 </v-card-text>
               </v-card>
             </v-flex>
-            <v-flex xs12 class="mb-3 question-item required">
-              <v-card class="mx-auto" width="100%">
+            <v-flex xs12 v-for="(questionSection, index) in formData.questions" :key="index" class="mb-4 question-item">
+              <h4 v-if="formData.questions.length > 1" class="primary--text">
+                {{ questionSection.title + (index + 1) }}
+              </h4>
+              <v-card
+                v-for="item in questionSection.questionList"
+                :key="item.key"
+                :class="item.required ? 'required mx-auto mb-2' : 'mx-auto mb-2'"
+                width="100%"
+              >
                 <v-card-text>
-                  <div><small>Jawaban Singkat</small></div>
+                  <div>
+                    <small>{{ item.type.label }}</small>
+                  </div>
                   <p class="headline">
-                    Test Buat Form Baru
+                    {{ item.text }}
                   </p>
-                  <p class="text--disabled mb-2">Ini adalah sebuah uji coba form karya anak bangsa!</p>
-                  <v-layout>
+                  <p class="text--disabled mb-2">{{ item.description }}</p>
+                  <v-layout v-if="item.type.value === 'text_field'">
                     <v-text-field
+                      v-model="answerSkeleton[`${item.key}`]"
                       clearable
                       type="text"
                       autocomplete="off"
-                      :rules="notEmpty('Jawaban ini')"
+                      :rules="item.required ? notEmpty('Jawaban ini') : []"
                       :disabled="isLoading"
                       :loading="isLoading"
                     ></v-text-field>
                   </v-layout>
+                  <v-layout v-if="item.type.value === 'text_area'">
+                    <v-textarea
+                      v-model="answerSkeleton[`${item.key}`]"
+                      clearable
+                      type="text"
+                      autocomplete="off"
+                      auto-grow
+                      rows="4"
+                      row-height="30"
+                      :rules="item.required ? notEmpty('Jawaban ini') : []"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-textarea>
+                  </v-layout>
+                  <v-layout v-if="item.type.value === 'radio'">
+                    <v-radio-group v-model="answerSkeleton[`${item.key}`]">
+                      <v-radio
+                        v-for="(option, optionIndex) in item.options"
+                        :key="optionIndex"
+                        :label="option.text"
+                        :value="option.text"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-layout>
+                  <v-layout v-if="item.type.value === 'checkbox'">
+                    <v-container fluid>
+                      <v-checkbox
+                        v-model="answerSkeleton[`${item.key}`]"
+                        v-for="(option, optionIndex) in item.options"
+                        :key="optionIndex"
+                        :label="option.text"
+                        :value="option.text"
+                      ></v-checkbox>
+                    </v-container>
+                  </v-layout>
                 </v-card-text>
               </v-card>
+            </v-flex>
+            <v-flex xs12 class="mb-3">
+              <v-layout row>
+                <v-flex xs12 class="mb-2 text-end">
+                  <v-btn color="primary" @click="submit" :disabled="isLoading" :loading="isLoading" class="ml-2"
+                    >Kirim</v-btn
+                  >
+                </v-flex>
+              </v-layout>
             </v-flex>
           </v-layout>
         </v-form>
@@ -48,7 +100,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { Form, FormStatus } from '@/@types';
+import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
 @Component
@@ -73,9 +125,15 @@ export default class QuestionnairePage extends Vue {
         title: 'Bagian ',
         questionList: []
       }
-    ],
-    respondents: []
+    ]
   };
+  respondentData: Respondent = {
+    formKey: '',
+    answers: [],
+    submitDate: ''
+  };
+  // answerSkeleton: Answer[] = [];
+  answerSkeleton: any = {};
 
   /* ------------------------------------
   => Setter and Getter
@@ -97,7 +155,9 @@ export default class QuestionnairePage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   async mounted(): Promise<void> {
-    // await this.getFormData();
+    await console.warn(this.$store.state.form.selectedForm.questions);
+    await this.createAnswerSkeleton();
+    console.warn('answerSkeleton', this.answerSkeleton);
   }
 
   /* ------------------------------------
@@ -105,6 +165,47 @@ export default class QuestionnairePage extends Vue {
   ------------------------------------ */
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
+  }
+
+  // createAnswerSkeleton(): void {
+  //   const newAnswerSkeleton: Answer[] = [];
+  //   this.formData.questions.forEach((quesitonSection: QuestionSection) => {
+  //     quesitonSection.questionList.forEach((question: Question) => {
+  //       newAnswerSkeleton.push({
+  //         key: question.key,
+  //         type: question.type,
+  //         value: this.getValueType(question.type.value)
+  //       });
+  //     });
+  //   });
+  //   this.answerSkeleton = newAnswerSkeleton;
+  // }
+
+  createAnswerSkeleton(): void {
+    const newAnswerSkeleton: any = {};
+    this.formData.questions.forEach((quesitonSection: QuestionSection) => {
+      quesitonSection.questionList.forEach((question: Question) => {
+        newAnswerSkeleton[`${question.key}`] = this.getValueType(question.type.value);
+      });
+    });
+    this.answerSkeleton = newAnswerSkeleton;
+  }
+
+  getValueType(type: QuestionType): string | string[] | number | number[] | boolean | boolean[] | Option {
+    switch (type) {
+      case QuestionType.TEXT_FIELD:
+      case QuestionType.TEXT_AREA:
+      case QuestionType.RADIO:
+        return '';
+      case QuestionType.CHECKBOX:
+        return [];
+      default:
+        return '';
+    }
+  }
+
+  submit(): void {
+    console.warn('result:', this.answerSkeleton);
   }
 }
 </script>
@@ -122,5 +223,8 @@ export default class QuestionnairePage extends Vue {
   p {
     margin-bottom: 0;
   }
+}
+.v-input--checkbox {
+  margin-top: 0;
 }
 </style>
