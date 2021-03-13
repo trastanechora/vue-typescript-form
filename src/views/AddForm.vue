@@ -119,7 +119,16 @@
                       <v-icon left>mdi-plus</v-icon>Tambah Bagian
                     </v-btn>
                     <v-spacer />
-                    <v-btn rounded color="primary" @click="saveForm" :disabled="isLoading" :loading="isLoading"
+                    <v-btn
+                      v-if="isEdit"
+                      rounded
+                      color="primary"
+                      @click="editForm"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      >Perbarui Form</v-btn
+                    >
+                    <v-btn v-else rounded color="primary" @click="saveForm" :disabled="isLoading" :loading="isLoading"
                       >Simpan Form</v-btn
                     >
                   </v-row>
@@ -132,7 +141,7 @@
     </v-layout>
     <AddQuestion
       :dialog="dialog"
-      :is-edit="isEdit"
+      :is-edit="isEditQuestion"
       :selected-question="selectedQuestion"
       :question-key="newKey"
       :close-dialog="closeQuestionDialog"
@@ -143,7 +152,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 import draggable from 'vuedraggable';
 
@@ -164,7 +173,7 @@ export default class AddFormPage extends Vue {
   ------------------------------------ */
   newKey: string = '';
   dialog: boolean = false;
-  isEdit: boolean = false;
+  isEditQuestion: boolean = false;
   valid: boolean = true;
   dragState: boolean = false;
   formData: Form = {
@@ -183,7 +192,8 @@ export default class AddFormPage extends Vue {
         title: 'Bagian ',
         questionList: []
       }
-    ]
+    ],
+    respondents: []
   };
   selectedQuestion: Question = {
     key: '',
@@ -203,6 +213,10 @@ export default class AddFormPage extends Vue {
     return this.$store.state.form.isLoading;
   }
 
+  get isEdit(): boolean {
+    return this.$store.state.form.isEdit;
+  }
+
   get formList(): Form[] {
     return this.$store.state.form.formList;
   }
@@ -211,7 +225,9 @@ export default class AddFormPage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   async mounted(): Promise<void> {
-    await this.getFormData();
+    if (this.isEdit) {
+      await this.getFormData();
+    }
   }
 
   /* ------------------------------------
@@ -225,7 +241,7 @@ export default class AddFormPage extends Vue {
   }
   openAddQuestionDialog(): void {
     this.newKey = uuid.v1();
-    this.isEdit = false;
+    this.isEditQuestion = false;
     this.dialog = true;
   }
   addQuestion(item: Question): void {
@@ -243,12 +259,32 @@ export default class AddFormPage extends Vue {
     const formId = uuid.v1();
     data.uuid = formId;
     data.createdAt = newDate.toISOString();
+    data.questionCount = this.getQuestionCount();
     data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
-    this.$store.dispatch('form/updateSelectedForm', data);
-    this.$store.dispatch('form/saveForm', data);
+    this.$store.dispatch('form/saveForm', data).then(() => {
+      this.$router.push('/dashboard');
+    });
+  }
+  editForm(): void {
+    const data = { ...this.formData };
+    const newDate = new Date();
+    data.updatedAt = newDate.toISOString();
+    data.questionCount = this.getQuestionCount();
+    this.$store.dispatch('form/editForm', data).then(() => {
+      this.$router.push('/dashboard');
+    });
   }
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
+  }
+  getQuestionCount(): number {
+    let newQuestionCount: number = 0;
+    this.formData.questions.forEach((quesitonSection: QuestionSection) => {
+      quesitonSection.questionList.forEach(() => {
+        newQuestionCount++;
+      });
+    });
+    return newQuestionCount;
   }
   deleteQuestion(selectedQuestion: Question): void {
     const newQuestionSection = this.formData.questions.map((quesitonSection: QuestionSection) => {
@@ -267,7 +303,7 @@ export default class AddFormPage extends Vue {
   }
   openEditQuestionDialog(selectedQuestion: Question): void {
     this.selectedQuestion = selectedQuestion;
-    this.isEdit = true;
+    this.isEditQuestion = true;
     this.dialog = true;
   }
   editQuestion(editedQuestion: Question): void {
@@ -286,14 +322,6 @@ export default class AddFormPage extends Vue {
       };
     });
     this.formData.questions = newQuestionSection;
-  }
-
-  /* ------------------------------------
-  => Watcher
-  ------------------------------------ */
-  @Watch('formData.questions')
-  async handleOnChange(newValue: Question | Question[] | Question[][]): Promise<void> {
-    console.warn(newValue);
   }
 }
 </script>
