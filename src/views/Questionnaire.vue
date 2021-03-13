@@ -113,8 +113,8 @@ export default class QuestionnairePage extends Vue {
     uuid: '',
     label: '',
     description: '',
-    createdDate: '',
-    updatedDate: '',
+    createdAt: '',
+    updatedAt: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -128,6 +128,7 @@ export default class QuestionnairePage extends Vue {
     ]
   };
   respondentData: Respondent = {
+    uuid: '',
     formKey: '',
     answers: [],
     submitDate: ''
@@ -166,20 +167,6 @@ export default class QuestionnairePage extends Vue {
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
   }
-
-  // createAnswerSkeleton(): void {
-  //   const newAnswerSkeleton: Answer[] = [];
-  //   this.formData.questions.forEach((quesitonSection: QuestionSection) => {
-  //     quesitonSection.questionList.forEach((question: Question) => {
-  //       newAnswerSkeleton.push({
-  //         key: question.key,
-  //         type: question.type,
-  //         value: this.getValueType(question.type.value)
-  //       });
-  //     });
-  //   });
-  //   this.answerSkeleton = newAnswerSkeleton;
-  // }
 
   createAnswerSkeleton(): void {
     const newAnswerSkeleton: any = {};

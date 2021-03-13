@@ -4,8 +4,25 @@
       <v-btn rounded color="primary" outlined to="/dashboard/add"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
     </v-flex>
     <v-flex xs12>
-      <v-data-table :headers="formHeaders" :items="formList" :items-per-page="10" class="elevation-1 full-width">
-        <template v-slot:[`item.userAction`]="{ item }">
+      <v-data-table
+        :headers="formHeaders"
+        :items="formList"
+        :items-per-page="10"
+        :loading="isLoading"
+        class="elevation-1 full-width"
+      >
+        <template v-slot:[`item.status`]="{ item }">
+          <v-chip class="ma-2" outlined small>
+            <v-icon left x-small>
+              mdi-circle
+            </v-icon>
+            {{ item.status }}
+          </v-chip>
+        </template>
+        <template v-slot:[`item.createdAt`]="{ item }">
+          {{ formatDate(item.createdAt) }}
+        </template>
+        <template v-slot:[`item.link`]="{ item }">
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -14,8 +31,18 @@
                 :disabled="isLoading"
                 v-bind="attrs"
                 v-on="on"
-                @click="showChartEditDialog(item)"
+                @click="copyToClipboard(item.link)"
               >
+                <v-icon>mdi-share</v-icon>
+              </v-btn>
+            </template>
+            <span>Salin Tautan</span>
+          </v-tooltip>
+        </template>
+        <template v-slot:[`item.userAction`]="{ item }">
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="test(item)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </template>
@@ -30,6 +57,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { TableHeader, Form } from '@/@types';
+import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 
 @Component({
@@ -40,17 +68,18 @@ export default class DashboardPage extends Vue {
   => Local State Declaration
   ------------------------------------ */
   formHeaders: TableHeader[] = [
-    { text: 'Label', value: 'label' },
-    { text: 'Jumlah Pertanyaan', value: 'questionCount' },
-    { text: 'Jumlah Responden', value: 'respondentCount' },
-    { text: 'Status', value: 'status' },
-    { text: 'Batas Waktu', value: 'dueDate' },
-    { text: 'Tanggal Dibuat', value: 'createdDate' },
-    { text: 'Diedit Terakhir', value: 'updatedDate' },
-    { text: 'Link', value: 'link' },
+    { text: 'Label', value: 'label', width: 300 },
+    { text: 'Jumlah Pertanyaan', value: 'questionCount', align: 'center' },
+    { text: 'Jumlah Responden', value: 'respondentCount', align: 'center' },
+    { text: 'Status', value: 'status', align: 'center' },
+    { text: 'Batas Waktu', value: 'dueDate', width: 150, align: 'center' },
+    { text: 'Tanggal Dibuat', value: 'createdAt', width: 150, align: 'center' },
+    { text: 'Diedit Terakhir', value: 'updatedAt', width: 150, align: 'center' },
+    { text: 'Link', value: 'link', align: 'center', sortable: false },
     {
       text: 'Tindakan',
       value: 'userAction',
+      align: 'center',
       sortable: false
     }
   ];
@@ -71,14 +100,32 @@ export default class DashboardPage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   mounted(): void {
-    // await this.getUserList();
+    this.$store.dispatch('form/getForms');
   }
 
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  getUserList(): void {
-    this.$store.dispatch('user/getUsers');
+  formatDate(dateIsoString: string): string {
+    const parsedDate = new Date(dateIsoString);
+    return dateFormatter(parsedDate);
+  }
+  copyToClipboard(text: string): void {
+    const dummy = document.createElement('textarea');
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+    this.$store.dispatch('ui/showSnackbar', {
+      open: true,
+      message: 'Link telah berhasil disalin!',
+      color: 'dark',
+      timeout: 4000
+    });
+  }
+  test(item: any): void {
+    console.warn(item);
   }
 }
 </script>

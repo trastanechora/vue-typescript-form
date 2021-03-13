@@ -171,8 +171,8 @@ export default class AddFormPage extends Vue {
     uuid: '',
     label: '',
     description: '',
-    createdDate: '',
-    updatedDate: '',
+    createdAt: '',
+    updatedAt: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -238,8 +238,14 @@ export default class AddFormPage extends Vue {
     });
   }
   saveForm(): void {
-    this.$store.dispatch('form/updateSelectedForm', this.formData);
-    this.$store.dispatch('form/saveForm', this.formData);
+    const data = { ...this.formData };
+    const newDate = new Date();
+    const formId = uuid.v1();
+    data.uuid = formId;
+    data.createdAt = newDate.toISOString();
+    data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
+    this.$store.dispatch('form/updateSelectedForm', data);
+    this.$store.dispatch('form/saveForm', data);
   }
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
