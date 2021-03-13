@@ -59,10 +59,10 @@ const state = (): FormState => ({
         title: 'Bagian ',
         questionList: []
       }
-    ],
-    respondents: []
+    ]
   },
-  formList: []
+  formList: [],
+  respondentList: []
 });
 
 /* ------------------------------------------------

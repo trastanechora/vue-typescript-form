@@ -4,7 +4,7 @@
       <v-btn rounded color="primary" outlined to="/dashboard/add"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
     </v-flex>
     <v-flex xs12>
-      <v-data-table :headers="formHeaders" :items="[]" :items-per-page="10" class="elevation-1 full-width">
+      <v-data-table :headers="formHeaders" :items="formList" :items-per-page="10" class="elevation-1 full-width">
         <template v-slot:[`item.userAction`]="{ item }">
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
