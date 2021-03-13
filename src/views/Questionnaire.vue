@@ -99,6 +99,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { uuid } from 'vue-uuid';
 
 import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
 import { notEmptyRules } from '@/@utils';
@@ -125,12 +126,12 @@ export default class QuestionnairePage extends Vue {
         title: 'Bagian ',
         questionList: []
       }
-    ]
+    ],
+    respondents: []
   };
   respondentData: Respondent = {
     uuid: '',
-    formKey: '',
-    answers: [],
+    answers: {},
     submitDate: ''
   };
   // answerSkeleton: Answer[] = [];
@@ -148,7 +149,7 @@ export default class QuestionnairePage extends Vue {
   => Createe (Lifecycle)
   ------------------------------------ */
   async created(): Promise<void> {
-    await console.warn(this.$route.params.id);
+    await this.$store.dispatch('form/getFormById', this.$route.params.id);
     this.formData = this.$store.state.form.selectedForm;
   }
 
@@ -156,9 +157,7 @@ export default class QuestionnairePage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   async mounted(): Promise<void> {
-    await console.warn(this.$store.state.form.selectedForm.questions);
     await this.createAnswerSkeleton();
-    console.warn('answerSkeleton', this.answerSkeleton);
   }
 
   /* ------------------------------------
@@ -192,7 +191,14 @@ export default class QuestionnairePage extends Vue {
   }
 
   submit(): void {
-    console.warn('result:', this.answerSkeleton);
+    this.respondentData.uuid = uuid.v1();
+    const newDate = new Date();
+    this.respondentData.submitDate = newDate.toISOString();
+    this.respondentData.answers = this.answerSkeleton;
+    console.warn('result respondent data:', this.respondentData);
+    this.$store.dispatch('form/submitResponse', this.respondentData).then(() => {
+      this.$router.push('/thank-you');
+    });
   }
 }
 </script>
