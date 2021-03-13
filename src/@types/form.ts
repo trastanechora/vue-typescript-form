@@ -24,7 +24,7 @@ export enum FormStatus {
 
 export interface Option {
   text: string;
-  value: string | number;
+  value: string | number | boolean;
   otherValue?: string;
   icon?: string;
 }
@@ -48,14 +48,10 @@ export interface QuestionSection {
   questionList: Question[];
 }
 
-export interface Answer {
-  key: number;
-  type: QuestionTypeObject;
-  value: string | number | Option;
-}
-
 export interface Respondent {
-  answers: Answer[];
+  formKey: string;
+  answers: any;
+  submitDate: string;
 }
 
 export interface Form {
@@ -70,7 +66,6 @@ export interface Form {
   status: FormStatus;
   link: string;
   questions: QuestionSection[];
-  respondents: Respondent[];
 }
 
 /* ------------------------------------
@@ -81,4 +76,5 @@ export interface FormState {
   selectedForm: Form;
   questionTypeList: QuestionTypeObject[];
   formList: Form[];
+  respondentList: Respondent[];
 }
