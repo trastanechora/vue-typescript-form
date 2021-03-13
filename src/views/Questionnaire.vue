@@ -1,6 +1,47 @@
 <template>
-  <v-layout>
-    <v-layout wrap>test</v-layout>
+  <v-layout class="my-6">
+    <v-layout wrap class="full-width">
+      <v-flex xs10 class="mb-4 mx-auto">
+        <v-form ref="questionnaireForm" v-model="valid" lazy-validation>
+          <v-layout wrap>
+            <v-flex xs12 class="mb-3">
+              {{ formData }}
+            </v-flex>
+            <v-flex xs12 class="mb-3">
+              <v-card class="mx-auto" width="100%">
+                <v-card-text>
+                  <p class="display-1">
+                    {{ formData.label }}
+                  </p>
+                  <p>{{ formData.description }}</p>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex xs12 class="mb-3 question-item required">
+              <v-card class="mx-auto" width="100%">
+                <v-card-text>
+                  <div><small>Jawaban Singkat</small></div>
+                  <p class="headline">
+                    Test Buat Form Baru
+                  </p>
+                  <p class="text--disabled mb-2">Ini adalah sebuah uji coba form karya anak bangsa!</p>
+                  <v-layout>
+                    <v-text-field
+                      clearable
+                      type="text"
+                      autocomplete="off"
+                      :rules="notEmpty('Jawaban ini')"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-text-field>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-form>
+      </v-flex>
+    </v-layout>
   </v-layout>
 </template>
 
@@ -49,6 +90,7 @@ export default class QuestionnairePage extends Vue {
   ------------------------------------ */
   async created(): Promise<void> {
     await console.warn(this.$route.params.id);
+    this.formData = this.$store.state.form.selectedForm;
   }
 
   /* ------------------------------------
@@ -72,16 +114,13 @@ export default class QuestionnairePage extends Vue {
   text-transform: none;
 }
 // Put red colored asterisk on required class
-.required >>> label::after {
+.required >>> .headline::after {
   content: ' *';
   color: red;
 }
-.section-title {
-  justify-content: left;
-}
-.form-actions {
-  position: sticky;
-  bottom: 40px;
-  z-index: 10;
+.question-item {
+  p {
+    margin-bottom: 0;
+  }
 }
 </style>

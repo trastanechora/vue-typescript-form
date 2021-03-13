@@ -5,10 +5,34 @@
         <v-toolbar color="primary" dark>Tambahkan Pertanyaan</v-toolbar>
         <v-card-text>
           <div class="mt-4">
-            <v-form ref="addQuestionForm" v-model="valid" lazy-validation class="pa-0">
-              <v-card-text>
+            <v-card-text>
+              <v-form ref="addQuestionForm" v-model="valid" lazy-validation class="pa-0">
                 <v-layout row>
-                  <v-flex lg12 sm12 xs12>
+                  <v-flex xs12 class="mb-2 text-end">
+                    <v-btn
+                      v-if="!descriptionProvided"
+                      text
+                      small
+                      color="secondary"
+                      @click="addDescription"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2"
+                      ><v-icon small>mdi-plus</v-icon>Beri Deskripsi</v-btn
+                    >
+                    <v-btn
+                      v-else
+                      text
+                      small
+                      color="secondary"
+                      @click="removeDescription"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2"
+                      ><v-icon small>mdi-minus</v-icon>Hapus Deskripsi</v-btn
+                    >
+                  </v-flex>
+                  <v-flex xs12>
                     <v-select
                       v-model="currentQuestion.type"
                       outlined
@@ -23,42 +47,77 @@
                       return-object
                       :loading="isLoading"
                     ></v-select>
+                    <v-flex xs12>
+                      <v-text-field
+                        v-model="currentQuestion.text"
+                        outlined
+                        clearable
+                        label="Pertanyaan"
+                        type="text"
+                        autocomplete="off"
+                        class="required"
+                        :rules="notEmpty('Pertanyaan')"
+                        :disabled="isLoading"
+                        :loading="isLoading"
+                      ></v-text-field>
+                    </v-flex>
+                    <v-flex v-if="descriptionProvided" xs12>
+                      <v-text-field
+                        v-model="currentQuestion.description"
+                        filled
+                        clearable
+                        label="Deskripsi"
+                        type="text"
+                        autocomplete="off"
+                        :disabled="isLoading"
+                        :loading="isLoading"
+                      ></v-text-field>
+                    </v-flex>
                   </v-flex>
-                  <v-flex lg12 sm12 xs12>
-                    <v-text-field
-                      v-model="currentQuestion.text"
-                      outlined
-                      clearable
-                      label="Pertanyaan"
-                      type="text"
-                      autocomplete="off"
-                      class="required"
-                      :rules="notEmpty('Pertanyaan')"
-                      :disabled="isLoading"
-                      :loading="isLoading"
-                    ></v-text-field>
-                  </v-flex>
-                  <v-flex lg12 sm12 xs12>
-                    <v-layout v-if="currentQuestion.type === 'select'">
-                      <v-flex lg12 sm12 xs12>
+                </v-layout>
+              </v-form>
+              <v-form
+                v-if="currentQuestion.type.value === 'radio'"
+                ref="radioForm"
+                v-model="valid"
+                lazy-validation
+                class="pa-0"
+              >
+                <v-layout row>
+                  <v-flex xs12>
+                    <hr class="my-6" />
+                    <v-layout wrap>
+                      <v-flex v-for="(option, index) in currentQuestion.options" :key="index" xs12>
                         <v-text-field
-                          v-model="currentQuestion.text"
-                          outlined
+                          v-model="option.text"
+                          filled
                           clearable
-                          label="Pertanyaan"
+                          :label="`Pilihan ${index + 1}`"
                           type="text"
                           autocomplete="off"
                           class="required"
-                          :rules="notEmpty('Pertanyaan')"
+                          :rules="notEmpty(`Pilihan ${index + 1}`)"
                           :disabled="isLoading"
                           :loading="isLoading"
                         ></v-text-field>
                       </v-flex>
+                      <v-flex xs12>
+                        <v-btn
+                          text
+                          small
+                          color="secondary"
+                          @click="addOption"
+                          :disabled="isLoading"
+                          :loading="isLoading"
+                          class="ml-2"
+                          ><v-icon small>mdi-plus</v-icon>Tambah Pilihan</v-btn
+                        >
+                      </v-flex>
                     </v-layout>
                   </v-flex>
                 </v-layout>
-              </v-card-text>
-            </v-form>
+              </v-form>
+            </v-card-text>
           </div>
         </v-card-text>
         <v-card-actions class="justify-end py-4 px-6">
@@ -112,6 +171,7 @@ export default class DialogQuestion extends Vue {
   => Local State Declaration
   ------------------------------------ */
   valid: boolean = true;
+  descriptionProvided: boolean = false;
   currentQuestion: Question = {
     key: '',
     type: {
@@ -119,7 +179,14 @@ export default class DialogQuestion extends Vue {
       value: QuestionType.EMPTY
     },
     required: false,
-    text: ''
+    text: '',
+    description: '',
+    options: [
+      {
+        text: '',
+        value: ''
+      }
+    ]
   };
 
   /* ------------------------------------
@@ -173,8 +240,20 @@ export default class DialogQuestion extends Vue {
       addQuestionForm.reset();
     }
   }
+  addDescription() {
+    this.descriptionProvided = true;
+  }
+  removeDescription() {
+    this.descriptionProvided = false;
+  }
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
+  }
+  addOption(): void {
+    this.currentQuestion.options!.push({
+      text: '',
+      value: ''
+    });
   }
   /* ------------------------------------
   => Mounted (Lifecycle)
@@ -190,12 +269,15 @@ export default class DialogQuestion extends Vue {
   async handleOnLoad(newValue: boolean): Promise<void> {
     if (newValue) {
       if (this.isEdit) {
-        console.warn('test #1', { ...this.selectedQuestion });
         this.currentQuestion = { ...this.selectedQuestion };
-        console.warn('test #2', this.currentQuestion);
       } else {
         this.currentQuestion.required = false;
       }
+    } else {
+      this.currentQuestion.type = {
+        label: '',
+        value: QuestionType.EMPTY
+      };
     }
   }
 }

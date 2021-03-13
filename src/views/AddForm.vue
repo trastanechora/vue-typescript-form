@@ -67,16 +67,6 @@
                           <v-row v-if="!open" no-gutters style="width: 100%">
                             <v-col cols="6">{{ item.type.label }}</v-col>
                             <v-col cols="6">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
-                            <!-- <v-col cols="1"
-                              ><v-btn icon small @click="test">
-                                <v-icon>mdi-pencil</v-icon>
-                              </v-btn></v-col
-                            >
-                            <v-col cols="1"
-                              ><v-btn icon small @click="test">
-                                <v-icon>mdi-delete</v-icon>
-                              </v-btn></v-col
-                            > -->
                           </v-row>
                         </v-fade-transition>
                       </v-col>
