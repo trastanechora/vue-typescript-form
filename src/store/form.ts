@@ -1,4 +1,4 @@
-import Store, { FormState, Form, FormStatus, QuestionType } from '@/@types';
+import Store, { FormState, Form, FormStatus, QuestionType, Respondent } from '@/@types';
 import { FORM_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
@@ -6,6 +6,7 @@ import { FORM_ENDPOINT } from '@/@api';
   ----------------------------------------------- */
 const state = (): FormState => ({
   isLoading: false,
+  isEdit: false,
   questionTypeList: [
     {
       label: 'Jawaban Singkat',
@@ -60,7 +61,8 @@ const state = (): FormState => ({
         title: 'Bagian ',
         questionList: []
       }
-    ]
+    ],
+    respondents: []
   },
   formList: [],
   respondentList: []
@@ -72,6 +74,9 @@ const state = (): FormState => ({
 const mutations = {
   setLoading(state: FormState, param: boolean): void {
     state.isLoading = param;
+  },
+  setEditState(state: FormState, param: boolean): void {
+    state.isEdit = param;
   },
   setSelectedForm(state: FormState, param: Form): void {
     state.selectedForm = param;
@@ -88,6 +93,9 @@ const mutations = {
   => Actions
   ----------------------------------------------- */
 const actions: any = {
+  async updateEditState(store: Store<FormState> | any, param: boolean): Promise<void> {
+    await store.commit('setEditState', param);
+  },
   async updateSelectedForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
     await store.commit('setLoading', true);
     return new Promise(resolve => {
@@ -101,6 +109,13 @@ const actions: any = {
     const forms = await FORM_ENDPOINT.getForms();
     console.warn('new list form nih!', forms);
     await store.commit('setFormList', forms);
+    await store.commit('setLoading', false);
+  },
+  async getFormById(store: Store<FormState> | any, param: string): Promise<void> {
+    await store.commit('setLoading', true);
+    const form = await FORM_ENDPOINT.getFormById(param);
+    console.warn('result!', form);
+    store.commit('setSelectedForm', form);
     await store.commit('setLoading', false);
   },
   async saveForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
@@ -127,6 +142,73 @@ const actions: any = {
           {
             open: true,
             message: `Form gagal disimpan: ${err}`,
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        throw err;
+      });
+  },
+  async editForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
+    await store.commit('setLoading', true);
+    return FORM_ENDPOINT.editForm(params)
+      .then((res: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Perubahan form berhasil disimpan!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: `Form gagal disimpan: ${err}`,
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        throw err;
+      });
+  },
+  async submitResponse(store: Store<FormState> | any, params: Respondent): Promise<boolean> {
+    await store.commit('setLoading', true);
+    const currentData = store.state.selectedForm;
+    currentData.respondents.push(params);
+    currentData.respondentCount = currentData.respondents.length;
+    return FORM_ENDPOINT.editForm(currentData)
+      .then((res: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Tanggapan Anda telah berhasil disimpan!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: `Tanggapan gagal disimpan: ${err}`,
             color: 'red',
             timeout: 4000
           },

@@ -50,7 +50,6 @@ export interface QuestionSection {
 
 export interface Respondent {
   uuid: string;
-  formKey: string;
   answers: any;
   submitDate: string;
 }
@@ -66,7 +65,8 @@ export interface Form {
   status: FormStatus;
   link: string;
   questions: QuestionSection[];
-  respondentCount?: number;
+  respondentCount: number;
+  respondents: Respondent[];
 }
 
 /* ------------------------------------
@@ -74,6 +74,7 @@ export interface Form {
 ------------------------------------ */
 export interface FormState {
   isLoading: boolean;
+  isEdit: boolean;
   selectedForm: Form;
   questionTypeList: QuestionTypeObject[];
   formList: Form[];
