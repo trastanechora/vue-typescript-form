@@ -1,7 +1,7 @@
 <template>
   <v-layout wrap class="admin-view full-width">
     <v-flex xs12 class="mb-4">
-      <v-btn rounded color="primary" outlined to="/dashboard/add"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
+      <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
     </v-flex>
     <v-flex xs12>
       <v-data-table
@@ -11,6 +11,14 @@
         :loading="isLoading"
         class="elevation-1 full-width"
       >
+        <template v-slot:[`item.label`]="{ item }">
+          <v-tooltip right>
+            <template v-slot:activator="{ on }">
+              <v-btn text small color="primary" v-on="on" @click="toResponseList(item.uuid)">{{ item.label }}</v-btn>
+            </template>
+            <span>Lihat Responden</span>
+          </v-tooltip>
+        </template>
         <template v-slot:[`item.status`]="{ item }">
           <v-chip class="ma-2" outlined small>
             <v-icon left x-small>
@@ -21,6 +29,9 @@
         </template>
         <template v-slot:[`item.createdAt`]="{ item }">
           {{ formatDate(item.createdAt) }}
+        </template>
+        <template v-slot:[`item.updatedAt`]="{ item }">
+          {{ formatDate(item.updatedAt) }}
         </template>
         <template v-slot:[`item.link`]="{ item }">
           <v-tooltip right>
@@ -42,7 +53,7 @@
         <template v-slot:[`item.userAction`]="{ item }">
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="test(item)">
+              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="editForm(item)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </template>
@@ -124,8 +135,23 @@ export default class DashboardPage extends Vue {
       timeout: 4000
     });
   }
-  test(item: any): void {
-    console.warn(item);
+  toResponseList(uuid: string): void {
+    this.$router.push(`/dashboard/${uuid}`);
+  }
+  async addForm(): Promise<void> {
+    await this.$store.dispatch('form/updateEditState', false);
+    this.$router.push('/dashboard/form');
+  }
+  async editForm(item: Form): Promise<void> {
+    await this.$store.dispatch('form/updateEditState', true);
+    await this.$store.dispatch('form/updateSelectedForm', item);
+    this.$router.push('/dashboard/form');
   }
 }
 </script>
+<style lang="stylus" scoped>
+.v-btn {
+  letter-spacing: normal;
+  text-transform: none;
+}
+</style>
