@@ -102,7 +102,7 @@
                       rounded
                       color="primary"
                       outlined
-                      @click="addNewQuestion"
+                      @click="openAddQuestionDialog"
                       :disabled="isLoading"
                       :loading="isLoading"
                     >
@@ -183,8 +183,7 @@ export default class AddFormPage extends Vue {
         title: 'Bagian ',
         questionList: []
       }
-    ],
-    respondents: []
+    ]
   };
   selectedQuestion: Question = {
     key: '',
@@ -224,7 +223,7 @@ export default class AddFormPage extends Vue {
   closeQuestionDialog(): void {
     this.dialog = false;
   }
-  addNewQuestion(): void {
+  openAddQuestionDialog(): void {
     this.newKey = uuid.v1();
     this.isEdit = false;
     this.dialog = true;
@@ -240,6 +239,7 @@ export default class AddFormPage extends Vue {
   }
   saveForm(): void {
     this.$store.dispatch('form/updateSelectedForm', this.formData);
+    this.$store.dispatch('form/saveForm', this.formData);
   }
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
@@ -279,7 +279,6 @@ export default class AddFormPage extends Vue {
         questionList: newQuestionList
       };
     });
-    console.warn('newQuestionSection', newQuestionSection);
     this.formData.questions = newQuestionSection;
   }
 
