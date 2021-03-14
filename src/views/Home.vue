@@ -1,51 +1,58 @@
 <template>
-  <v-layout>
-    <v-card class="mx-auto mt-10 py-5" max-width="600">
-      <v-card-title class="primary--text px-7">
-        Masukkan Kod Form
-      </v-card-title>
-      <v-card-text class="text--primary login-box-content px-7">
-        <v-form ref="searchForm" v-model="valid" lazy-validation class="pa-0">
-          <v-card-text>
-            <v-layout row>
-              <v-flex lg12 sm12 xs12>
-                <v-text-field
-                  v-model="searchString"
-                  outlined
-                  clearable
-                  label="Kod From"
-                  type="text"
-                  autocomplete="off"
-                  class="required"
-                  :rules="notEmpty('Kod From')"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                ></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </v-form>
-      </v-card-text>
-
-      <v-card-actions class="px-7">
-        <v-btn
-          color="primary"
-          class="full-width transform-none"
-          :disabled="isLoading || !valid"
-          :loading="isLoading"
-          @click="search"
-        >
-          Cari
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+  <v-layout justify-center row wrap>
+    <div class="banner"></div>
+    <v-flex xs8>
+      <v-card class="main-box py-10">
+        <v-card-text>
+          <v-layout row>
+            <v-flex xs10 class="mx-auto mb-5">
+              <h1 class="text-center primary--text">Selamat Datang</h1>
+            </v-flex>
+            <v-flex xs10 class="mx-auto">
+              <v-text-field
+                v-model="searchString"
+                label="Kod Form"
+                hint="Masukkan kod form Anda di sini"
+                placeholder="048df450..."
+                outlined
+                clearable
+                type="text"
+                autocomplete="off"
+                class="required full-width"
+                :disabled="isLoading"
+                :loading="isLoading"
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-layout row class="mt-5">
+            <v-flex xs10 class="mx-auto">
+              <v-btn
+                color="primary"
+                class="full-width transform-none"
+                :disabled="isLoading || !valid"
+                :loading="isLoading"
+                @click="search"
+              >
+                Cari Form
+              </v-btn>
+            </v-flex>
+            <v-flex xs10 class="my-2 mx-auto text-end">
+              <v-btn text small color="secondary" :disabled="isLoading" :loading="isLoading" class="ml-2" to="/admin"
+                ><v-icon small>mdi-plus</v-icon>Buat Form</v-btn
+              >
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { notEmptyRules } from '@/@utils';
-import { VForm } from '@/@types';
 
 @Component
 export default class HomePage extends Vue {
@@ -70,8 +77,7 @@ export default class HomePage extends Vue {
     return notEmptyRules(identifier);
   }
   search(): void {
-    const form = this.$refs.searchForm as VForm;
-    if (form.validate()) {
+    if (this.searchString) {
       this.$router.push(`/questionnaire/${this.searchString}`);
     }
   }
@@ -86,5 +92,20 @@ export default class HomePage extends Vue {
 .required >>> label::after {
   content: ' *';
   color: red;
+}
+.main-box {
+  margin: -700px 0 0 0;
+  padding: 10px;
+  opacity: 0.62;
+  .v-card__text {
+    padding-bottom: 0;
+  }
+}
+.banner {
+  background-image: url(https://picsum.photos/1920/1080?random)
+  background-size: cover;
+  width: 100%
+  height: 100vh;
+  opacity: 0.6;
 }
 </style>
