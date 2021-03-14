@@ -2,9 +2,12 @@
   <v-layout column>
     <!-- LOGIN FORM -->
     <v-card class="mx-auto mt-10 py-5" max-width="600">
-      <v-card-title class="primary--text px-7">
-        Masuk sebagai Admin
+      <v-card-title class="primary--text center px-7 display-1">
+        Masuk
       </v-card-title>
+      <v-card-subtitle class="primary--text px-7">
+        Anda perlu masuk untuk buat form
+      </v-card-subtitle>
       <v-card-text class="text--primary login-box-content px-7">
         <v-form ref="loginForm" v-model="validLogin" lazy-validation class="pa-0">
           <v-card-text>
@@ -43,15 +46,24 @@
       </v-card-text>
 
       <v-card-actions class="px-7">
-        <v-btn
-          color="primary"
-          class="full-width transform-none"
-          :disabled="isLoading || !validLogin"
-          :loading="isLoading"
-          @click="doLogin"
-        >
-          Masuk
-        </v-btn>
+        <v-layout row class="mt-5">
+          <v-flex xs11 class="mx-auto">
+            <v-btn
+              color="primary"
+              class="full-width"
+              :disabled="isLoading || !validLogin"
+              :loading="isLoading"
+              @click="doLogin"
+            >
+              Masuk
+            </v-btn>
+          </v-flex>
+          <v-flex xs12 class="my-5 mx-auto text-start">
+            <v-btn text small color="secondary" :disabled="isLoading" :loading="isLoading" class="ml-2" to="/"
+              ><v-icon small>mdi-chevron-left</v-icon>Kembali ke Halaman Utama</v-btn
+            >
+          </v-flex>
+        </v-layout>
       </v-card-actions>
     </v-card>
   </v-layout>
@@ -109,6 +121,10 @@ export default class LoginPage extends Vue {
 .full-width {
   width: 100%;
 }
+.v-btn {
+  letter-spacing: normal;
+  text-transform: none;
+}
 .v-image >>> .v-image__image--cover {
   background-size: contain;
 }
@@ -117,9 +133,5 @@ export default class LoginPage extends Vue {
   >>> .v-card__text {
     padding-bottom: 0;
   }
-}
-.transform-none {
-  text-transform: none;
-  letter-spacing: normal;
 }
 </style>
