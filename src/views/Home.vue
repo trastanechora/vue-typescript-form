@@ -96,7 +96,7 @@ export default class HomePage extends Vue {
 .main-box {
   margin: -700px 0 0 0;
   padding: 10px;
-  opacity: 0.62;
+  opacity: 0.82;
   .v-card__text {
     padding-bottom: 0;
   }
