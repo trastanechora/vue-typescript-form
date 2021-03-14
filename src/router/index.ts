@@ -8,6 +8,8 @@ import Forbidden from '@/views/Forbidden.vue';
 import NotFound from '@/views/NotFound.vue';
 import Questionnaire from '@/views/Questionnaire.vue';
 import Response from '@/views/Response.vue';
+import ThankYou from '@/views/ThankYou.vue';
+import Default from '@/layout/Default.vue';
 import Admin from '@/layout/Admin.vue';
 
 Vue.use(VueRouter);
@@ -15,8 +17,29 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    component: Default,
+    children: [
+      {
+        path: '',
+        name: 'Home',
+        component: Home
+      },
+      {
+        path: '/admin',
+        name: 'Login',
+        component: Login
+      },
+      {
+        path: '/thank-you',
+        name: 'Thank You',
+        component: ThankYou
+      },
+      {
+        path: '/forbidden',
+        name: 'forbidden',
+        component: Forbidden
+      }
+    ]
   },
   {
     path: '/questionnaire/:id',
@@ -47,16 +70,6 @@ const routes: Array<RouteConfig> = [
         component: Response
       }
     ]
-  },
-  {
-    path: '/admin',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/forbidden',
-    name: 'forbidden',
-    component: Forbidden
   },
   {
     path: '*',
