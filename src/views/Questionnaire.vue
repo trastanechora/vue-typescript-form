@@ -151,12 +151,6 @@ export default class QuestionnairePage extends Vue {
   async created(): Promise<void> {
     await this.$store.dispatch('form/getFormById', this.$route.params.id);
     this.formData = this.$store.state.form.selectedForm;
-  }
-
-  /* ------------------------------------
-  => Mounted (Lifecycle)
-  ------------------------------------ */
-  async mounted(): Promise<void> {
     await this.createAnswerSkeleton();
   }
 

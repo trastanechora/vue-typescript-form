@@ -228,6 +228,9 @@ export default class DialogQuestion extends Vue {
         text: this.currentQuestion.text,
         options: this.currentQuestion.options
       };
+      if (this.descriptionProvided) {
+        data.description = this.currentQuestion.description;
+      }
       this.add(data);
       this.closeDialog();
       addQuestionForm.reset();
@@ -243,6 +246,9 @@ export default class DialogQuestion extends Vue {
         text: this.currentQuestion.text,
         options: this.currentQuestion.options
       };
+      if (this.descriptionProvided) {
+        data.description = this.currentQuestion.description;
+      }
       this.edit(data);
       this.closeDialog();
       addQuestionForm.reset();

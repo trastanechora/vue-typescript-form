@@ -27,11 +27,14 @@
             {{ item.status }}
           </v-chip>
         </template>
+        <template v-slot:[`item.dueDate`]="{ item }">
+          {{ item.dueDate ? formatDate(item.dueDate) : '-' }}
+        </template>
         <template v-slot:[`item.createdAt`]="{ item }">
           {{ formatDate(item.createdAt) }}
         </template>
         <template v-slot:[`item.updatedAt`]="{ item }">
-          {{ formatDate(item.updatedAt) }}
+          {{ item.updatedAt ? formatDate(item.updatedAt) : '-' }}
         </template>
         <template v-slot:[`item.link`]="{ item }">
           <v-tooltip right>

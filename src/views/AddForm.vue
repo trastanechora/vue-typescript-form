@@ -74,7 +74,23 @@
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
                     <v-row
-                      ><v-col cols="6">{{ item.description ? item.description : '' }}</v-col>
+                      ><v-col cols="6" class="text--secondary px-6">
+                        <v-row>{{ item.description ? item.description : '' }}</v-row>
+                        <v-row v-if="item.type.value === 'radio' || item.type.value === 'checkbox'"
+                          ><v-list dense>
+                            <v-subheader>Pilihan Jawaban:</v-subheader>
+                            <v-list-item-group color="primary">
+                              <v-list-item v-for="(option, optionIndex) in item.options" :key="optionIndex" disabled>
+                                <v-list-item-icon>
+                                  {{ optionIndex + 1 }}
+                                </v-list-item-icon>
+                                <v-list-item-content>
+                                  <v-list-item-title v-text="option.text"></v-list-item-title>
+                                </v-list-item-content>
+                              </v-list-item>
+                            </v-list-item-group> </v-list
+                        ></v-row>
+                      </v-col>
                       <v-col cols="6" class="text-right">
                         <v-chip class="ma-2"> {{ item.type.label }} </v-chip
                         ><v-chip v-if="item.required" class="ma-2" color="error" outlined>
