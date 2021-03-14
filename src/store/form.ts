@@ -111,12 +111,28 @@ const actions: any = {
     await store.commit('setFormList', forms);
     await store.commit('setLoading', false);
   },
-  async getFormById(store: Store<FormState> | any, param: string): Promise<void> {
-    await store.commit('setLoading', true);
-    const form = await FORM_ENDPOINT.getFormById(param);
-    console.warn('result!', form);
-    store.commit('setSelectedForm', form);
-    await store.commit('setLoading', false);
+  async getFormById(store: Store<FormState> | any, param: string): Promise<Form | string> {
+    try {
+      await store.commit('setLoading', true);
+      const form = await FORM_ENDPOINT.getFormById(param);
+      console.warn('result!', form);
+      store.commit('setSelectedForm', form);
+      await store.commit('setLoading', false);
+      return form;
+    } catch (err) {
+      store.commit(
+        'ui/setSnackbar',
+        {
+          open: true,
+          message: 'Maaf, form tidak dapat ditemukan',
+          color: 'red',
+          timeout: 4000
+        },
+        { root: true }
+      );
+      await store.commit('setLoading', false);
+      throw err;
+    }
   },
   async saveForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
     await store.commit('setLoading', true);
