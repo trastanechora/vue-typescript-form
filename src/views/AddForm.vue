@@ -276,7 +276,7 @@ export default class AddFormPage extends Vue {
     data.uuid = formId;
     data.createdAt = newDate.toISOString();
     data.questionCount = this.getQuestionCount();
-    data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
+    data.link = `${process.env.VUE_APP_URL}questionnaire/${formId}`;
     this.$store.dispatch('form/saveForm', data).then(() => {
       this.$router.push('/dashboard');
     });
