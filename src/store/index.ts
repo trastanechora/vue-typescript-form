@@ -5,11 +5,12 @@ import createPersistedState from 'vuex-persistedstate';
 import ui from './ui';
 import auth from './auth';
 import form from './form';
+import user from './user';
 
 Vue.use(Vuex);
 
 const dataState = createPersistedState({
-  paths: ['auth.isLogin', 'form']
+  paths: ['auth.isLogin', 'form', 'user.currentUser']
 });
 
 export default new Vuex.Store({
@@ -26,6 +27,10 @@ export default new Vuex.Store({
     form: {
       namespaced: true,
       ...form
+    },
+    user: {
+      namespaced: true,
+      ...user
     }
   }
 });

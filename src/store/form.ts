@@ -47,6 +47,7 @@ const state = (): FormState => ({
   ],
   selectedForm: {
     uuid: '',
+    authorUuid: '',
     label: '',
     description: '',
     createdAt: '',

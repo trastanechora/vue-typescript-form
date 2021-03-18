@@ -56,6 +56,7 @@ export interface Respondent {
 
 export interface Form {
   uuid: string;
+  authorUuid: string;
   label: string;
   description: string;
   createdAt: string;

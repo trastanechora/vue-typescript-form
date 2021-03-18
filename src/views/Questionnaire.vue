@@ -126,6 +126,7 @@ export default class QuestionnairePage extends Vue {
   isFound: boolean = true;
   formData: Form = {
     uuid: '',
+    authorUuid: '',
     label: '',
     description: '',
     createdAt: '',
