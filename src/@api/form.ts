@@ -41,7 +41,7 @@ export const FORM_ENDPOINT: any = {
   /* ------------------------------------
   => [GET] Get List of Forms
   ------------------------------------ */
-  async getForms(): Promise<any> {
+  async getForms(userUuid: string): Promise<any> {
     const db: any = await this.getDb();
     return new Promise(resolve => {
       const trans = db.transaction(['forms'], 'readonly');
@@ -50,7 +50,9 @@ export const FORM_ENDPOINT: any = {
       store.openCursor().onsuccess = (e: any) => {
         const cursor = e.target.result;
         if (cursor) {
-          forms.push(cursor.value);
+          if (cursor.value.authorUuid === userUuid) {
+            forms.push(cursor.value);
+          }
           cursor.continue();
         }
       };
