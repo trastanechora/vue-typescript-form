@@ -233,6 +233,38 @@ const actions: any = {
         );
         throw err;
       });
+  },
+  async deleteForm(store: Store<FormState> | any): Promise<any> {
+    return FORM_ENDPOINT.deleteForm(store.state.selectedForm)
+      .then((res: Form) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Sukses menghapus Form!',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.dispatch('getForms');
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit('setLoading', false);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: `Menghapus Form gagal: ${err}!`,
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        throw err;
+      });
   }
 };
 

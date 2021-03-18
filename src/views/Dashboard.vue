@@ -60,11 +60,27 @@
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </template>
-            <span>Edit</span>
+            <span>Ubah</span>
+          </v-tooltip>
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
+                @click="showDeleteDialog(item)"
+              >
+                <v-icon>mdi-trash-can</v-icon>
+              </v-btn>
+            </template>
+            <span>Hapus</span>
           </v-tooltip>
         </template>
       </v-data-table>
     </v-flex>
+    <DialogConfirmation :dialog="dialog" :close-dialog="closeDeleteDialog" />
   </v-layout>
 </template>
 
@@ -73,14 +89,16 @@ import { Component, Vue } from 'vue-property-decorator';
 import { TableHeader, Form } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
+import DialogConfirmation from '@/components/DialogConfirmation.vue';
 
 @Component({
-  components: { AppBar }
+  components: { AppBar, DialogConfirmation }
 })
 export default class DashboardPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
+  dialog: boolean = false;
   formHeaders: TableHeader[] = [
     { text: 'Label', value: 'label', width: 300 },
     { text: 'Jumlah Pertanyaan', value: 'questionCount', align: 'center' },
@@ -93,6 +111,7 @@ export default class DashboardPage extends Vue {
     {
       text: 'Tindakan',
       value: 'userAction',
+      width: 150,
       align: 'center',
       sortable: false
     }
@@ -149,6 +168,13 @@ export default class DashboardPage extends Vue {
     await this.$store.dispatch('form/updateEditState', true);
     await this.$store.dispatch('form/updateSelectedForm', item);
     this.$router.push('/dashboard/form');
+  }
+  async showDeleteDialog(item: Form): Promise<void> {
+    await this.$store.dispatch('form/updateSelectedForm', item);
+    this.dialog = true;
+  }
+  closeDeleteDialog(): void {
+    this.dialog = false;
   }
 }
 </script>

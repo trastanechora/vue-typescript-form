@@ -122,5 +122,19 @@ export const FORM_ENDPOINT: any = {
         }
       };
     });
+  },
+  /* ------------------------------------
+  => [DELETE] Delete Form
+  ------------------------------------ */
+  async deleteForm(form: any): Promise<void> {
+    const db: any = await this.getDb();
+    return new Promise(resolve => {
+      const trans = db.transaction(['forms'], 'readwrite');
+      const store = trans.objectStore('forms');
+      store.delete(form.uuid);
+      trans.oncomplete = () => {
+        resolve();
+      };
+    });
   }
 };
