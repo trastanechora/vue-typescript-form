@@ -5,7 +5,7 @@
     </v-btn>
     <v-spacer />
     <v-btn v-if="isLogin" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard">
-      Admin Panel
+      Dashboard
     </v-btn>
     <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
       <v-icon>mdi-theme-light-dark</v-icon>
@@ -28,7 +28,7 @@
       <v-icon left>
         mdi-key-chain-variant
       </v-icon>
-      Login Admin
+      Login
     </v-btn>
   </v-app-bar>
 </template>
