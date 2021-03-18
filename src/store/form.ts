@@ -107,8 +107,7 @@ const actions: any = {
   },
   async getForms(store: Store<FormState> | any): Promise<void> {
     await store.commit('setLoading', true);
-    const forms = await FORM_ENDPOINT.getForms();
-    console.warn('new list form nih!', forms);
+    const forms = await FORM_ENDPOINT.getForms(store.rootState.user.currentUser.uuid);
     await store.commit('setFormList', forms);
     await store.commit('setLoading', false);
   },

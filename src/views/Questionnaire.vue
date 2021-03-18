@@ -57,7 +57,10 @@
                   ></v-textarea>
                 </v-layout>
                 <v-layout v-if="item.type.value === 'radio'">
-                  <v-radio-group v-model="answerSkeleton[`${item.key}`]">
+                  <v-radio-group
+                    v-model="answerSkeleton[`${item.key}`]"
+                    :rules="item.required ? notEmptyOptionRules(false) : []"
+                  >
                     <v-radio
                       v-for="(option, optionIndex) in item.options"
                       :key="optionIndex"
@@ -74,6 +77,8 @@
                       :key="optionIndex"
                       :label="option.text"
                       :value="option.text"
+                      :rules="item.required ? notEmptyOptionRules(true) : []"
+                      :hide-details="optionIndex !== item.options.length - 1"
                     ></v-checkbox>
                   </v-container>
                 </v-layout>
@@ -83,7 +88,13 @@
           <v-flex xs12 class="mb-3">
             <v-layout row>
               <v-flex xs12 class="mb-2 text-end">
-                <v-btn color="primary" @click="submit" :disabled="isLoading" :loading="isLoading" class="ml-2"
+                <v-btn
+                  color="primary"
+                  @click="submit"
+                  :disabled="isLoading || !valid"
+                  :loading="isLoading"
+                  class="ml-2"
+                  width="200px"
                   >Kirim</v-btn
                 >
               </v-flex>
@@ -115,7 +126,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 
 import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
-import { notEmptyRules } from '@/@utils';
+import { notEmptyRules, notEmptyOptionRules } from '@/@utils';
 
 @Component
 export default class QuestionnairePage extends Vue {
@@ -183,6 +194,10 @@ export default class QuestionnairePage extends Vue {
     return notEmptyRules(identifier);
   }
 
+  notEmptyOptionRules(isMultiple: boolean): any[] {
+    return notEmptyOptionRules(isMultiple);
+  }
+
   createAnswerSkeleton(): void {
     const newAnswerSkeleton: any = {};
     this.formData.questions.forEach((quesitonSection: QuestionSection) => {
@@ -207,14 +222,17 @@ export default class QuestionnairePage extends Vue {
   }
 
   submit(): void {
-    this.respondentData.uuid = uuid.v1();
-    const newDate = new Date();
-    this.respondentData.submitDate = newDate.toISOString();
-    this.respondentData.answers = this.answerSkeleton;
-    console.warn('result respondent data:', this.respondentData);
-    this.$store.dispatch('form/submitResponse', this.respondentData).then(() => {
-      this.$router.push('/thank-you');
-    });
+    const questionnaireForm = this.$refs.questionnaireForm as VForm;
+    if (questionnaireForm.validate()) {
+      this.respondentData.uuid = uuid.v1();
+      const newDate = new Date();
+      this.respondentData.submitDate = newDate.toISOString();
+      this.respondentData.answers = this.answerSkeleton;
+      console.warn('result respondent data:', this.respondentData);
+      this.$store.dispatch('form/submitResponse', this.respondentData).then(() => {
+        this.$router.push('/thank-you');
+      });
+    }
   }
 }
 </script>
