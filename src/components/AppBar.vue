@@ -3,27 +3,43 @@
     <v-btn id="home-btn" text class="transform-none ma-2" to="/">
       <v-toolbar-title v-text="title" />
     </v-btn>
-    <v-spacer />
-    <v-btn v-if="isLogin" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard">
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard/" active-class="no-active">
       Dashboard
-    </v-btn>
-    <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
-      <v-icon>mdi-theme-light-dark</v-icon>
     </v-btn>
     <v-btn
       v-if="isLogin"
-      id="account-btn"
-      depressed
-      rounded
-      color="primary"
+      id="dashboard-btn"
+      text
       class="transform-none ma-2"
-      @click="logout"
+      to="/dashboard/profile"
+      active-class="no-active"
     >
-      <v-icon left>
-        mdi-exit-to-app
-      </v-icon>
-      Keluar
+      Profil
     </v-btn>
+    <v-spacer />
+    <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
+      <v-icon>mdi-theme-light-dark</v-icon>
+    </v-btn>
+    <v-menu v-if="isLogin" offset-y>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn rounded color="primary" v-bind="attrs" class="text-none" v-on="on">
+          <v-avatar v-if="currentUser.imgUrl" size="25" class="inherit-spacing">
+            <img :src="currentUser.imgUrl" alt="profile-pic" />
+          </v-avatar>
+          <v-icon v-else left size="25" class="inherit-spacing"> mdi-account-circle </v-icon>
+          <span v-if="currentUser.displayName !== ''" class="normal-spacing ml-2">{{ currentUser.displayName }}</span>
+          <span v-else>User</span>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item id="do-logout" @click="logout">
+          <v-list-item-action>
+            <v-icon> mdi-exit-to-app </v-icon>
+          </v-list-item-action>
+          <v-list-item-title> Keluar </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
     <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/admin">
       <v-icon left>
         mdi-key-chain-variant
@@ -57,12 +73,8 @@ export default class AppBar extends Vue {
     return this.$store.state.auth.isLogin;
   }
 
-  get profilePictureUrl(): string {
-    return this.$store.state.user.currentUser.imgUrl;
-  }
-
-  get roleUser(): string {
-    return this.$store.state.user.currentUser.role;
+  get currentUser(): string {
+    return this.$store.state.user.currentUser;
   }
 
   /* ------------------------------------
@@ -93,5 +105,8 @@ export default class AppBar extends Vue {
 .transform-none {
   text-transform: none;
   letter-spacing: inherit;
+}
+.v-btn--active.no-active::before {
+  opacity: 0 !important;
 }
 </style>

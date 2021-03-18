@@ -9,6 +9,7 @@ import NotFound from '@/views/NotFound.vue';
 import Questionnaire from '@/views/Questionnaire.vue';
 import Response from '@/views/Response.vue';
 import ThankYou from '@/views/ThankYou.vue';
+import Profile from '@/views/Profile.vue';
 import Default from '@/layout/Default.vue';
 import Admin from '@/layout/Admin.vue';
 
@@ -58,6 +59,11 @@ const routes: Array<RouteConfig> = [
         path: '',
         name: 'Dashboard',
         component: Dashboard
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: Profile
       },
       {
         path: 'form',
