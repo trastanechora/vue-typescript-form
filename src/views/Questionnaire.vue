@@ -42,7 +42,7 @@
                     :loading="isLoading"
                   ></v-text-field>
                 </v-layout>
-                <v-layout v-if="item.type.value === 'text_area'">
+                <v-layout v-else-if="item.type.value === 'text_area'">
                   <v-textarea
                     v-model="answerSkeleton[`${item.key}`]"
                     clearable
@@ -56,7 +56,7 @@
                     :loading="isLoading"
                   ></v-textarea>
                 </v-layout>
-                <v-layout v-if="item.type.value === 'radio'">
+                <v-layout v-else-if="item.type.value === 'radio'">
                   <v-radio-group
                     v-model="answerSkeleton[`${item.key}`]"
                     :rules="item.required ? notEmptyOptionRules(false) : []"
@@ -69,7 +69,7 @@
                     ></v-radio>
                   </v-radio-group>
                 </v-layout>
-                <v-layout v-if="item.type.value === 'checkbox'">
+                <v-layout v-else-if="item.type.value === 'checkbox'">
                   <v-container fluid>
                     <v-checkbox
                       v-model="answerSkeleton[`${item.key}`]"
@@ -80,6 +80,20 @@
                       :rules="item.required ? notEmptyOptionRules(true) : []"
                       :hide-details="optionIndex !== item.options.length - 1"
                     ></v-checkbox>
+                  </v-container>
+                </v-layout>
+                <v-layout v-else-if="item.type.value === 'date'">
+                  <v-container fluid>
+                    <v-date-picker
+                      v-model="answerSkeleton[`${item.key}`]"
+                      :first-day-of-week="1"
+                      locale="id-id"
+                    ></v-date-picker>
+                  </v-container>
+                </v-layout>
+                <v-layout v-else-if="item.type.value === 'time'">
+                  <v-container fluid>
+                    <v-time-picker v-model="answerSkeleton[`${item.key}`]" class="mt-4" format="24hr"></v-time-picker>
                   </v-container>
                 </v-layout>
               </v-card-text>
@@ -125,7 +139,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 
-import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
+import { VForm, Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
 import { notEmptyRules, notEmptyOptionRules } from '@/@utils';
 
 @Component

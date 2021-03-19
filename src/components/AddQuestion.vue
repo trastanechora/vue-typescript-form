@@ -78,7 +78,57 @@
               </v-form>
               <v-form
                 v-if="currentQuestion.type.value === 'radio' || currentQuestion.type.value === 'checkbox'"
-                ref="radioForm"
+                ref="radioCheckboxForm"
+                v-model="valid"
+                lazy-validation
+                class="pa-0"
+              >
+                <v-layout row>
+                  <v-flex xs12>
+                    <hr class="my-6" />
+                    <v-layout wrap>
+                      <v-flex v-for="(option, index) in currentQuestion.options" :key="index" xs12>
+                        <v-row no-gutters>
+                          <v-col cols="10">
+                            <v-text-field
+                              v-model="option.text"
+                              filled
+                              clearable
+                              :label="`Pilihan ${index + 1}`"
+                              type="text"
+                              autocomplete="off"
+                              class="required"
+                              :rules="notEmpty(`Pilihan ${index + 1}`)"
+                              :disabled="isLoading"
+                              :loading="isLoading"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="2" class="my-2 px-1"
+                            ><v-btn color="primary" text @click="deleteOption(option)">
+                              <v-icon left>mdi-delete</v-icon> Hapus
+                            </v-btn></v-col
+                          >
+                        </v-row>
+                      </v-flex>
+                      <v-flex xs12>
+                        <v-btn
+                          text
+                          small
+                          color="secondary"
+                          @click="addOption"
+                          :disabled="isLoading"
+                          :loading="isLoading"
+                          class="ml-2"
+                          ><v-icon small>mdi-plus</v-icon>Tambah Pilihan</v-btn
+                        >
+                      </v-flex>
+                    </v-layout>
+                  </v-flex>
+                </v-layout>
+              </v-form>
+              <v-form
+                v-if="currentQuestion.type.value === 'radio_row'"
+                ref="radioRowForm"
                 v-model="valid"
                 lazy-validation
                 class="pa-0"
