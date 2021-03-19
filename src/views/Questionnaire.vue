@@ -87,13 +87,28 @@
                     <v-date-picker
                       v-model="answerSkeleton[`${item.key}`]"
                       :first-day-of-week="1"
+                      :rules="item.required ? notEmpty('Jawaban ini') : []"
+                      :disabled="isLoading"
                       locale="id-id"
+                    >
+                      <v-text-field
+                        v-model="answerSkeleton[`${item.key}`]"
+                        :rules="item.required ? notEmpty('Jawaban ini') : []"
+                        :disabled="isLoading"
+                        :loading="isLoading"
+                      ></v-text-field
                     ></v-date-picker>
                   </v-container>
                 </v-layout>
                 <v-layout v-else-if="item.type.value === 'time'">
                   <v-container fluid>
-                    <v-time-picker v-model="answerSkeleton[`${item.key}`]" class="mt-4" format="24hr"></v-time-picker>
+                    <v-time-picker v-model="answerSkeleton[`${item.key}`]" class="mt-4" format="24hr">
+                      <v-text-field
+                        v-model="answerSkeleton[`${item.key}`]"
+                        :rules="item.required ? notEmpty('Jawaban ini') : []"
+                        :loading="isLoading"
+                      ></v-text-field>
+                    </v-time-picker>
                   </v-container>
                 </v-layout>
               </v-card-text>
