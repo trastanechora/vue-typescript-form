@@ -20,22 +20,22 @@ const state = (): FormState => ({
       label: 'Pilihan Ganda',
       value: QuestionType.RADIO
     },
-    {
-      label: 'Pilihan Ganda Berbaris',
-      value: QuestionType.RADIO_ROW
-    },
+    // {
+    //   label: 'Pilihan Ganda Berbaris',
+    //   value: QuestionType.RADIO_ROW
+    // },
     {
       label: 'Kotak Centang',
       value: QuestionType.CHECKBOX
     },
-    {
-      label: 'Kotak Centang Berbaris',
-      value: QuestionType.CHECKBOX_ROW
-    },
-    {
-      label: 'Skala Linier',
-      value: QuestionType.SCALE
-    },
+    // {
+    //   label: 'Kotak Centang Berbaris',
+    //   value: QuestionType.CHECKBOX_ROW
+    // },
+    // {
+    //   label: 'Skala Linier',
+    //   value: QuestionType.SCALE
+    // },
     {
       label: 'Tanggal',
       value: QuestionType.DATE
