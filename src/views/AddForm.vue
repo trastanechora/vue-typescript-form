@@ -135,6 +135,7 @@
                       <v-icon left>mdi-plus</v-icon>Tambah Bagian
                     </v-btn>
                     <v-spacer />
+                    <v-switch v-if="isEdit" v-model="status" label="Status" class="mt-0 pt-1 pr-5" />
                     <v-btn
                       v-if="isEdit"
                       rounded
@@ -192,6 +193,7 @@ export default class AddFormPage extends Vue {
   isEditQuestion: boolean = false;
   valid: boolean = true;
   dragState: boolean = false;
+  status: boolean = true;
   formData: Form = {
     uuid: '',
     authorUuid: '',
@@ -288,12 +290,22 @@ export default class AddFormPage extends Vue {
     const newDate = new Date();
     data.updatedAt = newDate.toISOString();
     data.questionCount = this.getQuestionCount();
+    if (status) {
+      data.status = FormStatus.OPEN;
+    } else {
+      data.status = FormStatus.CLOSED;
+    }
     this.$store.dispatch('form/editForm', data).then(() => {
       this.$router.push('/dashboard');
     });
   }
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
+    if (this.formData.status === FormStatus.OPEN) {
+      this.status = true;
+    } else {
+      this.status = false;
+    }
   }
   getQuestionCount(): number {
     let newQuestionCount: number = 0;

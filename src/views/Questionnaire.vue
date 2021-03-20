@@ -1,5 +1,20 @@
 <template>
-  <v-layout v-if="isFound" wrap class="my-6 full-width">
+  <v-layout v-if="formData.status === 'closed'" wrap class="my-6 full-width">
+    <v-flex xs10 class="mt-10 mx-auto">
+      <v-card class="mx-auto py-5" width="100%">
+        <v-card-text>
+          <h1 class="text-center error--text">Form telah ditutup</h1>
+          <h4 class="text-center">Hubungi pemilik form untuk pertanyaan lebih lanjut</h4>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+    <v-flex xs10 class="my-2 mx-auto text-end">
+      <v-btn text small color="secondary" :disabled="isLoading" :loading="isLoading" class="ml-2" to="/"
+        ><v-icon small>mdi-chevron-left</v-icon>Kembali ke Halaman Utama</v-btn
+      >
+    </v-flex>
+  </v-layout>
+  <v-layout v-else-if="isFound" wrap class="my-6 full-width">
     <v-flex xs10 class="mb-4 mx-auto">
       <v-form ref="questionnaireForm" v-model="valid" lazy-validation>
         <v-layout wrap>
