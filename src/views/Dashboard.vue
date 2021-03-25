@@ -20,11 +20,23 @@
           </v-tooltip>
         </template>
         <template v-slot:[`item.status`]="{ item }">
-          <v-chip class="ma-2" outlined small>
+          <v-chip
+            v-if="!checkDueDate(item.dueDate)"
+            :color="statusColorFormatter(item.status)"
+            class="ma-2"
+            outlined
+            small
+          >
             <v-icon left x-small>
-              mdi-circle
+              {{ statusIconFormatter(item.status) }}
             </v-icon>
-            {{ item.status }}
+            {{ statusTextFormatter(item.status) }}
+          </v-chip>
+          <v-chip v-else :color="statusColorFormatter('ended')" class="ma-2" outlined small>
+            <v-icon left x-small>
+              {{ statusIconFormatter('ended') }}
+            </v-icon>
+            {{ statusTextFormatter('ended') }}
           </v-chip>
         </template>
         <template v-slot:[`item.dueDate`]="{ item }">
@@ -86,8 +98,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { TableHeader, Form } from '@/@types';
-import { dateFormatter } from '@/@utils';
+import { TableHeader, Form, FormStatus } from '@/@types';
+import { dateFormatter, statusFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 import DialogConfirmation from '@/components/DialogConfirmation.vue';
 
@@ -142,6 +154,21 @@ export default class DashboardPage extends Vue {
   formatDate(dateIsoString: string): string {
     const parsedDate = new Date(dateIsoString);
     return dateFormatter(parsedDate);
+  }
+  statusTextFormatter(status: FormStatus): string {
+    return statusFormatter(status).text;
+  }
+  statusColorFormatter(status: FormStatus): string {
+    return statusFormatter(status).color;
+  }
+  statusIconFormatter(status: FormStatus): string {
+    return statusFormatter(status).icon;
+  }
+  checkDueDate(date: string): boolean {
+    console.warn('date', date);
+    const dueDate = new Date(date);
+    const today = new Date();
+    return today > dueDate;
   }
   copyToClipboard(text: string): void {
     const dummy = document.createElement('textarea');
