@@ -1,23 +1,16 @@
 <template>
   <v-app-bar fixed app>
-    <v-btn id="home-btn" text class="transform-none ma-2" to="/">
+    <v-btn id="home-btn" text class="ma-2" to="/">
       <v-toolbar-title v-text="title" />
     </v-btn>
-    <v-btn v-if="isLogin" id="dashboard-btn" text class="transform-none ma-2" to="/dashboard/" active-class="no-active">
-      Dashboard
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/" active-class="no-active">
+      Form
     </v-btn>
-    <v-btn
-      v-if="isLogin"
-      id="dashboard-btn"
-      text
-      class="transform-none ma-2"
-      to="/dashboard/profile"
-      active-class="no-active"
-    >
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/profile" active-class="no-active">
       Profil
     </v-btn>
     <v-spacer />
-    <v-btn id="switch-theme" depressed small fab class="transform-none ma-2" @click="switchTheme">
+    <v-btn id="switch-theme" depressed small fab class="ma-2" @click="switchTheme">
       <v-icon>mdi-theme-light-dark</v-icon>
     </v-btn>
     <v-menu v-if="isLogin" offset-y>
@@ -40,7 +33,7 @@
         </v-list-item>
       </v-list>
     </v-menu>
-    <v-btn v-else id="account-btn" depressed rounded color="primary" class="transform-none ma-2" to="/admin">
+    <v-btn v-else id="account-btn" depressed rounded color="primary" class="ma-2" to="/admin">
       <v-icon left>
         mdi-key-chain-variant
       </v-icon>
@@ -102,9 +95,9 @@ export default class AppBar extends Vue {
 .no-padding {
   padding: 0 !important;
 }
-.transform-none {
+.v-btn {
+  letter-spacing: normal;
   text-transform: none;
-  letter-spacing: inherit;
 }
 .v-btn--active.no-active::before {
   opacity: 0 !important;
