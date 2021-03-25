@@ -14,7 +14,7 @@
       >
     </v-flex>
   </v-layout>
-  <v-layout v-else-if="checkDueDate" wrap class="my-6 full-width">
+  <v-layout v-else-if="checkDueDate()" wrap class="my-6 full-width">
     <v-flex xs10 class="mt-10 mx-auto">
       <v-card class="mx-auto py-5" width="100%">
         <v-card-text>
@@ -297,6 +297,8 @@ export default class QuestionnairePage extends Vue {
   checkDueDate(): boolean {
     const dueDate = new Date(this.formData.dueDate);
     const today = new Date();
+    console.warn('today > dueDate');
+    console.warn('today > dueDate', today > dueDate);
     return today > dueDate;
   }
 }

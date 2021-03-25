@@ -360,6 +360,8 @@ export default class AddFormPage extends Vue {
       } finally {
         console.warn('Batas Waktu tidak valid');
       }
+    } else {
+      delete data.dueDate;
     }
     this.$store.dispatch('form/editForm', data).then(() => {
       this.$router.push('/dashboard');
@@ -371,6 +373,10 @@ export default class AddFormPage extends Vue {
       this.status = true;
     } else {
       this.status = false;
+    }
+    if (this.formData.dueDate) {
+      this.dueDateProvided = true;
+      this.dueDate = this.formData.dueDate.slice(0, 10);
     }
   }
   getQuestionCount(): number {
