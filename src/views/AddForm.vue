@@ -31,11 +31,58 @@
                 rows="4"
                 row-height="30"
                 type="text"
+                hide-details
                 :disabled="isLoading"
                 :loading="isLoading"
               ></v-textarea>
             </v-flex>
-            <v-flex xs12 class="mb-3">
+            <v-flex v-if="!dueDateProvided" xs12 class="mt-3">
+              <v-btn
+                text
+                small
+                color="secondary"
+                @click="dueDateProvided = true"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="ml-2"
+                ><v-icon small>mdi-plus</v-icon>Beri Batas Waktu Pengumpulan</v-btn
+              >
+            </v-flex>
+            <v-row v-if="dueDateProvided" justify="space-between" class="ma-0 pa-0 mt-5">
+              <v-menu
+                v-model="datePickerMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                top
+                max-width="290px"
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="dueDate"
+                    label="Batas Waktu"
+                    hint="Form akan tertutup otomatis jika sudah melewati batas waktu yang telah ditentukan"
+                    persistent-hint
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="dueDate" no-title @input="datePickerMenu = false"></v-date-picker>
+              </v-menu>
+              <v-btn
+                text
+                small
+                color="secondary"
+                @click="dueDateProvided = false"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="ml-2 mt-5"
+                ><v-icon small>mdi-minus</v-icon>Hapus Batas Waktu</v-btn
+              >
+            </v-row>
+            <v-flex xs12 class="mb-3 mt-6">
               <h2 class="primary--text">List Pertanyaan</h2>
               <hr />
             </v-flex>
@@ -194,6 +241,9 @@ export default class AddFormPage extends Vue {
   valid: boolean = true;
   dragState: boolean = false;
   status: boolean = true;
+  datePickerMenu: boolean = false;
+  dueDateProvided: boolean = false;
+  dueDate: string = '';
   formData: Form = {
     uuid: '',
     authorUuid: '',
@@ -281,6 +331,14 @@ export default class AddFormPage extends Vue {
     data.questionCount = this.getQuestionCount();
     data.authorUuid = this.$store.state.user.currentUser.uuid;
     data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
+    if (this.dueDateProvided) {
+      try {
+        const dueDate = new Date(this.dueDate);
+        data.dueDate = dueDate.toISOString();
+      } finally {
+        console.warn('Batas Waktu tidak valid');
+      }
+    }
     this.$store.dispatch('form/saveForm', data).then(() => {
       this.$router.push('/dashboard');
     });
@@ -290,10 +348,18 @@ export default class AddFormPage extends Vue {
     const newDate = new Date();
     data.updatedAt = newDate.toISOString();
     data.questionCount = this.getQuestionCount();
-    if (status) {
+    if (this.status) {
       data.status = FormStatus.OPEN;
     } else {
       data.status = FormStatus.CLOSED;
+    }
+    if (this.dueDateProvided) {
+      try {
+        const dueDate = new Date(this.dueDate);
+        data.dueDate = dueDate.toISOString();
+      } finally {
+        console.warn('Batas Waktu tidak valid');
+      }
     }
     this.$store.dispatch('form/editForm', data).then(() => {
       this.$router.push('/dashboard');
