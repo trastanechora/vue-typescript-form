@@ -114,31 +114,63 @@
                 </v-layout>
                 <v-layout v-else-if="item.type.value === 'date'">
                   <v-container fluid>
-                    <v-date-picker
-                      v-model="answerSkeleton[`${item.key}`]"
-                      :first-day-of-week="1"
-                      :rules="item.required ? notEmpty('Jawaban ini') : []"
-                      :disabled="isLoading"
-                      locale="id-id"
+                    <v-menu
+                      v-model="dialogSkeleton[`${item.key}`]"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
                     >
-                      <v-text-field
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="answerSkeleton[`${item.key}`]"
+                          prepend-icon="mdi-calendar"
+                          :rules="item.required ? notEmpty('Jawaban ini') : []"
+                          readonly
+                          v-bind="attrs"
+                          v-on="on"
+                          :disabled="isLoading"
+                          :loading="isLoading"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
                         v-model="answerSkeleton[`${item.key}`]"
-                        :rules="item.required ? notEmpty('Jawaban ini') : []"
-                        :disabled="isLoading"
-                        :loading="isLoading"
-                      ></v-text-field
-                    ></v-date-picker>
+                        :first-day-of-week="1"
+                        locale="id-id"
+                        @input="dialogSkeleton[`${item.key}`] = false"
+                      ></v-date-picker>
+                    </v-menu>
                   </v-container>
                 </v-layout>
                 <v-layout v-else-if="item.type.value === 'time'">
                   <v-container fluid>
-                    <v-time-picker v-model="answerSkeleton[`${item.key}`]" class="mt-4" format="24hr">
-                      <v-text-field
+                    <v-menu
+                      v-model="dialogSkeleton[`${item.key}`]"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="answerSkeleton[`${item.key}`]"
+                          prepend-icon="mdi-clock"
+                          :rules="item.required ? notEmpty('Jawaban ini') : []"
+                          readonly
+                          v-bind="attrs"
+                          v-on="on"
+                          :disabled="isLoading"
+                          :loading="isLoading"
+                        ></v-text-field>
+                      </template>
+                      <v-time-picker
                         v-model="answerSkeleton[`${item.key}`]"
-                        :rules="item.required ? notEmpty('Jawaban ini') : []"
-                        :loading="isLoading"
-                      ></v-text-field>
-                    </v-time-picker>
+                        format="24hr"
+                        @input="dialogSkeleton[`${item.key}`] = false"
+                      ></v-time-picker>
+                    </v-menu>
                   </v-container>
                 </v-layout>
               </v-card-text>
@@ -219,8 +251,8 @@ export default class QuestionnairePage extends Vue {
     answers: {},
     submitDate: ''
   };
-  // answerSkeleton: Answer[] = [];
   answerSkeleton: any = {};
+  dialogSkeleton: any = {};
 
   /* ------------------------------------
   => Setter and Getter
@@ -267,6 +299,18 @@ export default class QuestionnairePage extends Vue {
     this.answerSkeleton = newAnswerSkeleton;
   }
 
+  createDialogSkeleton(): void {
+    const newDialogSkeleton: any = {};
+    this.formData.questions.forEach((quesitonSection: QuestionSection) => {
+      quesitonSection.questionList.forEach((question: Question) => {
+        if (question.type.value === 'date' || question.type.value === 'time') {
+          newDialogSkeleton[`${question.key}`] = false;
+        }
+      });
+    });
+    this.dialogSkeleton = newDialogSkeleton;
+  }
+
   getValueType(type: QuestionType): string | string[] | number | number[] | boolean | boolean[] | Option {
     switch (type) {
       case QuestionType.TEXT_FIELD:
@@ -297,8 +341,6 @@ export default class QuestionnairePage extends Vue {
   checkDueDate(): boolean {
     const dueDate = new Date(this.formData.dueDate);
     const today = new Date();
-    console.warn('today > dueDate');
-    console.warn('today > dueDate', today > dueDate);
     return today > dueDate;
   }
 }
