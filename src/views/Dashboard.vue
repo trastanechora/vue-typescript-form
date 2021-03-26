@@ -205,6 +205,7 @@ export default class DashboardPage extends Vue {
   }
 }
 </script>
+
 <style lang="stylus" scoped>
 .v-btn {
   letter-spacing: normal;
