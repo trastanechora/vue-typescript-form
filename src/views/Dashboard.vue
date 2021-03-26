@@ -165,7 +165,6 @@ export default class DashboardPage extends Vue {
     return statusFormatter(status).icon;
   }
   checkDueDate(date: string): boolean {
-    console.warn('date', date);
     const dueDate = new Date(date);
     const today = new Date();
     return today > dueDate;
