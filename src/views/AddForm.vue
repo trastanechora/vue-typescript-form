@@ -92,8 +92,19 @@
               v-for="(questionSection, index) in formData.questions"
               :key="index"
             >
-              <h4 v-if="formData.questions.length > 1" class="primary--text">
+              <h4 v-if="formData.questions.length > 1" class="primary--text mb-2">
                 {{ questionSection.title + (index + 1) }}
+                <v-btn
+                  v-if="index > 0"
+                  color="primary"
+                  class="ml-2"
+                  outlined
+                  rounded
+                  @click="removeSection(questionSection, index)"
+                  x-small
+                >
+                  <v-icon left small>mdi-close-circle</v-icon> Hapus
+                </v-btn>
               </h4>
               <draggable
                 v-model="questionSection.questionList"
@@ -321,6 +332,12 @@ export default class AddFormPage extends Vue {
       title: 'Bagian ',
       questionList: []
     });
+  }
+  removeSection(section: QuestionSection, index: number): void {
+    section.questionList.forEach(question => {
+      this.formData.questions[index - 1].questionList.push(question);
+    });
+    this.formData.questions.splice(index, 1);
   }
   saveForm(): void {
     const data = { ...this.formData };
