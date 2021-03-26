@@ -10,6 +10,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Snackbar from '@/components/Snackbar.vue';
+import VueJsonToCsv from 'vue-json-to-csv';
+
+Vue.component('vueJsonToCsv', VueJsonToCsv);
 
 export default Vue.extend({
   name: 'App',
