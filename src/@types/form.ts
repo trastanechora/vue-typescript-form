@@ -4,6 +4,7 @@
 export enum QuestionType {
   EMPTY = '',
   TEXT_FIELD = 'text_field',
+  NUMERIC_FIELD = 'numeric_field',
   TEXT_AREA = 'text_area',
   SELECT = 'select',
   RADIO = 'radio',

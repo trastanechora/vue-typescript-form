@@ -72,6 +72,17 @@
                     :loading="isLoading"
                   ></v-text-field>
                 </v-layout>
+                <v-layout v-if="item.type.value === 'numeric_field'">
+                  <v-text-field
+                    v-model="answerSkeleton[`${item.key}`]"
+                    clearable
+                    type="number"
+                    autocomplete="off"
+                    :rules="item.required ? notEmpty('Jawaban ini') : []"
+                    :disabled="isLoading"
+                    :loading="isLoading"
+                  ></v-text-field>
+                </v-layout>
                 <v-layout v-else-if="item.type.value === 'text_area'">
                   <v-textarea
                     v-model="answerSkeleton[`${item.key}`]"

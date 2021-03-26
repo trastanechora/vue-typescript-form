@@ -13,6 +13,10 @@ const state = (): FormState => ({
       value: QuestionType.TEXT_FIELD
     },
     {
+      label: 'Jawaban Numerik',
+      value: QuestionType.NUMERIC_FIELD
+    },
+    {
       label: 'Jawaban Paragraf',
       value: QuestionType.TEXT_AREA
     },
