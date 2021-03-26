@@ -1,22 +1,27 @@
 <template>
   <v-layout wrap class="admin-view full-width">
     <v-flex xs12 class="mb-4 mx-2">
-      <v-layout>
-        <v-flex xs8>
+      <v-layout class="mb-2">
+        <v-flex xs10>
           <div>
             <small>Daftar Responden</small>
           </div>
-          <p class="display-1 primary--text">
+          <span class="display-1 primary--text">
             {{ selectedForm.label }}
-          </p>
+          </span>
+          <br />
+          <small
+            >Jumlah Tanggapan: <span class="primary--text">{{ selectedForm.respondentCount }} </span></small
+          >
         </v-flex>
-        <v-flex xs4 class="text-right">
-          <div>
-            <small>Jumlah Tanggapan</small>
-          </div>
-          <p class="display-1 primary--text">
-            {{ selectedForm.respondentCount }}
-          </p>
+        <v-flex xs2 class="text-right mt-5">
+          <vue-json-to-csv
+            :json-data="respondentBody"
+            :labels="respondentCSVHeader"
+            :csv-title="`Daftar Responden ${selectedForm.label}`"
+          >
+            <v-btn rounded color="primary" outlined> <v-icon left>mdi-download</v-icon>Export CSV</v-btn>
+          </vue-json-to-csv>
         </v-flex>
       </v-layout>
     </v-flex>
@@ -48,6 +53,7 @@ export default class ResponsePage extends Vue {
   ------------------------------------ */
   respondentHeader: TableHeader[] = [];
   respondentBody: any = [];
+  respondentCSVHeader: any = {};
 
   /* ------------------------------------
   => Setter and Getter
@@ -67,8 +73,7 @@ export default class ResponsePage extends Vue {
     await this.$store.dispatch('form/getFormById', this.$route.params.id);
     await this.createHeader();
     await this.createBody();
-    console.warn('header', this.respondentHeader);
-    console.warn('body', this.respondentBody);
+    await this.createCSVHeader();
   }
 
   /* ------------------------------------
@@ -92,6 +97,15 @@ export default class ResponsePage extends Vue {
     });
     this.respondentHeader = newHeader;
   }
+  createCSVHeader(): void {
+    this.selectedForm.questions.forEach((quesitonSection: QuestionSection) => {
+      quesitonSection.questionList.forEach((question: Question) => {
+        this.respondentCSVHeader[`${question.key}`] = {
+          title: question.text
+        };
+      });
+    });
+  }
   createBody(): void {
     const newBody: any = [];
     this.selectedForm.respondents.forEach((respondent: any) => {
@@ -99,8 +113,12 @@ export default class ResponsePage extends Vue {
     });
     this.respondentBody = newBody;
   }
-  test(item: any): void {
-    console.warn(item);
-  }
 }
 </script>
+
+<style lang="stylus" scoped>
+.v-btn {
+  letter-spacing: normal;
+  text-transform: none;
+}
+</style>
