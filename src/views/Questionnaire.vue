@@ -243,7 +243,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 
 import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option } from '@/@types';
@@ -372,7 +372,6 @@ export default class QuestionnairePage extends Vue {
         this.submit();
       } else {
         this.currentStep = index + 2;
-        this.$vuetify.goTo(0);
       }
     }
   }
@@ -381,7 +380,6 @@ export default class QuestionnairePage extends Vue {
     const questionnaireForm = this.$refs[`questionnaireForm-${index}`] as any;
     questionnaireForm[0].resetValidation();
     this.currentStep = index;
-    this.$vuetify.goTo(0);
   }
 
   checkDueDate(): boolean {
@@ -389,8 +387,20 @@ export default class QuestionnairePage extends Vue {
     const today = new Date();
     return today > dueDate;
   }
+
+  /* ------------------------------------
+  => Watcher
+  ------------------------------------ */
+  @Watch('currentStep')
+  async handleOnStepChange(): Promise<void> {
+    setTimeout(() => {
+      // This resolve bug vuetify scroll to top not working on v-stepper nextStep
+      this.$vuetify.goTo(0);
+    }, 1);
+  }
 }
 </script>
+
 <style lang="stylus" scoped>
 .v-btn {
   letter-spacing: normal;
