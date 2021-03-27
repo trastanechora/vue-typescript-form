@@ -32,6 +32,7 @@
   <v-layout v-else-if="isFound" wrap class="my-6 full-width">
     <v-flex xs10 class="mb-3 mx-auto">
       <v-card width="100%">
+        <v-img v-if="formData.imageBanner" :src="parsedImage"></v-img>
         <v-card-text>
           <p class="display-1 primary--text">
             {{ formData.label }}
@@ -256,11 +257,13 @@ export default class QuestionnairePage extends Vue {
   ------------------------------------ */
   valid: boolean = true;
   isFound: boolean = true;
+  parsedImage: any = '';
   formData: Form = {
     uuid: '',
     authorUuid: '',
     label: '',
     description: '',
+    imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
     dueDate: '',
@@ -307,6 +310,7 @@ export default class QuestionnairePage extends Vue {
       });
     this.formData = this.$store.state.form.selectedForm;
     await this.createAnswerSkeleton();
+    this.parseImage();
   }
 
   /* ------------------------------------
@@ -386,6 +390,19 @@ export default class QuestionnairePage extends Vue {
     const dueDate = new Date(this.formData.dueDate);
     const today = new Date();
     return today > dueDate;
+  }
+
+  async parseImage(): Promise<void> {
+    if (this.formData.imageBanner) {
+      const arrayBufferView = new Uint8Array(this.formData.imageBanner);
+      const blobImage = new Blob([arrayBufferView], { type: 'image/jpeg' });
+      const reader = new FileReader();
+      await reader.readAsDataURL(blobImage);
+      reader.onloadend = () => {
+        const base64data = reader.result;
+        this.parsedImage = base64data;
+      };
+    }
   }
 
   /* ------------------------------------

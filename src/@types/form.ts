@@ -60,6 +60,7 @@ export interface Form {
   authorUuid: string;
   label: string;
   description: string;
+  imageBanner: any;
   createdAt: string;
   updatedAt: string;
   dueDate: string;

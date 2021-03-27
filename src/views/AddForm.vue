@@ -36,8 +36,9 @@
                 :loading="isLoading"
               ></v-textarea>
             </v-flex>
-            <v-flex v-if="!dueDateProvided" xs12 class="mt-3">
+            <v-flex xs12 class="mt-3">
               <v-btn
+                v-if="!dueDateProvided"
                 text
                 small
                 color="secondary"
@@ -45,41 +46,67 @@
                 :disabled="isLoading"
                 :loading="isLoading"
                 class="ml-2"
-                ><v-icon small>mdi-plus</v-icon>Beri Batas Waktu Pengumpulan</v-btn
+                ><v-icon small>mdi-plus</v-icon>Batas Waktu Pengumpulan</v-btn
+              >
+              <v-btn
+                v-if="!posterProvided"
+                text
+                small
+                color="secondary"
+                @click="posterProvided = true"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="ml-2"
+                ><v-icon small>mdi-plus</v-icon>Poster</v-btn
               >
             </v-flex>
-            <v-row v-if="dueDateProvided" justify="space-between" class="ma-0 pa-0 mt-5">
-              <v-menu
-                v-model="datePickerMenu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                top
-                max-width="290px"
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="dueDate"
-                    label="Batas Waktu"
-                    hint="Form akan tertutup otomatis jika sudah melewati batas waktu yang telah ditentukan"
-                    persistent-hint
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker v-model="dueDate" no-title @input="datePickerMenu = false"></v-date-picker>
-              </v-menu>
+            <v-flex xs12 class="mt-3">
+              <v-row v-if="dueDateProvided" justify="space-between" class="w-100 ma-0 pa-0 mt-5">
+                <v-menu
+                  v-model="datePickerMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  top
+                  max-width="290px"
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="dueDate"
+                      label="Batas Waktu"
+                      hint="Form akan tertutup otomatis jika sudah melewati batas waktu yang telah ditentukan"
+                      persistent-hint
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="dueDate" no-title @input="datePickerMenu = false"></v-date-picker>
+                </v-menu>
+                <v-btn
+                  text
+                  small
+                  color="secondary"
+                  @click="dueDateProvided = false"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  class="ml-2 mt-5"
+                  ><v-icon small>mdi-minus</v-icon>Hapus Batas Waktu</v-btn
+                >
+              </v-row>
+            </v-flex>
+            <v-row v-if="posterProvided" justify="space-between" class="ma-0 pa-0 mt-5">
+              <v-file-input accept="image/*" label="Gambar Poster" @change="saveCurrentFile"></v-file-input>
               <v-btn
                 text
                 small
                 color="secondary"
-                @click="dueDateProvided = false"
+                @click="posterProvided = false"
                 :disabled="isLoading"
                 :loading="isLoading"
                 class="ml-2 mt-5"
-                ><v-icon small>mdi-minus</v-icon>Hapus Batas Waktu</v-btn
+                ><v-icon small>mdi-minus</v-icon>Hapus Poster</v-btn
               >
             </v-row>
             <v-flex xs12 class="mb-3 mt-6">
@@ -254,12 +281,14 @@ export default class AddFormPage extends Vue {
   status: boolean = true;
   datePickerMenu: boolean = false;
   dueDateProvided: boolean = false;
+  posterProvided: boolean = false;
   dueDate: string = '';
   formData: Form = {
     uuid: '',
     authorUuid: '',
     label: '',
     description: '',
+    imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
     dueDate: '',
@@ -441,6 +470,17 @@ export default class AddFormPage extends Vue {
       };
     });
     this.formData.questions = newQuestionSection;
+  }
+
+  async saveCurrentFile(file: any): Promise<void> {
+    if (file) {
+      const arrayBufferObject = await file.arrayBuffer().then((res: any) => {
+        return res;
+      });
+      this.formData.imageBanner = arrayBufferObject;
+    } else {
+      this.formData.imageBanner = undefined;
+    }
   }
 }
 </script>

@@ -54,6 +54,7 @@ const state = (): FormState => ({
     authorUuid: '',
     label: '',
     description: '',
+    imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
     dueDate: '',
