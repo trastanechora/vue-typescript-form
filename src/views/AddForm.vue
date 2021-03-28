@@ -97,7 +97,7 @@
               </v-row>
             </v-flex>
             <v-row v-if="posterProvided" justify="space-between" class="ma-0 pa-0 mt-5">
-              <v-file-input accept="image/*" label="Gambar Poster" @change="saveCurrentFile"></v-file-input>
+              <v-file-input accept="image/*" label="Gambar Poster" @change="saveImageBanner"></v-file-input>
               <v-btn
                 text
                 small
@@ -472,12 +472,13 @@ export default class AddFormPage extends Vue {
     this.formData.questions = newQuestionSection;
   }
 
-  async saveCurrentFile(file: any): Promise<void> {
+  async saveImageBanner(file: any): Promise<void> {
     if (file) {
-      const arrayBufferObject = await file.arrayBuffer().then((res: any) => {
-        return res;
-      });
-      this.formData.imageBanner = arrayBufferObject;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.formData.imageBanner = e.target.result;
+      };
+      reader.readAsDataURL(file);
     } else {
       this.formData.imageBanner = undefined;
     }
