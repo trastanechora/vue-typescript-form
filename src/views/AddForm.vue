@@ -97,15 +97,17 @@
               </v-row>
             </v-flex>
             <v-row v-if="posterProvided" justify="space-between" class="ma-0 pa-0 mt-5">
-              <v-file-input accept="image/*" label="Gambar Poster" @change="saveImageBanner"></v-file-input>
-              <v-btn
-                text
-                small
-                color="secondary"
-                @click="posterProvided = false"
-                :disabled="isLoading"
-                :loading="isLoading"
-                class="ml-2 mt-5"
+              <v-file-input
+                v-if="!formData.imageBanner"
+                accept="image/*"
+                label="Gambar Poster"
+                @change="saveImageBanner"
+              ></v-file-input>
+              <div v-else>
+                <v-btn text small color="secondary" disabled>Pratinjau poster:</v-btn>
+                <v-img :src="formData.imageBanner" max-width="400" max-height="200" class="ml-3"></v-img>
+              </div>
+              <v-btn text small @click="deletePoster" :disabled="isLoading" :loading="isLoading" class="ml-2 mt-5"
                 ><v-icon small>mdi-minus</v-icon>Hapus Poster</v-btn
               >
             </v-row>
@@ -424,6 +426,9 @@ export default class AddFormPage extends Vue {
       this.dueDateProvided = true;
       this.dueDate = this.formData.dueDate.slice(0, 10);
     }
+    if (this.formData.imageBanner) {
+      this.posterProvided = true;
+    }
   }
   getQuestionCount(): number {
     let newQuestionCount: number = 0;
@@ -482,6 +487,11 @@ export default class AddFormPage extends Vue {
     } else {
       this.formData.imageBanner = undefined;
     }
+  }
+
+  deletePoster(): void {
+    this.posterProvided = false;
+    this.formData.imageBanner = undefined;
   }
 }
 </script>
