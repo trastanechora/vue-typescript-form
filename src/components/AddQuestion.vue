@@ -31,6 +31,28 @@
                       class="ml-2"
                       ><v-icon small>mdi-minus</v-icon>Hapus Deskripsi</v-btn
                     >
+                    <v-btn
+                      v-if="!imageProvided"
+                      text
+                      small
+                      color="secondary"
+                      @click="addImage"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2"
+                      ><v-icon small>mdi-plus</v-icon>Beri Gambar</v-btn
+                    >
+                    <v-btn
+                      v-else
+                      text
+                      small
+                      color="secondary"
+                      @click="removeImage"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2"
+                      ><v-icon small>mdi-minus</v-icon>Hapus Gambar</v-btn
+                    >
                   </v-flex>
                   <v-flex xs12>
                     <v-select
@@ -72,6 +94,15 @@
                         :disabled="isLoading"
                         :loading="isLoading"
                       ></v-text-field>
+                    </v-flex>
+                    <v-flex v-if="imageProvided" xs12>
+                      <v-file-input
+                        accept="image/*"
+                        label="Gambar"
+                        :disabled="isLoading"
+                        :loading="isLoading"
+                        @change="saveImage"
+                      ></v-file-input>
                     </v-flex>
                   </v-flex>
                 </v-layout>
@@ -231,6 +262,7 @@ export default class DialogQuestion extends Vue {
   ------------------------------------ */
   valid: boolean = true;
   descriptionProvided: boolean = false;
+  imageProvided: boolean = false;
   currentQuestion: Question = {
     key: '',
     type: {
@@ -240,6 +272,7 @@ export default class DialogQuestion extends Vue {
     required: false,
     text: '',
     description: '',
+    image: undefined,
     options: [
       {
         text: '',
@@ -281,6 +314,9 @@ export default class DialogQuestion extends Vue {
       if (this.descriptionProvided) {
         data.description = this.currentQuestion.description;
       }
+      if (this.imageProvided) {
+        data.image = this.currentQuestion.image;
+      }
       this.add(data);
       this.closeDialog();
       addQuestionForm.reset();
@@ -299,6 +335,9 @@ export default class DialogQuestion extends Vue {
       if (this.descriptionProvided) {
         data.description = this.currentQuestion.description;
       }
+      if (this.imageProvided) {
+        data.image = this.currentQuestion.image;
+      }
       this.edit(data);
       this.closeDialog();
       addQuestionForm.reset();
@@ -310,8 +349,25 @@ export default class DialogQuestion extends Vue {
   removeDescription() {
     this.descriptionProvided = false;
   }
+  addImage() {
+    this.imageProvided = true;
+  }
+  removeImage() {
+    this.imageProvided = false;
+  }
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
+  }
+  saveImage(file: any): void {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.currentQuestion.image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      this.currentQuestion.image = undefined;
+    }
   }
   addOption(): void {
     this.currentQuestion.options!.push({

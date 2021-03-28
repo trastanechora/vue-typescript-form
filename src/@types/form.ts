@@ -42,6 +42,7 @@ export interface Question {
   required: boolean;
   description?: string;
   options?: Option[];
+  image?: any;
 }
 
 export interface QuestionSection {
