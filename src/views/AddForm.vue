@@ -162,6 +162,9 @@
                   <v-expansion-panel-content>
                     <v-row
                       ><v-col cols="6" class="text--secondary px-6">
+                        <v-row v-if="item.image">
+                          <v-img :src="item.image" max-width="300" max-height="150"></v-img>
+                        </v-row>
                         <v-row>{{ item.description ? item.description : '' }}</v-row>
                         <v-row v-if="item.type.value === 'radio' || item.type.value === 'checkbox'"
                           ><v-list dense>

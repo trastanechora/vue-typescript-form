@@ -97,12 +97,17 @@
                     </v-flex>
                     <v-flex v-if="imageProvided" xs12>
                       <v-file-input
+                        v-if="!currentQuestion.image"
                         accept="image/*"
                         label="Gambar"
                         :disabled="isLoading"
                         :loading="isLoading"
                         @change="saveImage"
                       ></v-file-input>
+                      <div v-else>
+                        <v-btn text small color="secondary" disabled>Pratinjau gambar:</v-btn>
+                        <v-img :src="currentQuestion.image" max-width="300" max-height="200" class="ml-3"></v-img>
+                      </div>
                     </v-flex>
                   </v-flex>
                 </v-layout>
@@ -354,6 +359,7 @@ export default class DialogQuestion extends Vue {
   }
   removeImage() {
     this.imageProvided = false;
+    this.currentQuestion.image = undefined;
   }
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
@@ -401,6 +407,12 @@ export default class DialogQuestion extends Vue {
         this.currentQuestion = { ...this.selectedQuestion };
       } else {
         this.currentQuestion.required = false;
+      }
+      if (this.selectedQuestion.description) {
+        this.descriptionProvided = true;
+      }
+      if (this.selectedQuestion.image) {
+        this.imageProvided = true;
       }
     } else {
       this.currentQuestion.type = {
