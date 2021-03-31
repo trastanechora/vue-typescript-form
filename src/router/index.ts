@@ -29,7 +29,7 @@ const routes: Array<RouteConfig> = [
         component: Home
       },
       {
-        path: '/admin',
+        path: '/login',
         name: 'Login',
         component: Login
       },

@@ -1,9 +1,7 @@
 <template>
   <v-app>
     <Snackbar />
-    <v-main>
-      <router-view />
-    </v-main>
+    <router-view />
   </v-app>
 </template>
 
@@ -26,12 +24,5 @@ export default Vue.extend({
 <style lang="stylus">
 .full-width {
   width: 100%;
-}
-.admin-drawer {
-  position: fixed;
-  padding-top: 56px;
-}
-.admin-view {
-  padding: 0 20px;
 }
 </style>

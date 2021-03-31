@@ -36,7 +36,7 @@
         </v-list-item>
       </v-list>
     </v-menu>
-    <v-btn v-else id="account-btn" depressed rounded color="primary" class="ma-2" to="/admin">
+    <v-btn v-else id="account-btn" depressed rounded color="primary" class="ma-2" to="/login">
       <v-icon left>
         mdi-key-chain-variant
       </v-icon>
@@ -86,7 +86,7 @@ export default class AppBar extends Vue {
 
   logout(): void {
     this.$store.dispatch('auth/logout').then(() => {
-      this.$router.push('/admin');
+      this.$router.push('/login');
     });
   }
 }

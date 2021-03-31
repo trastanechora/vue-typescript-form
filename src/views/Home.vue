@@ -39,7 +39,14 @@
               </v-btn>
             </v-flex>
             <v-flex xs10 class="my-2 mx-auto text-end">
-              <v-btn text small color="secondary" :disabled="isLoading" :loading="isLoading" class="ml-2" to="/admin"
+              <v-btn
+                text
+                small
+                color="secondary"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="ml-2"
+                @click="checkAuth"
                 ><v-icon small>mdi-plus</v-icon>Buat Form</v-btn
               >
             </v-flex>
@@ -79,6 +86,13 @@ export default class HomePage extends Vue {
   search(): void {
     if (this.searchString) {
       this.$router.push(`/questionnaire/${this.searchString}`);
+    }
+  }
+  checkAuth(): void {
+    if (this.$store.state.auth.isLogin) {
+      this.$router.push('/dashboard/form');
+    } else {
+      this.$router.push('/login');
     }
   }
 }

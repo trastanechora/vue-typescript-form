@@ -1,96 +1,28 @@
 <template>
-  <v-layout wrap class="admin-view full-width">
-    <v-flex xs12 class="mb-4">
-      <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
+  <v-layout wrap class="full-width">
+    <v-flex xs3 class="mb-4">
+      <v-list two-line>
+        <template v-for="(item, index) in items">
+          <v-subheader v-if="item.header" :key="item.header" inset>
+            {{ item.header }}
+          </v-subheader>
+
+          <v-divider v-else-if="item.divider" :key="index" inset></v-divider>
+
+          <v-list-item v-else :key="item.title" ripple>
+            <v-list-item-avatar>
+              <img :src="item.avatar" />
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.title"></v-list-item-title>
+              <v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-list>
     </v-flex>
-    <v-flex xs12>
-      <v-data-table
-        :headers="formHeaders"
-        :items="formList"
-        :items-per-page="10"
-        :loading="isLoading"
-        class="elevation-1 full-width"
-      >
-        <template v-slot:[`item.label`]="{ item }">
-          <v-tooltip right>
-            <template v-slot:activator="{ on }">
-              <v-btn text small color="primary" v-on="on" @click="toResponseList(item.uuid)">{{ item.label }}</v-btn>
-            </template>
-            <span>Lihat Responden</span>
-          </v-tooltip>
-        </template>
-        <template v-slot:[`item.status`]="{ item }">
-          <v-chip
-            v-if="!checkDueDate(item.dueDate)"
-            :color="statusColorFormatter(item.status)"
-            class="ma-2"
-            outlined
-            small
-          >
-            <v-icon left x-small>
-              {{ statusIconFormatter(item.status) }}
-            </v-icon>
-            {{ statusTextFormatter(item.status) }}
-          </v-chip>
-          <v-chip v-else :color="statusColorFormatter('ended')" class="ma-2" outlined small>
-            <v-icon left x-small>
-              {{ statusIconFormatter('ended') }}
-            </v-icon>
-            {{ statusTextFormatter('ended') }}
-          </v-chip>
-        </template>
-        <template v-slot:[`item.dueDate`]="{ item }">
-          {{ item.dueDate ? formatDate(item.dueDate) : '-' }}
-        </template>
-        <template v-slot:[`item.createdAt`]="{ item }">
-          {{ formatDate(item.createdAt) }}
-        </template>
-        <template v-slot:[`item.updatedAt`]="{ item }">
-          {{ item.updatedAt ? formatDate(item.updatedAt) : '-' }}
-        </template>
-        <template v-slot:[`item.link`]="{ item }">
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                :loading="isLoading"
-                :disabled="isLoading"
-                v-bind="attrs"
-                v-on="on"
-                @click="copyToClipboard(item.link)"
-              >
-                <v-icon>mdi-share</v-icon>
-              </v-btn>
-            </template>
-            <span>Salin Tautan</span>
-          </v-tooltip>
-        </template>
-        <template v-slot:[`item.userAction`]="{ item }">
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon :loading="isLoading" :disabled="isLoading" v-bind="attrs" v-on="on" @click="editForm(item)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-            <span>Ubah</span>
-          </v-tooltip>
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                :loading="isLoading"
-                :disabled="isLoading"
-                v-bind="attrs"
-                v-on="on"
-                @click="showDeleteDialog(item)"
-              >
-                <v-icon>mdi-trash-can</v-icon>
-              </v-btn>
-            </template>
-            <span>Hapus</span>
-          </v-tooltip>
-        </template>
-      </v-data-table>
+    <v-flex xs9>
+      <!-- BOARDS CONTENT GOES HERE -->
     </v-flex>
     <DialogConfirmation :dialog="dialog" :close-dialog="closeDeleteDialog" />
   </v-layout>
@@ -98,7 +30,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { TableHeader, Form, FormStatus } from '@/@types';
+import { Form, FormStatus } from '@/@types';
 import { dateFormatter, statusFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 import DialogConfirmation from '@/components/DialogConfirmation.vue';
@@ -111,21 +43,58 @@ export default class DashboardPage extends Vue {
   => Local State Declaration
   ------------------------------------ */
   dialog: boolean = false;
-  formHeaders: TableHeader[] = [
-    { text: 'Label', value: 'label', width: 300 },
-    { text: 'Jumlah Pertanyaan', value: 'questionCount', align: 'center' },
-    { text: 'Jumlah Responden', value: 'respondentCount', align: 'center' },
-    { text: 'Status', value: 'status', align: 'center' },
-    { text: 'Batas Waktu', value: 'dueDate', width: 150, align: 'center' },
-    { text: 'Tanggal Dibuat', value: 'createdAt', width: 150, align: 'center' },
-    { text: 'Diedit Terakhir', value: 'updatedAt', width: 150, align: 'center' },
-    { text: 'Link', value: 'link', align: 'center', sortable: false },
+  items: any = [
     {
-      text: 'Tindakan',
-      value: 'userAction',
-      width: 150,
-      align: 'center',
-      sortable: false
+      header: 'Today'
+    },
+    { divider: true },
+    {
+      avatar: 'https://picsum.photos/250/300?image=660',
+      title: 'Meeting @ Noon',
+      subtitle: `<span class="font-weight-bold">Spike Lee</span> &mdash; I'll be in your neighborhood`
+    },
+    {
+      avatar: 'https://picsum.photos/250/300?image=821',
+      title: 'Summer BBQ <span class="grey--text text--lighten-1"></span>',
+      subtitle: '<span class="font-weight-bold">to Operations support</span> &mdash; Wish I could come.'
+    },
+    {
+      avatar: 'https://picsum.photos/250/300?image=783',
+      title: 'Yes yes',
+      subtitle: '<span class="font-weight-bold">Bella</span> &mdash; Do you have Paris recommendations'
+    },
+    {
+      header: 'Yesterday'
+    },
+    { divider: true },
+    {
+      avatar: 'https://picsum.photos/250/300?image=1006',
+      title: 'Dinner tonight?',
+      subtitle: '<span class="font-weight-bold">LaToya</span> &mdash; Do you want to hang out?'
+    },
+    {
+      avatar: 'https://picsum.photos/250/300?image=146',
+      title: 'So long',
+      subtitle: '<span class="font-weight-bold">Nancy</span> &mdash; Do you see what time it is?'
+    },
+    {
+      header: 'Last Week'
+    },
+    { divider: true },
+    {
+      avatar: 'https://picsum.photos/250/300?image=1008',
+      title: 'Breakfast?',
+      subtitle: '<span class="font-weight-bold">LaToya</span> &mdash; Do you want to hang out?'
+    },
+    {
+      avatar: 'https://picsum.photos/250/300?image=839',
+      title: 'Winter Porridge <span class="grey--text text--lighten-1"></span>',
+      subtitle: '<span class="font-weight-bold">cc: Daniel</span> &mdash; Tell me more...'
+    },
+    {
+      avatar: 'https://picsum.photos/250/300?image=145',
+      title: 'Oui oui',
+      subtitle: '<span class="font-weight-bold">Nancy</span> &mdash; Do you see what time it is?'
     }
   ];
 
@@ -134,18 +103,14 @@ export default class DashboardPage extends Vue {
   ** (Adopt store variables to local state)
   ------------------------------------ */
   get isLoading(): boolean {
-    return this.$store.state.form.isLoading;
-  }
-
-  get formList(): Form[] {
-    return this.$store.state.form.formList;
+    return this.$store.state.project.isLoading;
   }
 
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
   mounted(): void {
-    this.$store.dispatch('form/getForms');
+    // this.$store.dispatch('form/getForms');
   }
 
   /* ------------------------------------

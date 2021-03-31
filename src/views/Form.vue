@@ -1,5 +1,5 @@
 <template>
-  <v-layout wrap class="admin-view full-width">
+  <v-layout wrap class="full-width">
     <v-flex xs12 class="mb-4">
       <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
     </v-flex>
@@ -188,12 +188,12 @@ export default class FormPage extends Vue {
   }
   async addForm(): Promise<void> {
     await this.$store.dispatch('form/updateEditState', false);
-    this.$router.push('/dashboard/form');
+    this.$router.push('/dashboard/form/add-edit');
   }
   async editForm(item: Form): Promise<void> {
     await this.$store.dispatch('form/updateEditState', true);
     await this.$store.dispatch('form/updateSelectedForm', item);
-    this.$router.push('/dashboard/form');
+    this.$router.push('/dashboard/form/add-edit');
   }
   async showDeleteDialog(item: Form): Promise<void> {
     await this.$store.dispatch('form/updateSelectedForm', item);
