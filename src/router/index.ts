@@ -10,8 +10,11 @@ import Questionnaire from '@/views/Questionnaire.vue';
 import Response from '@/views/Response.vue';
 import ThankYou from '@/views/ThankYou.vue';
 import Profile from '@/views/Profile.vue';
+import Form from '@/views/Form.vue';
+import Board from '@/views/Board.vue';
 import Default from '@/layout/Default.vue';
-import Admin from '@/layout/Admin.vue';
+import Authenticated from '@/layout/Authenticated.vue';
+import Plain from '@/layout/Plain.vue';
 
 Vue.use(VueRouter);
 
@@ -50,7 +53,7 @@ const routes: Array<RouteConfig> = [
 
   {
     path: '/dashboard',
-    component: Admin,
+    component: Authenticated,
     meta: {
       auth: true
     },
@@ -67,13 +70,35 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'form',
-        name: 'Add New Form',
-        component: AddForm
+        component: Plain,
+        children: [
+          {
+            path: '',
+            name: 'Form List',
+            component: Form
+          },
+          {
+            path: 'add-edit',
+            name: 'Add New Form',
+            component: AddForm
+          },
+          {
+            path: ':id',
+            name: 'View Response',
+            component: Response
+          }
+        ]
       },
       {
-        path: ':id',
-        name: 'View Response',
-        component: Response
+        path: 'board',
+        component: Plain,
+        children: [
+          {
+            path: '',
+            name: 'Project List',
+            component: Board
+          }
+        ]
       }
     ]
   },
