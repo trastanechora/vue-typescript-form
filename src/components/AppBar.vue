@@ -1,10 +1,13 @@
 <template>
   <v-app-bar fixed app>
-    <v-btn id="home-btn" text class="ma-2" to="/">
+    <v-btn id="home-btn" text class="ma-2" to="/dashboard" active-class="no-active">
       <v-toolbar-title v-text="title" />
     </v-btn>
-    <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/" active-class="no-active">
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/form" active-class="no-active">
       Form
+    </v-btn>
+    <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/board" active-class="no-active">
+      Board
     </v-btn>
     <v-btn v-if="isLogin" id="dashboard-btn" text class="ma-2" to="/dashboard/profile" active-class="no-active">
       Profil

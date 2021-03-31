@@ -14,5 +14,5 @@ import AppBar from '@/components/AppBar.vue';
 @Component({
   components: { AppBar }
 })
-export default class AdminLayout extends Vue {}
+export default class AuthenticatedLayout extends Vue {}
 </script>
