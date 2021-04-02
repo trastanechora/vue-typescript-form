@@ -1,5 +1,5 @@
 <template>
-  <v-layout wrap class="full-width">
+  <v-layout wrap class="pa-10">
     <v-flex xs12 class="mb-4">
       <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
     </v-flex>
@@ -9,7 +9,7 @@
         :items="formList"
         :items-per-page="10"
         :loading="isLoading"
-        class="elevation-1 full-width"
+        class="elevation-1"
       >
         <template v-slot:[`item.label`]="{ item }">
           <v-tooltip right>
@@ -100,11 +100,10 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { TableHeader, Form, FormStatus } from '@/@types';
 import { dateFormatter, statusFormatter } from '@/@utils';
-import AppBar from '@/components/AppBar.vue';
 import DialogConfirmation from '@/components/DialogConfirmation.vue';
 
 @Component({
-  components: { AppBar, DialogConfirmation }
+  components: { DialogConfirmation }
 })
 export default class FormPage extends Vue {
   /* ------------------------------------

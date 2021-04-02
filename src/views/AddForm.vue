@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-layout wrap class="full-width">
+    <v-layout wrap class="full-width pa-10">
       <v-flex xs10 class="mb-4 mx-auto">
         <v-form ref="addForm" v-model="valid" lazy-validation>
           <v-layout wrap>
