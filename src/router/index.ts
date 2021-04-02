@@ -11,10 +11,12 @@ import Response from '@/views/Response.vue';
 import ThankYou from '@/views/ThankYou.vue';
 import Profile from '@/views/Profile.vue';
 import Form from '@/views/Form.vue';
+import Project from '@/views/Project.vue';
 import Board from '@/views/Board.vue';
 import Default from '@/layout/Default.vue';
 import Authenticated from '@/layout/Authenticated.vue';
 import Plain from '@/layout/Plain.vue';
+import BoardLayout from '@/layout/Board.vue';
 
 Vue.use(VueRouter);
 
@@ -91,11 +93,16 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'board',
-        component: Plain,
+        component: BoardLayout,
         children: [
           {
             path: '',
             name: 'Project List',
+            component: Project
+          },
+          {
+            path: ':id',
+            name: 'Board',
             component: Board
           }
         ]
