@@ -1,100 +1,106 @@
 <template>
-  <v-layout wrap class="full-width">
-    <v-flex xs3 class="mb-4">
-      <v-list two-line>
-        <template v-for="(item, index) in items">
-          <v-subheader v-if="item.header" :key="item.header" inset>
-            {{ item.header }}
-          </v-subheader>
-
-          <v-divider v-else-if="item.divider" :key="index" inset></v-divider>
-
-          <v-list-item v-else :key="item.title" ripple>
-            <v-list-item-avatar>
-              <img :src="item.avatar" />
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title v-html="item.title"></v-list-item-title>
-              <v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
+  <v-layout id="board" wrap>
+    <v-flex xs12>
+      <v-card flat>
+        <v-toolbar class="elevation-0" dense>
+          <v-app-bar-nav-icon></v-app-bar-nav-icon>
+          <v-toolbar-title>Judul Board</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon>
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+          <v-btn icon>
+            <v-icon>mdi-heart</v-icon>
+          </v-btn>
+          <v-btn icon>
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card>
     </v-flex>
-    <v-flex xs9>
-      <!-- BOARDS CONTENT GOES HERE -->
+    <v-flex xs12 class="board-container mt-2">
+      <draggable
+        v-model="boards"
+        group="boards"
+        tag="div"
+        class="full-height no-wrap"
+        draggable=".item"
+        ghost-class="ghost"
+      >
+        <div v-for="list in boards" :key="list.id" class="list-container item">
+          <v-card class="ma-0 px-2 py-3" color="tone" flat>
+            <v-flex xs12 class="px-1">
+              <strong>{{ list.title }}</strong>
+            </v-flex>
+            <v-flex xs12>
+              <draggable v-model="list.cards" group="cards" tag="div" draggable=".cardItem" ghost-class="ghost">
+                <v-card v-for="card in list.cards" :key="card.id" class="mb-2 cardItem">
+                  <v-card-title class="pb-0">
+                    {{ card.title }}
+                  </v-card-title>
+                  <v-card-actions>
+                    <v-btn text>
+                      Edit
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </draggable>
+            </v-flex>
+            <v-flex xs12 class="mt-1"
+              ><v-btn block depressed text><v-icon small>mdi-plus</v-icon>Tambahkan Kartu</v-btn></v-flex
+            >
+          </v-card>
+        </div>
+        <div class="list-container">
+          <v-btn block depressed><v-icon small>mdi-plus</v-icon>Tambahkan List</v-btn>
+        </div>
+      </draggable>
     </v-flex>
-    <DialogConfirmation :dialog="dialog" :close-dialog="closeDeleteDialog" />
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Form, FormStatus } from '@/@types';
-import { dateFormatter, statusFormatter } from '@/@utils';
-import AppBar from '@/components/AppBar.vue';
-import DialogConfirmation from '@/components/DialogConfirmation.vue';
+import draggable from 'vuedraggable';
 
 @Component({
-  components: { AppBar, DialogConfirmation }
+  components: {
+    draggable
+  }
 })
-export default class DashboardPage extends Vue {
+export default class ProjectPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  dialog: boolean = false;
-  items: any = [
+  boards: any = [
     {
-      header: 'Today'
-    },
-    { divider: true },
-    {
-      avatar: 'https://picsum.photos/250/300?image=660',
-      title: 'Meeting @ Noon',
-      subtitle: `<span class="font-weight-bold">Spike Lee</span> &mdash; I'll be in your neighborhood`
+      id: 1,
+      title: 'Judul List 1',
+      cards: []
     },
     {
-      avatar: 'https://picsum.photos/250/300?image=821',
-      title: 'Summer BBQ <span class="grey--text text--lighten-1"></span>',
-      subtitle: '<span class="font-weight-bold">to Operations support</span> &mdash; Wish I could come.'
+      id: 2,
+      title: 'Judul List 2',
+      cards: [
+        {
+          id: 1,
+          title: 'Test Card 1'
+        }
+      ]
     },
     {
-      avatar: 'https://picsum.photos/250/300?image=783',
-      title: 'Yes yes',
-      subtitle: '<span class="font-weight-bold">Bella</span> &mdash; Do you have Paris recommendations'
-    },
-    {
-      header: 'Yesterday'
-    },
-    { divider: true },
-    {
-      avatar: 'https://picsum.photos/250/300?image=1006',
-      title: 'Dinner tonight?',
-      subtitle: '<span class="font-weight-bold">LaToya</span> &mdash; Do you want to hang out?'
-    },
-    {
-      avatar: 'https://picsum.photos/250/300?image=146',
-      title: 'So long',
-      subtitle: '<span class="font-weight-bold">Nancy</span> &mdash; Do you see what time it is?'
-    },
-    {
-      header: 'Last Week'
-    },
-    { divider: true },
-    {
-      avatar: 'https://picsum.photos/250/300?image=1008',
-      title: 'Breakfast?',
-      subtitle: '<span class="font-weight-bold">LaToya</span> &mdash; Do you want to hang out?'
-    },
-    {
-      avatar: 'https://picsum.photos/250/300?image=839',
-      title: 'Winter Porridge <span class="grey--text text--lighten-1"></span>',
-      subtitle: '<span class="font-weight-bold">cc: Daniel</span> &mdash; Tell me more...'
-    },
-    {
-      avatar: 'https://picsum.photos/250/300?image=145',
-      title: 'Oui oui',
-      subtitle: '<span class="font-weight-bold">Nancy</span> &mdash; Do you see what time it is?'
+      id: 3,
+      title: 'Judul List 3',
+      cards: [
+        {
+          id: 2,
+          title: 'Test Card 2'
+        },
+        {
+          id: 3,
+          title: 'Test Card 3'
+        }
+      ]
     }
   ];
 
@@ -116,57 +122,6 @@ export default class DashboardPage extends Vue {
   /* ------------------------------------
   => Methods
   ------------------------------------ */
-  formatDate(dateIsoString: string): string {
-    const parsedDate = new Date(dateIsoString);
-    return dateFormatter(parsedDate);
-  }
-  statusTextFormatter(status: FormStatus): string {
-    return statusFormatter(status).text;
-  }
-  statusColorFormatter(status: FormStatus): string {
-    return statusFormatter(status).color;
-  }
-  statusIconFormatter(status: FormStatus): string {
-    return statusFormatter(status).icon;
-  }
-  checkDueDate(date: string): boolean {
-    const dueDate = new Date(date);
-    const today = new Date();
-    return today > dueDate;
-  }
-  copyToClipboard(text: string): void {
-    const dummy = document.createElement('textarea');
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand('copy');
-    document.body.removeChild(dummy);
-    this.$store.dispatch('ui/showSnackbar', {
-      open: true,
-      message: 'Link telah berhasil disalin!',
-      color: 'dark',
-      timeout: 4000
-    });
-  }
-  toResponseList(uuid: string): void {
-    this.$router.push(`/dashboard/${uuid}`);
-  }
-  async addForm(): Promise<void> {
-    await this.$store.dispatch('form/updateEditState', false);
-    this.$router.push('/dashboard/form');
-  }
-  async editForm(item: Form): Promise<void> {
-    await this.$store.dispatch('form/updateEditState', true);
-    await this.$store.dispatch('form/updateSelectedForm', item);
-    this.$router.push('/dashboard/form');
-  }
-  async showDeleteDialog(item: Form): Promise<void> {
-    await this.$store.dispatch('form/updateSelectedForm', item);
-    this.dialog = true;
-  }
-  closeDeleteDialog(): void {
-    this.dialog = false;
-  }
 }
 </script>
 
@@ -174,5 +129,58 @@ export default class DashboardPage extends Vue {
 .v-btn {
   letter-spacing: normal;
   text-transform: none;
+  font-weight: 400;
+}
+.full-height {
+  height: 100%;
+}
+.no-wrap {
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+#board {
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  top: 0;
+}
+.board-container {
+  height: 100%;
+}
+.list-container:first-child {
+  margin-left: 8px;
+}
+.list-container {
+  width: 272px;
+  margin: 0 4px;
+  height: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.list {
+  background-color: #ebecf0;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  position: relative;
+  white-space: normal;
+}
+.headline {
+  font-size: 1rem!important;
+}
+.ghost {
+  opacity: 0.2;
+  background: var(--v-primary-base);
+}
+.list-background {
+  background-color: var(--v-primary-base);
+}
+.test {
+  background-color: #ebecf0;
 }
 </style>
