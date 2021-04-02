@@ -1,5 +1,5 @@
 <template>
-  <v-layout wrap class="full-width">
+  <v-layout wrap class="full-width pa-10">
     <v-flex xs12 class="mb-4 mx-2">
       <v-layout class="mb-2">
         <v-flex xs10>
