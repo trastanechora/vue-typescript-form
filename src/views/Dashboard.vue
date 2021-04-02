@@ -1,5 +1,5 @@
 <template>
-  <v-layout wrap class="full-width">
+  <v-layout wrap class="full-width pa-10">
     <v-flex xs12 class="mb-4">
       <h1 class="text-center primary--text mb-2">Selamat Datang</h1>
       <h4 class="text-center">Pilih menu dari Navigasi untuk menggunakan fitur Form atau Board</h4>
