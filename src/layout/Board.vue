@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <v-main class="overflow-hidden">
     <router-view />
   </v-main>
 </template>
@@ -8,5 +8,11 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
-export default class PlainLayout extends Vue {}
+export default class BoardLayout extends Vue {}
 </script>
+
+<style scoped>
+.overflow-hidden {
+  overflow: hidden;
+}
+</style>
