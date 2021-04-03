@@ -9,3 +9,4 @@ export * from './ui';
 export * from './auth';
 export * from './form';
 export * from './user';
+export * from './board';
