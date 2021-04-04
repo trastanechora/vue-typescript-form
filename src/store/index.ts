@@ -6,6 +6,7 @@ import ui from './ui';
 import auth from './auth';
 import form from './form';
 import user from './user';
+import board from './board';
 
 Vue.use(Vuex);
 
@@ -27,6 +28,10 @@ export default new Vuex.Store({
     form: {
       namespaced: true,
       ...form
+    },
+    board: {
+      namespaced: true,
+      ...board
     },
     user: {
       namespaced: true,
