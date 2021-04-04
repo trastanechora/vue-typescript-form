@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="profile pt-10">
     <v-card max-width="500" class="mx-auto mt-10">
       <v-list>
         <v-list-item>
