@@ -171,6 +171,41 @@ export const BOARD_ENDPOINT: any = {
     });
   },
   /* ------------------------------------
+  => [DELETE] Delete CardGroup
+  ------------------------------------ */
+  async deleteCardGroup(cardGroup: CardGroup): Promise<void> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === cardGroup.boardId) {
+            const editedBoard = result.value;
+            const newCardGroup = result.value.cardGroup.reduce(function(
+              result: CardGroup[],
+              currentCardGroup: CardGroup
+            ) {
+              if (currentCardGroup.id !== cardGroup.id) {
+                result.push(currentCardGroup);
+              }
+              return result;
+            },
+            []);
+            editedBoard.cardGroup = newCardGroup;
+            boardStore.put(editedBoard);
+            resolve(editedBoard);
+          }
+          result.continue();
+        } else {
+          reject('List tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
   => [POST] Insert New Card
   ------------------------------------ */
   async addCard(card: Card): Promise<Board> {

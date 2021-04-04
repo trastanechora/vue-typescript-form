@@ -45,7 +45,7 @@
                       <v-list-item-title>Ubah</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item @click="deleteCard(card, list.id)">
+                  <v-list-item @click="deleteCardGroup(list)">
                     <v-list-item-icon>
                       <v-icon>mdi-trash-can</v-icon>
                     </v-list-item-icon>
@@ -262,15 +262,20 @@ export default class ProjectPage extends Vue {
   }
 
   editCardGroup(cardGroup: CardGroup): void {
+    console.warn('edited cardGroup', cardGroup);
     this.$store
-      .dispatch('board/editCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id })
+      .dispatch('board/editCardGroup', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id })
       .then(() => {
         this.closeAddCardGroupDialog();
       });
   }
 
   deleteCardGroup(cardGroup: CardGroup): void {
-    this.$store.dispatch('board/deleteCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id });
+    this.$store
+      .dispatch('board/deleteCardGroup', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id })
+      .then(() => {
+        this.closeAddCardGroupDialog();
+      });
   }
 
   closeAddCardGroupDialog(): void {
