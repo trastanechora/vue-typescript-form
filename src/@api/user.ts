@@ -16,7 +16,7 @@ export const USER_ENDPOINT: any = {
       }
       const request = window.indexedDB.open(DB_NAME, DB_VERSION);
       request.onerror = e => {
-        console.log('Error opening DB!', e);
+        console.log('[API] Error opening DB!', e);
         reject('Error');
       };
       request.onsuccess = (e: any) => {
@@ -24,7 +24,7 @@ export const USER_ENDPOINT: any = {
         resolve(DB);
       };
       request.onupgradeneeded = (e: any) => {
-        console.log('DB Upgrade success!');
+        console.log('[API] DB Upgrade success!');
         const db: any = e.target.result;
         const objectStore = db.createObjectStore('users', { keyPath: 'uuid' });
         objectStore.createIndex('username', 'username', { unique: true });

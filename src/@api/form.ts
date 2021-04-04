@@ -16,7 +16,7 @@ export const FORM_ENDPOINT: any = {
       }
       const request = window.indexedDB.open(DB_NAME, DB_VERSION);
       request.onerror = e => {
-        console.log('Error opening DB!', e);
+        console.log('[API] Error opening DB!', e);
         reject('Error');
       };
       request.onsuccess = (e: any) => {
@@ -24,7 +24,7 @@ export const FORM_ENDPOINT: any = {
         resolve(DB);
       };
       request.onupgradeneeded = (e: any) => {
-        console.log('DB Upgrade success!');
+        console.log('[API] DB Upgrade success!');
         const db: any = e.target.result;
         const objectStore = db.createObjectStore('forms', { keyPath: 'uuid' });
         objectStore.createIndex('label', 'label', { unique: false });
@@ -104,7 +104,6 @@ export const FORM_ENDPOINT: any = {
   => [PUT] Edit Form and Submit Response
   ------------------------------------ */
   async editForm(formData: Form): Promise<Form> {
-    console.warn('formData', formData);
     const db: any = await this.getDb();
     return new Promise((resolve, reject) => {
       const trans = db.transaction(['forms'], 'readwrite');
@@ -114,7 +113,6 @@ export const FORM_ENDPOINT: any = {
         const result = e.target.result;
         if (result) {
           if (result.value.uuid === formData.uuid) {
-            console.warn('result', result.value);
             formStore.put(formData);
             resolve(formData);
           }
