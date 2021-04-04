@@ -102,12 +102,12 @@ export const BOARD_ENDPOINT: any = {
   /* ------------------------------------
   => [DELETE] Delete Board
   ------------------------------------ */
-  async deleteBoard(board: any): Promise<void> {
+  async deleteBoard(board: Board): Promise<void> {
     const db: any = await this.getDb();
     return new Promise(resolve => {
       const trans = db.transaction(['boards'], 'readwrite');
       const store = trans.objectStore('boards');
-      store.delete(board.uuid);
+      store.delete(board.id);
       trans.oncomplete = () => {
         resolve();
       };
@@ -157,6 +157,44 @@ export const BOARD_ENDPOINT: any = {
               if (cardGroup.id === card.cardGroupId) {
                 const newCardGroup = cardGroup;
                 newCardGroup.cards.push(card);
+                return newCardGroup;
+              } else {
+                return cardGroup;
+              }
+            });
+            boardStore.put(editedBoard);
+            resolve(editedBoard);
+          }
+          result.continue();
+        } else {
+          reject('Board tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
+  => [DELETE] Delete Card
+  ------------------------------------ */
+  async deleteCard(card: Card): Promise<void> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === card.boardId) {
+            const editedBoard = result.value;
+            editedBoard.cardGroup = result.value.cardGroup.map((cardGroup: CardGroup) => {
+              if (cardGroup.id === card.cardGroupId) {
+                const newCardGroup = cardGroup;
+                newCardGroup.cards = cardGroup.cards.reduce(function(result: Card[], currentCard: Card) {
+                  if (currentCard.id !== card.id) {
+                    result.push(currentCard);
+                  }
+                  return result;
+                }, []);
                 return newCardGroup;
               } else {
                 return cardGroup;
