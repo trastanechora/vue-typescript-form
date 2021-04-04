@@ -3,14 +3,13 @@
     <v-flex xs12>
       <v-card flat>
         <v-toolbar class="elevation-0" dense>
-          <v-app-bar-nav-icon></v-app-bar-nav-icon>
-          <v-toolbar-title>Judul Board</v-toolbar-title>
+          <v-toolbar-title>{{ boardTitle }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon>
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
           <v-btn icon>
-            <v-icon>mdi-heart</v-icon>
+            <v-icon>mdi-star</v-icon>
           </v-btn>
           <v-btn icon>
             <v-icon>mdi-dots-vertical</v-icon>
@@ -20,108 +19,221 @@
     </v-flex>
     <v-flex xs12 class="board-container mt-2">
       <draggable
-        v-model="boards"
-        group="boards"
+        v-model="cardGroup"
+        group="cardGroup"
         tag="div"
         class="full-height no-wrap"
         draggable=".item"
         ghost-class="ghost"
       >
-        <div v-for="list in boards" :key="list.id" class="list-container item">
+        <div v-for="list in cardGroup" :key="list.id" class="list-container item">
           <v-card class="ma-0 px-2 py-3" color="tone" flat>
-            <v-flex xs12 class="px-1">
+            <v-flex xs12 class="px-1 mb-2">
               <strong>{{ list.title }}</strong>
             </v-flex>
             <v-flex xs12>
               <draggable v-model="list.cards" group="cards" tag="div" draggable=".cardItem" ghost-class="ghost">
                 <v-card v-for="card in list.cards" :key="card.id" class="mb-2 cardItem">
-                  <v-card-title class="pb-0">
+                  <v-card-title class="pb-2 custom-card-tittle">
                     {{ card.title }}
+                    <v-spacer />
+                    <v-menu bottom left>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn icon v-bind="attrs" v-on="on">
+                          <v-icon>mdi-dots-vertical</v-icon>
+                        </v-btn>
+                      </template>
+
+                      <v-list dense>
+                        <v-list-item @click="openEditCardDialog(card, list.id)">
+                          <v-list-item-icon>
+                            <v-icon>mdi-pencil</v-icon>
+                          </v-list-item-icon>
+                          <v-list-item-content>
+                            <v-list-item-title>Ubah</v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item @click="deleteCard(card, list.id)">
+                          <v-list-item-icon>
+                            <v-icon>mdi-trash-can</v-icon>
+                          </v-list-item-icon>
+                          <v-list-item-content>
+                            <v-list-item-title>Hapus</v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
                   </v-card-title>
-                  <v-card-actions>
+                  <!-- <v-card-actions class="pt-0">
                     <v-btn text>
                       Edit
                     </v-btn>
-                  </v-card-actions>
+                  </v-card-actions> -->
                 </v-card>
               </draggable>
             </v-flex>
             <v-flex xs12 class="mt-1"
-              ><v-btn block depressed text><v-icon small>mdi-plus</v-icon>Tambahkan Kartu</v-btn></v-flex
+              ><v-btn block depressed text @click="openAddCardDialog(list.id)"
+                ><v-icon small>mdi-plus</v-icon>Tambahkan Kartu</v-btn
+              ></v-flex
             >
           </v-card>
         </div>
         <div class="list-container">
-          <v-btn block depressed><v-icon small>mdi-plus</v-icon>Tambahkan List</v-btn>
+          <v-btn block depressed @click="openAddCardGroupDialog()"><v-icon small>mdi-plus</v-icon>Tambahkan List</v-btn>
         </div>
       </draggable>
     </v-flex>
+    <AddCard
+      :dialog="cardDialog"
+      :is-edit="cardEditState"
+      :close-dialog="closeAddCardDialog"
+      :selected-card="selectedCard"
+      @add="addCard"
+      @edit="editCard"
+    />
+    <AddList
+      :dialog="cardGroupDialog"
+      :is-edit="cardGroupEditState"
+      :close-dialog="closeAddCardDialog"
+      :selected-card-group="selectedCardGroup"
+      @add="addCardGroup"
+      @edit="editCardGroup"
+    />
   </v-layout>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { CardGroup, Card } from '@/@types';
 import draggable from 'vuedraggable';
+import AddCard from '@/components/AddCard.vue';
+import AddList from '@/components/AddList.vue';
 
 @Component({
   components: {
-    draggable
+    draggable,
+    AddCard,
+    AddList
   }
 })
 export default class ProjectPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  boards: any = [
-    {
-      id: 1,
-      title: 'Judul List 1',
-      cards: []
-    },
-    {
-      id: 2,
-      title: 'Judul List 2',
-      cards: [
-        {
-          id: 1,
-          title: 'Test Card 1'
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Judul List 3',
-      cards: [
-        {
-          id: 2,
-          title: 'Test Card 2'
-        },
-        {
-          id: 3,
-          title: 'Test Card 3'
-        }
-      ]
-    }
-  ];
+  cardDialog: boolean = false;
+  cardEditState: boolean = false;
+  cardGroupTarget: string = '';
+  cardGroupDialog: boolean = false;
+  cardGroupEditState: boolean = false;
+  selectedCard: Card = {
+    id: '',
+    title: '',
+    description: ''
+  };
+  selectedCardGroup: CardGroup = {
+    id: '',
+    title: '',
+    cards: []
+  };
 
   /* ------------------------------------
   => Setter and Getter
   ** (Adopt store variables to local state)
   ------------------------------------ */
   get isLoading(): boolean {
-    return this.$store.state.project.isLoading;
+    return this.$store.state.board.isLoading;
+  }
+
+  get boardTitle(): string {
+    return this.$store.state.board.selectedBoard.title;
+  }
+
+  get cardGroup(): CardGroup {
+    return this.$store.state.board.selectedBoard.cardGroup;
+  }
+
+  set cardGroup(newCardGroup: CardGroup) {
+    this.$store.dispatch('board/updateCurrentCardGroup', newCardGroup);
   }
 
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
   mounted(): void {
-    // this.$store.dispatch('form/getForms');
+    this.$store.dispatch('board/getBoardById', this.$route.params.id);
   }
 
   /* ------------------------------------
   => Methods
   ------------------------------------ */
+  openAddCardDialog(cardGroupId: string): void {
+    this.cardEditState = false;
+    this.cardDialog = true;
+    this.cardGroupTarget = cardGroupId;
+  }
+
+  addCard(card: Card): void {
+    this.$store.dispatch('board/addCard', { ...card, cardGroupId: this.cardGroupTarget });
+  }
+
+  openEditCardDialog(card: Card, cardGroupId: string): void {
+    this.selectedCard = card;
+    this.cardEditState = true;
+    this.cardDialog = true;
+    this.cardGroupTarget = cardGroupId;
+  }
+
+  editCard(card: Card): void {
+    this.$store.dispatch('board/editCard', { ...card, cardGroupId: this.cardGroupTarget });
+  }
+
+  deleteCard(card: Card): void {
+    this.$store.dispatch('board/deleteCard', { ...card, cardGroupId: this.cardGroupTarget });
+  }
+
+  closeAddCardDialog(): void {
+    this.cardDialog = false;
+  }
+
+  openAddCardGroupDialog(): void {
+    this.cardGroupEditState = false;
+    this.cardGroupDialog = true;
+  }
+
+  addCardGroup(cardGroup: CardGroup): void {
+    this.$store
+      .dispatch('board/addCardGroup', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id })
+      .then(() => {
+        this.closeAddCardGroupDialog();
+      });
+  }
+
+  openEditCardGroupDialog(cardGroup: CardGroup): void {
+    this.selectedCardGroup = cardGroup;
+    this.cardGroupEditState = true;
+    this.cardGroupDialog = true;
+  }
+
+  editCardGroup(cardGroup: CardGroup): void {
+    this.$store.dispatch('board/editCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id });
+  }
+
+  deleteCardGroup(cardGroup: CardGroup): void {
+    this.$store.dispatch('board/deleteCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id });
+  }
+
+  closeAddCardGroupDialog(): void {
+    this.cardGroupDialog = false;
+  }
+
+  /* ------------------------------------
+  => Watcher
+  ------------------------------------ */
+  @Watch('cardGroup', { deep: true })
+  handleCardGroup(newValue: any): void {
+    console.warn('Watch cardGroup:', newValue);
+  }
 }
 </script>
 
@@ -180,7 +292,10 @@ export default class ProjectPage extends Vue {
 .list-background {
   background-color: var(--v-primary-base);
 }
-.test {
-  background-color: #ebecf0;
+.custom-card-tittle {
+  font-size: 16px;
+  border-top: inset;
+  border-width: thick;
+  border-color: currentColor;
 }
 </style>
