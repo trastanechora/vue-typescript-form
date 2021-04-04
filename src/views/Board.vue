@@ -29,6 +29,32 @@
         <div v-for="list in cardGroup" :key="list.id" class="list-container item">
           <v-card class="ma-0 px-2 py-3" color="tone" flat>
             <v-flex xs12 class="px-1 mb-2">
+              <v-menu top left>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on">
+                    <v-icon small>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+
+                <v-list dense>
+                  <v-list-item @click="openEditCardGroupDialog(list)">
+                    <v-list-item-icon>
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>Ubah</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item @click="deleteCard(card, list.id)">
+                    <v-list-item-icon>
+                      <v-icon>mdi-trash-can</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>Hapus</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
               <strong>{{ list.title }}</strong>
             </v-flex>
             <v-flex xs12>
@@ -193,11 +219,15 @@ export default class ProjectPage extends Vue {
   }
 
   editCard(card: Card): void {
-    this.$store.dispatch('board/editCard', {
-      ...card,
-      cardGroupId: this.cardGroupTarget,
-      boardId: this.$route.params.id
-    });
+    this.$store
+      .dispatch('board/editCard', {
+        ...card,
+        cardGroupId: this.cardGroupTarget,
+        boardId: this.$route.params.id
+      })
+      .then(() => {
+        this.closeAddCardDialog();
+      });
   }
 
   deleteCard(card: Card, cardGroupTarget: string): void {

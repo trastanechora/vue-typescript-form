@@ -150,6 +150,39 @@ const actions: any = {
         throw err;
       });
   },
+  async editCard(store: Store<BoardState> | any, params: Card): Promise<void> {
+    await store.commit('setLoading', true);
+    return BOARD_ENDPOINT.editCard(params)
+      .then((res: any) => {
+        store.dispatch('getBoardById', params.boardId);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Berhasil Mengubah Kartu',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Gagal Mengubah Kartu',
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        throw err;
+      });
+  },
   async deleteCard(store: Store<BoardState> | any, params: Card): Promise<void> {
     await store.commit('setLoading', true);
     return BOARD_ENDPOINT.deleteCard(params)

@@ -144,7 +144,7 @@ export default class DialogCard extends Vue {
   }
 
   editCard(): void {
-    console.warn('edit card');
+    this.edit(this.currentCard);
   }
 
   /* ------------------------------------
