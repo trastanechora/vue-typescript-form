@@ -95,7 +95,7 @@
     <AddList
       :dialog="cardGroupDialog"
       :is-edit="cardGroupEditState"
-      :close-dialog="closeAddCardDialog"
+      :close-dialog="closeAddCardGroupDialog"
       :selected-card-group="selectedCardGroup"
       @add="addCardGroup"
       @edit="editCardGroup"
@@ -174,7 +174,11 @@ export default class ProjectPage extends Vue {
   }
 
   addCard(card: Card): void {
-    this.$store.dispatch('board/addCard', { ...card, cardGroupId: this.cardGroupTarget });
+    this.$store.dispatch('board/addCard', {
+      ...card,
+      cardGroupId: this.cardGroupTarget,
+      boardId: this.$route.params.id
+    });
   }
 
   openEditCardDialog(card: Card, cardGroupId: string): void {

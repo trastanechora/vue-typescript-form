@@ -1,4 +1,4 @@
-import Store, { BoardState, Board, CardGroup } from '@/@types';
+import Store, { BoardState, Board, CardGroup, Card } from '@/@types';
 import { BOARD_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
@@ -93,7 +93,7 @@ const actions: any = {
           'ui/setSnackbar',
           {
             open: true,
-            message: 'Berhasil Menambahkan Board',
+            message: 'Berhasil Menambahkan List',
             color: 'green',
             timeout: 4000
           },
@@ -107,7 +107,40 @@ const actions: any = {
           'ui/setSnackbar',
           {
             open: true,
-            message: 'Gagal Menambahkan Board',
+            message: 'Gagal Menambahkan List',
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        throw err;
+      });
+  },
+  async addCard(store: Store<BoardState> | any, params: Card): Promise<void> {
+    await store.commit('setLoading', true);
+    return BOARD_ENDPOINT.addCard(params)
+      .then((res: any) => {
+        store.dispatch('getBoardById', params.boardId);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Berhasil Menambahkan Kartu',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Gagal Menambahkan Kartu',
             color: 'red',
             timeout: 4000
           },

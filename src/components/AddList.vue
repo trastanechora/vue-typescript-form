@@ -137,8 +137,8 @@ export default class DialogCard extends Vue {
       if (this.isEdit) {
         this.currentCardGroup = { ...this.selectedCardGroup };
       } else {
-        const addBoardForm = this.$refs.addBoardForm as VForm;
-        addBoardForm.reset();
+        const addCardGroupForm = this.$refs.addCardGroupForm as VForm;
+        addCardGroupForm.reset();
       }
     }
   }
