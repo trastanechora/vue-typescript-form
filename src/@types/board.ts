@@ -14,6 +14,7 @@ export interface CardGroup {
   id: string;
   title: string;
   cards: Card[];
+  boardId?: string;
 }
 
 export interface Board {
