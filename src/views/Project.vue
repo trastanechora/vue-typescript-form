@@ -43,7 +43,7 @@
               <v-row class="mb-4" align="center">
                 <strong class="title">Daftar Board</strong>
                 <v-spacer></v-spacer>
-                <v-btn rounded color="primary" outlined @click="addBoard">
+                <v-btn rounded color="primary" outlined @click="openAddBoardDialog">
                   <v-icon left>mdi-plus</v-icon>Tambah Board
                 </v-btn>
               </v-row>
@@ -51,7 +51,7 @@
               <v-item-group>
                 <v-container>
                   <v-row>
-                    <v-col v-for="n in 7" :key="n" cols="12" md="4">
+                    <v-col v-for="board in boardList" :key="board.id" cols="12" md="4">
                       <v-hover>
                         <template v-slot:default="{ hover }">
                           <v-card class="mx-auto" max-width="344">
@@ -59,16 +59,16 @@
 
                             <v-card-text>
                               <h2 class="title primary--text">
-                                Board Title
+                                {{ board.title }}
                               </h2>
                               <p>
-                                Travel to the best outdoor experience on planet Earth. A vacation you will never forget!
+                                {{ board.description }}
                               </p>
                             </v-card-text>
 
                             <v-fade-transition>
                               <v-overlay v-if="hover" absolute color="primary">
-                                <v-btn color="primary" rounded @click="goToBoard">Buka</v-btn>
+                                <v-btn color="primary" rounded @click="goToBoard(board.id)">Buka</v-btn>
                               </v-overlay>
                             </v-fade-transition>
                           </v-card>
@@ -86,20 +86,34 @@
         </v-window-item>
       </v-window>
     </v-flex>
+    <AddBoard
+      :dialog="addBoardDialog"
+      :is-edit="addBoardEditState"
+      :close-dialog="closeAddBoardDialog"
+      :selected-board="selecetdBoard"
+      @add="addBoard"
+      @edit="editBoard"
+    />
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { Form, FormStatus } from '@/@types';
+import AddBoard from '@/components/AddBoard.vue';
+import { Board } from '@/@types';
 // import { dateFormatter, statusFormatter } from '@/@utils';/
 
-@Component
+@Component({
+  components: {
+    AddBoard
+  }
+})
 export default class ProjectPage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
-  dialog: boolean = false;
+  addBoardDialog: boolean = false;
+  addBoardEditState: boolean = false;
   length: number = 3;
   window: number = 2;
   items: any = [
@@ -107,20 +121,31 @@ export default class ProjectPage extends Vue {
     { title: 'Boards', icon: 'mdi-view-dashboard', value: 2, disabled: false },
     { title: 'Setting', icon: 'mdi-cog', value: 3, disabled: true }
   ];
+  selecetdBoard: Board = {
+    id: '',
+    ownerUuid: '',
+    title: '',
+    description: '',
+    cardGroup: []
+  };
 
   /* ------------------------------------
   => Setter and Getter
   ** (Adopt store variables to local state)
   ------------------------------------ */
   get isLoading(): boolean {
-    return this.$store.state.project.isLoading;
+    return this.$store.state.board.isLoading;
+  }
+
+  get boardList(): boolean {
+    return this.$store.state.board.boards;
   }
 
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
   mounted(): void {
-    // this.$store.dispatch('form/getForms');
+    this.$store.dispatch('board/getBoards');
   }
 
   /* ------------------------------------
@@ -130,12 +155,24 @@ export default class ProjectPage extends Vue {
     console.warn('Displaying detail');
     this.window = id;
   }
-  goToBoard(): void {
-    const id = 'qwertyuiop';
+  goToBoard(id: string): void {
     this.$router.push(`/dashboard/board/${id}`);
   }
-  addBoard(): void {
-    console.warn('Add Board!');
+  openAddBoardDialog(): void {
+    this.addBoardEditState = false;
+    this.addBoardDialog = true;
+  }
+  addBoard(boardData: Board): void {
+    this.$store.dispatch('board/addBoard', boardData).then(() => {
+      this.closeAddBoardDialog();
+    });
+  }
+  editBoard(boardData: Board): void {
+    console.warn('Edit Board', boardData);
+    // this.$store.dispatch('board/addBoard', boardData);
+  }
+  closeAddBoardDialog(): void {
+    this.addBoardDialog = false;
   }
 }
 </script>
