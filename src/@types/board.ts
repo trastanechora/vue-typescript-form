@@ -8,6 +8,7 @@ export interface Card {
   title: string;
   description: string;
   cardGroupId?: string;
+  boardId?: string;
 }
 
 export interface CardGroup {

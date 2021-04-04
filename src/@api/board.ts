@@ -2,7 +2,7 @@ const DB_NAME = 'boarddb';
 const DB_VERSION = 1;
 let DB: any;
 
-import { Board, CardGroup } from '@/@types';
+import { Board, CardGroup, Card } from '@/@types';
 
 export const BOARD_ENDPOINT: any = {
   /* ------------------------------------
@@ -130,6 +130,39 @@ export const BOARD_ENDPOINT: any = {
             editedBoard.cardGroup.push(cardGroup);
             boardStore.put(editedBoard);
             console.warn('[API] Edited Board:', editedBoard);
+            resolve(editedBoard);
+          }
+          result.continue();
+        } else {
+          reject('Board tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
+  => [POST] Insert New Card
+  ------------------------------------ */
+  async addCard(card: Card): Promise<Board> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === card.boardId) {
+            const editedBoard = result.value;
+            editedBoard.cardGroup = result.value.cardGroup.map((cardGroup: CardGroup) => {
+              if (cardGroup.id === card.cardGroupId) {
+                const newCardGroup = cardGroup;
+                newCardGroup.cards.push(card);
+                return newCardGroup;
+              } else {
+                return cardGroup;
+              }
+            });
+            boardStore.put(editedBoard);
             resolve(editedBoard);
           }
           result.continue();
