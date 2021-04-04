@@ -2,7 +2,7 @@ const DB_NAME = 'boarddb';
 const DB_VERSION = 1;
 let DB: any;
 
-import { Board } from '@/@types';
+import { Board, CardGroup } from '@/@types';
 
 export const BOARD_ENDPOINT: any = {
   /* ------------------------------------
@@ -15,7 +15,7 @@ export const BOARD_ENDPOINT: any = {
       }
       const request = window.indexedDB.open(DB_NAME, DB_VERSION);
       request.onerror = e => {
-        console.log('Error opening DB!', e);
+        console.log('[API] Error opening DB!', e);
         reject('Error');
       };
       request.onsuccess = (e: any) => {
@@ -23,7 +23,7 @@ export const BOARD_ENDPOINT: any = {
         resolve(DB);
       };
       request.onupgradeneeded = (e: any) => {
-        console.log('DB Upgrade success!');
+        console.log('[API] DB Upgrade success!');
         const db: any = e.target.result;
         const objectStore = db.createObjectStore('boards', { keyPath: 'id' });
         objectStore.createIndex('title', 'title', { unique: false });
@@ -39,7 +39,6 @@ export const BOARD_ENDPOINT: any = {
   => [GET] Get List of Boards
   ------------------------------------ */
   async getBoards(userUuid: string): Promise<any> {
-    console.warn('Getting Boards');
     const db: any = await this.getDb();
     return new Promise(resolve => {
       const trans = db.transaction(['boards'], 'readonly');
@@ -48,7 +47,6 @@ export const BOARD_ENDPOINT: any = {
       store.openCursor().onsuccess = (e: any) => {
         const cursor = e.target.result;
         if (cursor) {
-          console.warn('cursor.value.ownerUuid', cursor.value.ownerUuid);
           if (cursor.value.ownerUuid === userUuid) {
             boards.push(cursor.value);
           }
@@ -63,21 +61,23 @@ export const BOARD_ENDPOINT: any = {
   /* ------------------------------------
   => [GET] Get Board by ID
   ------------------------------------ */
-  async getBoardById(id: string): Promise<Board> {
+  async getBoardById(userUuid: string, id: string): Promise<Board> {
     const db: any = await this.getDb();
     return new Promise((resolve, reject) => {
       const trans = db.transaction(['boards'], 'readonly');
-      const formStore = trans.objectStore('boards');
-      const getFormRequest = formStore.openCursor();
-      getFormRequest.onsuccess = (e: any) => {
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
         const result = e.target.result;
         if (result) {
-          if (result.value.uuid === id) {
-            resolve(result.value);
+          if (result.value.id === id) {
+            if (result.value.ownerUuid === userUuid) {
+              resolve(result.value);
+            }
           }
           result.continue();
         } else {
-          reject('Form tidak dapat ditemukan');
+          reject('Board tidak dapat ditemukan');
         }
       };
     });
@@ -110,6 +110,32 @@ export const BOARD_ENDPOINT: any = {
       store.delete(board.uuid);
       trans.oncomplete = () => {
         resolve();
+      };
+    });
+  },
+  /* ------------------------------------
+  => [POST] Insert New CardGroup
+  ------------------------------------ */
+  async addCardGroup(cardGroup: CardGroup): Promise<Board> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === cardGroup.boardId) {
+            const editedBoard = { ...result.value };
+            editedBoard.cardGroup.push(cardGroup);
+            boardStore.put(editedBoard);
+            console.warn('[API] Edited Board:', editedBoard);
+            resolve(editedBoard);
+          }
+          result.continue();
+        } else {
+          reject('Board tidak dapat ditemukan');
+        }
       };
     });
   }
