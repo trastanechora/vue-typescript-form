@@ -140,6 +140,37 @@ export const BOARD_ENDPOINT: any = {
     });
   },
   /* ------------------------------------
+  => [PUT] Edit CardGroup
+  ------------------------------------ */
+  async editCardGroup(cardGroup: CardGroup): Promise<Board> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === cardGroup.boardId) {
+            const editedBoard = result.value;
+            editedBoard.cardGroup = result.value.cardGroup.map((currentCardGroup: CardGroup) => {
+              if (currentCardGroup.id === cardGroup.id) {
+                return cardGroup;
+              } else {
+                return currentCardGroup;
+              }
+            });
+            boardStore.put(editedBoard);
+            resolve(editedBoard);
+          }
+          result.continue();
+        } else {
+          reject('List tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
   => [POST] Insert New Card
   ------------------------------------ */
   async addCard(card: Card): Promise<Board> {
@@ -206,7 +237,7 @@ export const BOARD_ENDPOINT: any = {
           }
           result.continue();
         } else {
-          reject('Board tidak dapat ditemukan');
+          reject('Kartu tidak dapat ditemukan');
         }
       };
     });
@@ -244,7 +275,7 @@ export const BOARD_ENDPOINT: any = {
           }
           result.continue();
         } else {
-          reject('Board tidak dapat ditemukan');
+          reject('Kartu tidak dapat ditemukan');
         }
       };
     });

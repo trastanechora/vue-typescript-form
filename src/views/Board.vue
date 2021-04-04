@@ -262,7 +262,11 @@ export default class ProjectPage extends Vue {
   }
 
   editCardGroup(cardGroup: CardGroup): void {
-    this.$store.dispatch('board/editCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id });
+    this.$store
+      .dispatch('board/editCard', { ...cardGroup, boardId: this.$store.state.board.selectedBoard.id })
+      .then(() => {
+        this.closeAddCardGroupDialog();
+      });
   }
 
   deleteCardGroup(cardGroup: CardGroup): void {

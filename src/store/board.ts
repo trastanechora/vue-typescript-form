@@ -117,6 +117,39 @@ const actions: any = {
         throw err;
       });
   },
+  async editCardGroup(store: Store<BoardState> | any, params: CardGroup): Promise<void> {
+    await store.commit('setLoading', true);
+    return BOARD_ENDPOINT.editCardGroup(params)
+      .then((res: any) => {
+        store.dispatch('getBoardById', params.boardId);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Berhasil Mengubah List',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Gagal Mengubah List',
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        throw err;
+      });
+  },
   async addCard(store: Store<BoardState> | any, params: Card): Promise<void> {
     await store.commit('setLoading', true);
     return BOARD_ENDPOINT.addCard(params)
