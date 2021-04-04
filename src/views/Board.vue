@@ -174,11 +174,15 @@ export default class ProjectPage extends Vue {
   }
 
   addCard(card: Card): void {
-    this.$store.dispatch('board/addCard', {
-      ...card,
-      cardGroupId: this.cardGroupTarget,
-      boardId: this.$route.params.id
-    });
+    this.$store
+      .dispatch('board/addCard', {
+        ...card,
+        cardGroupId: this.cardGroupTarget,
+        boardId: this.$route.params.id
+      })
+      .then(() => {
+        this.closeAddCardDialog();
+      });
   }
 
   openEditCardDialog(card: Card, cardGroupId: string): void {
@@ -189,11 +193,19 @@ export default class ProjectPage extends Vue {
   }
 
   editCard(card: Card): void {
-    this.$store.dispatch('board/editCard', { ...card, cardGroupId: this.cardGroupTarget });
+    this.$store.dispatch('board/editCard', {
+      ...card,
+      cardGroupId: this.cardGroupTarget,
+      boardId: this.$route.params.id
+    });
   }
 
-  deleteCard(card: Card): void {
-    this.$store.dispatch('board/deleteCard', { ...card, cardGroupId: this.cardGroupTarget });
+  deleteCard(card: Card, cardGroupTarget: string): void {
+    this.$store.dispatch('board/deleteCard', {
+      ...card,
+      cardGroupId: cardGroupTarget,
+      boardId: this.$route.params.id
+    });
   }
 
   closeAddCardDialog(): void {
