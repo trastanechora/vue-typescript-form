@@ -48,7 +48,6 @@ const actions: any = {
     await store.commit('setLoading', true);
     const board = await BOARD_ENDPOINT.getBoardById(store.rootState.user.currentUser.uuid, id);
     await store.commit('setSelectedBoard', board);
-    console.warn('board', board);
     await store.commit('setLoading', false);
   },
   async addBoard(store: Store<BoardState> | any, params: Board): Promise<void> {
@@ -283,8 +282,29 @@ const actions: any = {
       });
   },
   async updateCurrentCardGroup(store: Store<BoardState> | any, params: CardGroup[]): Promise<void> {
-    console.warn('new value:', params);
+    await store.commit('setLoading', true);
     await store.commit('setCurrentCardGroup', params);
+    // updateBoard;
+    return BOARD_ENDPOINT.updateBoard(store.state.selectedBoard)
+      .then((res: any) => {
+        // store.dispatch('getBoardById', store.state.selectedBoard.id);
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Gagal mengubah Board, mohon muat ulang halaman.',
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        throw err;
+      });
   }
 };
 

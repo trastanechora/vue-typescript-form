@@ -26,7 +26,7 @@
         draggable=".item"
         ghost-class="ghost"
       >
-        <div v-for="list in cardGroup" :key="list.id" class="list-container item">
+        <div v-for="list in cardGroup" :key="list.id" class="list-container item pb-16">
           <v-card class="ma-0 px-2 py-3" color="tone" flat>
             <v-flex xs12 class="px-1 mb-2">
               <v-menu top left>
@@ -286,8 +286,8 @@ export default class ProjectPage extends Vue {
   => Watcher
   ------------------------------------ */
   @Watch('cardGroup', { deep: true })
-  handleCardGroup(newValue: any): void {
-    console.warn('Watch cardGroup:', newValue);
+  handleCardGroup(newValue: CardGroup): void {
+    this.$store.dispatch('board/updateCurrentCardGroup', newValue);
   }
 }
 </script>
@@ -326,6 +326,7 @@ export default class ProjectPage extends Vue {
   display: inline-block;
   vertical-align: top;
   white-space: nowrap;
+  overflow-y: auto;
 }
 .list {
   background-color: #ebecf0;

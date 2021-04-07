@@ -100,6 +100,31 @@ export const BOARD_ENDPOINT: any = {
     });
   },
   /* ------------------------------------
+  => [PUT] Update Board
+  ------------------------------------ */
+  async updateBoard(board: Board): Promise<Board> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['boards'], 'readwrite');
+      const boardStore = trans.objectStore('boards');
+      const getBoardRequest = boardStore.openCursor();
+      getBoardRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.id === board.id) {
+            if (result.value.ownerUuid === board.ownerUuid) {
+              boardStore.put(board);
+              resolve(board);
+            }
+          }
+          result.continue();
+        } else {
+          reject('Board tidak dapat ditemukan');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
   => [DELETE] Delete Board
   ------------------------------------ */
   async deleteBoard(board: Board): Promise<void> {
@@ -129,7 +154,6 @@ export const BOARD_ENDPOINT: any = {
             const editedBoard = { ...result.value };
             editedBoard.cardGroup.push(cardGroup);
             boardStore.put(editedBoard);
-            console.warn('[API] Edited Board:', editedBoard);
             resolve(editedBoard);
           }
           result.continue();
