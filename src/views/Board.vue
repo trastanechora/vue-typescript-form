@@ -5,14 +5,14 @@
         <v-toolbar class="elevation-0" dense>
           <v-toolbar-title>{{ boardTitle }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon>
+          <!-- <v-btn icon>
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
           <v-btn icon>
             <v-icon>mdi-star</v-icon>
-          </v-btn>
-          <v-btn icon>
-            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn> -->
+          <v-btn icon @click="openEditBoardDialog">
+            <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </v-toolbar>
       </v-card>
@@ -110,6 +110,13 @@
         </div>
       </draggable>
     </v-flex>
+    <AddBoard
+      :dialog="editBoardDialog"
+      :is-edit="true"
+      :close-dialog="closeEditBoardDialog"
+      :selected-board="selectedBoard"
+      @edit="editBoard"
+    />
     <AddCard
       :dialog="cardDialog"
       :is-edit="cardEditState"
@@ -131,14 +138,16 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { CardGroup, Card } from '@/@types';
+import { CardGroup, Card, Board } from '@/@types';
 import draggable from 'vuedraggable';
+import AddBoard from '@/components/AddBoard.vue';
 import AddCard from '@/components/AddCard.vue';
 import AddList from '@/components/AddList.vue';
 
 @Component({
   components: {
     draggable,
+    AddBoard,
     AddCard,
     AddList
   }
@@ -152,6 +161,7 @@ export default class ProjectPage extends Vue {
   cardGroupTarget: string = '';
   cardGroupDialog: boolean = false;
   cardGroupEditState: boolean = false;
+  editBoardDialog: boolean = false;
   selectedCard: Card = {
     id: '',
     title: '',
@@ -161,6 +171,13 @@ export default class ProjectPage extends Vue {
     id: '',
     title: '',
     cards: []
+  };
+  selectedBoard: Board = {
+    id: '',
+    ownerUuid: '',
+    title: '',
+    description: '',
+    cardGroup: []
   };
 
   /* ------------------------------------
@@ -193,6 +210,21 @@ export default class ProjectPage extends Vue {
   /* ------------------------------------
   => Methods
   ------------------------------------ */
+  openEditBoardDialog(): void {
+    this.selectedBoard = this.$store.state.board.selectedBoard;
+    this.editBoardDialog = true;
+  }
+
+  closeEditBoardDialog(): void {
+    this.editBoardDialog = false;
+  }
+
+  editBoard(board: Board): void {
+    this.$store.dispatch('board/updateBoard', board).then(() => {
+      this.editBoardDialog = false;
+    });
+  }
+
   openAddCardDialog(cardGroupId: string): void {
     this.cardEditState = false;
     this.cardDialog = true;

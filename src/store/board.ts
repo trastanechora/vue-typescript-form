@@ -305,6 +305,40 @@ const actions: any = {
         store.commit('setLoading', false);
         throw err;
       });
+  },
+  async updateBoard(store: Store<BoardState> | any, params: Board[]): Promise<void> {
+    await store.commit('setLoading', true);
+    // updateBoard;
+    return BOARD_ENDPOINT.updateBoard(params)
+      .then((res: any) => {
+        store.dispatch('getBoardById', store.state.selectedBoard.id);
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Berhasil mengubah Board.',
+            color: 'green',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        return res;
+      })
+      .catch((err: any) => {
+        store.commit(
+          'ui/setSnackbar',
+          {
+            open: true,
+            message: 'Gagal mengubah Board, mohon muat ulang halaman.',
+            color: 'red',
+            timeout: 4000
+          },
+          { root: true }
+        );
+        store.commit('setLoading', false);
+        throw err;
+      });
   }
 };
 
