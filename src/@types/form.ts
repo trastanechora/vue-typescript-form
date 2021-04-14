@@ -80,7 +80,6 @@ export interface FormState {
   isLoading: boolean;
   isEdit: boolean;
   selectedForm: Form;
-  questionTypeList: QuestionTypeObject[];
   formList: Form[];
   respondentList: Respondent[];
 }

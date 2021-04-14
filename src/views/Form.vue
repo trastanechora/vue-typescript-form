@@ -115,6 +115,7 @@ export default class FormPage extends Vue {
     { text: 'Jumlah Pertanyaan', value: 'questionCount', align: 'center' },
     { text: 'Jumlah Responden', value: 'respondentCount', align: 'center' },
     { text: 'Status', value: 'status', align: 'center' },
+    { text: 'Tanggal Mulai', value: 'startDate', width: 150, align: 'center' },
     { text: 'Batas Waktu', value: 'dueDate', width: 150, align: 'center' },
     { text: 'Tanggal Dibuat', value: 'createdAt', width: 150, align: 'center' },
     { text: 'Diedit Terakhir', value: 'updatedAt', width: 150, align: 'center' },

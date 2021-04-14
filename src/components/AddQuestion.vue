@@ -285,6 +285,36 @@ export default class DialogQuestion extends Vue {
       }
     ]
   };
+  questionTypeList: QuestionTypeObject[] = [
+    {
+      label: 'Jawaban Singkat',
+      value: QuestionType.TEXT_FIELD
+    },
+    {
+      label: 'Jawaban Numerik',
+      value: QuestionType.NUMERIC_FIELD
+    },
+    {
+      label: 'Jawaban Paragraf',
+      value: QuestionType.TEXT_AREA
+    },
+    {
+      label: 'Pilihan Ganda',
+      value: QuestionType.RADIO
+    },
+    {
+      label: 'Kotak Centang',
+      value: QuestionType.CHECKBOX
+    },
+    {
+      label: 'Tanggal',
+      value: QuestionType.DATE
+    },
+    {
+      label: 'Waktu',
+      value: QuestionType.TIME
+    }
+  ];
 
   /* ------------------------------------
   => Setter and Getter
@@ -292,10 +322,6 @@ export default class DialogQuestion extends Vue {
   ------------------------------------ */
   get isLoading(): boolean {
     return this.$store.state.form.isLoading;
-  }
-
-  get questionTypeList(): QuestionTypeObject[] {
-    return this.$store.state.form.questionTypeList;
   }
 
   /* ------------------------------------

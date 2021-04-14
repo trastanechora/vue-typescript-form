@@ -1,4 +1,4 @@
-import Store, { FormState, Form, FormStatus, QuestionType, Respondent } from '@/@types';
+import Store, { FormState, Form, FormStatus, Respondent } from '@/@types';
 import { FORM_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
@@ -7,48 +7,6 @@ import { FORM_ENDPOINT } from '@/@api';
 const state = (): FormState => ({
   isLoading: false,
   isEdit: false,
-  questionTypeList: [
-    {
-      label: 'Jawaban Singkat',
-      value: QuestionType.TEXT_FIELD
-    },
-    {
-      label: 'Jawaban Numerik',
-      value: QuestionType.NUMERIC_FIELD
-    },
-    {
-      label: 'Jawaban Paragraf',
-      value: QuestionType.TEXT_AREA
-    },
-    {
-      label: 'Pilihan Ganda',
-      value: QuestionType.RADIO
-    },
-    // {
-    //   label: 'Pilihan Ganda Berbaris',
-    //   value: QuestionType.RADIO_ROW
-    // },
-    {
-      label: 'Kotak Centang',
-      value: QuestionType.CHECKBOX
-    },
-    // {
-    //   label: 'Kotak Centang Berbaris',
-    //   value: QuestionType.CHECKBOX_ROW
-    // },
-    // {
-    //   label: 'Skala Linier',
-    //   value: QuestionType.SCALE
-    // },
-    {
-      label: 'Tanggal',
-      value: QuestionType.DATE
-    },
-    {
-      label: 'Waktu',
-      value: QuestionType.TIME
-    }
-  ],
   selectedForm: {
     uuid: '',
     authorUuid: '',
