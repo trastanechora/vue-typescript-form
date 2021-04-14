@@ -72,8 +72,8 @@ export default class ResponsePage extends Vue {
   async mounted(): Promise<void> {
     await this.$store.dispatch('form/getFormById', this.$route.params.id);
     await this.createHeader();
-    await this.createBody();
     await this.createCSVHeader();
+    await this.createBody();
   }
 
   /* ------------------------------------
@@ -109,7 +109,15 @@ export default class ResponsePage extends Vue {
   createBody(): void {
     const newBody: any = [];
     this.selectedForm.respondents.forEach((respondent: any) => {
-      newBody.push(respondent.answers);
+      const parsedBody: any = {};
+      Object.keys(this.respondentCSVHeader).forEach((key: string) => {
+        if (respondent.answers[`${key}`]) {
+          parsedBody[`${key}`] = respondent.answers[`${key}`];
+        } else {
+          parsedBody[`${key}`] = '-';
+        }
+      });
+      newBody.push(parsedBody);
     });
     this.respondentBody = newBody;
   }
