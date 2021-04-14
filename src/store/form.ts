@@ -15,6 +15,7 @@ const state = (): FormState => ({
     imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
+    startDate: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -78,7 +79,6 @@ const actions: any = {
     try {
       await store.commit('setLoading', true);
       const form = await FORM_ENDPOINT.getFormById(param);
-      console.warn('result!', form);
       store.commit('setSelectedForm', form);
       await store.commit('setLoading', false);
       return form;

@@ -38,6 +38,17 @@
             </v-flex>
             <v-flex xs12 class="mt-3">
               <v-btn
+                v-if="!startDateProvided"
+                text
+                small
+                color="secondary"
+                @click="startDateProvided = true"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="ml-2"
+                ><v-icon small>mdi-plus</v-icon>Waktu Mulai Pengumpulan</v-btn
+              >
+              <v-btn
                 v-if="!dueDateProvided"
                 text
                 small
@@ -61,9 +72,45 @@
               >
             </v-flex>
             <v-flex xs12 class="mt-3">
+              <v-row v-if="startDateProvided" justify="space-between" class="w-100 ma-0 pa-0 mt-5">
+                <v-menu
+                  v-model="startDatePickerMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  top
+                  max-width="290px"
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="startDate"
+                      label="Waktu Mulai"
+                      hint="Form akan terbuka otomatis jika sudah melewati batas waktu yang telah ditentukan"
+                      persistent-hint
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="startDate" no-title @input="startDatePickerMenu = false"></v-date-picker>
+                </v-menu>
+                <v-btn
+                  text
+                  small
+                  color="secondary"
+                  @click="startDateProvided = false"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  class="ml-2 mt-5"
+                  ><v-icon small>mdi-minus</v-icon>Hapus Waktu Mulai</v-btn
+                >
+              </v-row>
+            </v-flex>
+            <v-flex xs12 class="mt-3">
               <v-row v-if="dueDateProvided" justify="space-between" class="w-100 ma-0 pa-0 mt-5">
                 <v-menu
-                  v-model="datePickerMenu"
+                  v-model="dueDatePickerMenu"
                   :close-on-content-click="false"
                   transition="scale-transition"
                   top
@@ -82,7 +129,7 @@
                       v-on="on"
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="dueDate" no-title @input="datePickerMenu = false"></v-date-picker>
+                  <v-date-picker v-model="dueDate" no-title @input="dueDatePickerMenu = false"></v-date-picker>
                 </v-menu>
                 <v-btn
                   text
@@ -284,9 +331,12 @@ export default class AddFormPage extends Vue {
   valid: boolean = true;
   dragState: boolean = false;
   status: boolean = true;
-  datePickerMenu: boolean = false;
+  startDatePickerMenu: boolean = false;
+  dueDatePickerMenu: boolean = false;
+  startDateProvided: boolean = false;
   dueDateProvided: boolean = false;
   posterProvided: boolean = false;
+  startDate: string = '';
   dueDate: string = '';
   formData: Form = {
     uuid: '',
@@ -296,6 +346,7 @@ export default class AddFormPage extends Vue {
     imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
+    startDate: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -382,6 +433,14 @@ export default class AddFormPage extends Vue {
     data.questionCount = this.getQuestionCount();
     data.authorUuid = this.$store.state.user.currentUser.uuid;
     data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
+    if (this.startDateProvided) {
+      try {
+        const startDate = new Date(this.startDate);
+        data.startDate = startDate.toISOString();
+      } finally {
+        console.warn('Batas Waktu tidak valid');
+      }
+    }
     if (this.dueDateProvided) {
       try {
         const dueDate = new Date(this.dueDate);
@@ -391,7 +450,7 @@ export default class AddFormPage extends Vue {
       }
     }
     this.$store.dispatch('form/saveForm', data).then(() => {
-      this.$router.push('/dashboard');
+      this.$router.push('/dashboard/form');
     });
   }
   editForm(): void {
@@ -404,6 +463,16 @@ export default class AddFormPage extends Vue {
     } else {
       data.status = FormStatus.CLOSED;
     }
+    if (this.startDateProvided) {
+      try {
+        const startDate = new Date(this.startDate);
+        data.startDate = startDate.toISOString();
+      } finally {
+        console.warn('Waktu Mulai tidak valid');
+      }
+    } else {
+      delete data.startDate;
+    }
     if (this.dueDateProvided) {
       try {
         const dueDate = new Date(this.dueDate);
@@ -415,7 +484,7 @@ export default class AddFormPage extends Vue {
       delete data.dueDate;
     }
     this.$store.dispatch('form/editForm', data).then(() => {
-      this.$router.push('/dashboard');
+      this.$router.push('/dashboard/form');
     });
   }
   getFormData(): void {

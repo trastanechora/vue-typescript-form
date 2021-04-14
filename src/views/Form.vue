@@ -21,23 +21,38 @@
         </template>
         <template v-slot:[`item.status`]="{ item }">
           <v-chip
-            v-if="!checkDueDate(item.dueDate)"
-            :color="statusColorFormatter(item.status)"
+            v-if="checkStartDate(item.startDate)"
+            :color="statusColorFormatter('unstarted')"
             class="ma-2"
             outlined
             small
           >
             <v-icon left x-small>
-              {{ statusIconFormatter(item.status) }}
+              {{ statusIconFormatter('unstarted') }}
             </v-icon>
-            {{ statusTextFormatter(item.status) }}
+            {{ statusTextFormatter('unstarted') }}
           </v-chip>
-          <v-chip v-else :color="statusColorFormatter('ended')" class="ma-2" outlined small>
+          <v-chip
+            v-else-if="checkDueDate(item.dueDate)"
+            :color="statusColorFormatter('ended')"
+            class="ma-2"
+            outlined
+            small
+          >
             <v-icon left x-small>
               {{ statusIconFormatter('ended') }}
             </v-icon>
             {{ statusTextFormatter('ended') }}
           </v-chip>
+          <v-chip v-else :color="statusColorFormatter(item.status)" class="ma-2" outlined small>
+            <v-icon left x-small>
+              {{ statusIconFormatter(item.status) }}
+            </v-icon>
+            {{ statusTextFormatter(item.status) }}
+          </v-chip>
+        </template>
+        <template v-slot:[`item.startDate`]="{ item }">
+          {{ item.startDate ? formatDate(item.startDate) : '-' }}
         </template>
         <template v-slot:[`item.dueDate`]="{ item }">
           {{ item.dueDate ? formatDate(item.dueDate) : '-' }}
@@ -163,6 +178,11 @@ export default class FormPage extends Vue {
   }
   statusIconFormatter(status: FormStatus): string {
     return statusFormatter(status).icon;
+  }
+  checkStartDate(date: string): boolean {
+    const dueDate = new Date(date);
+    const today = new Date();
+    return today <= dueDate;
   }
   checkDueDate(date: string): boolean {
     const dueDate = new Date(date);

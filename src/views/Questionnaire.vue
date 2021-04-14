@@ -14,6 +14,21 @@
       >
     </v-flex>
   </v-layout>
+  <v-layout v-else-if="checkStartDate()" wrap class="my-6 full-width">
+    <v-flex xs10 class="mt-10 mx-auto">
+      <v-card class="mx-auto py-5" width="100%">
+        <v-card-text>
+          <h1 class="text-center info--text mb-2">Form ini belum dibuka</h1>
+          <h4 class="text-center">Hubungi penyedia form ini untuk informasi lebih detil</h4>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+    <v-flex xs10 class="my-2 mx-auto text-end">
+      <v-btn text small color="secondary" :disabled="isLoading" :loading="isLoading" class="ml-2" to="/"
+        ><v-icon small>mdi-chevron-left</v-icon>Kembali ke Halaman Utama</v-btn
+      >
+    </v-flex>
+  </v-layout>
   <v-layout v-else-if="checkDueDate()" wrap class="my-6 full-width">
     <v-flex xs10 class="mt-10 mx-auto">
       <v-card class="mx-auto py-5" width="100%">
@@ -267,6 +282,7 @@ export default class QuestionnairePage extends Vue {
     imageBanner: undefined,
     createdAt: '',
     updatedAt: '',
+    startDate: '',
     dueDate: '',
     respondentCount: 0,
     questionCount: 0,
@@ -390,6 +406,12 @@ export default class QuestionnairePage extends Vue {
     const dueDate = new Date(this.formData.dueDate);
     const today = new Date();
     return today > dueDate;
+  }
+
+  checkStartDate(): boolean {
+    const startDate = new Date(this.formData.startDate);
+    const today = new Date();
+    return today < startDate;
   }
 
   // async parseImage(): Promise<void> {

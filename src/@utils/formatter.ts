@@ -8,6 +8,12 @@ export const dateFormatter = (date: Date, monthFormat: string = 'long'): string 
 
 export const statusFormatter = (status: FormStatus): any => {
   switch (status) {
+    case FormStatus.UNSTARTED:
+      return {
+        text: 'Belum Dibuka',
+        icon: 'mdi-timer-sand',
+        color: 'blue'
+      };
     case FormStatus.OPEN:
       return {
         text: 'Terbuka',

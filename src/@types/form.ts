@@ -17,6 +17,7 @@ export enum QuestionType {
 }
 
 export enum FormStatus {
+  UNSTARTED = 'unstarted',
   OPEN = 'open',
   CLOSED = 'closed',
   ENDED = 'ended',
@@ -64,6 +65,7 @@ export interface Form {
   imageBanner: any;
   createdAt: string;
   updatedAt: string;
+  startDate: string;
   dueDate: string;
   questionCount: number;
   status: FormStatus;
