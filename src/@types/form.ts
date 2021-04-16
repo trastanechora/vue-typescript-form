@@ -46,6 +46,11 @@ export interface Question {
   image?: any;
 }
 
+export interface QuestionPage {
+  title: string;
+  sectionList: QuestionSection[];
+}
+
 export interface QuestionSection {
   title: string;
   questionList: Question[];
@@ -70,7 +75,7 @@ export interface Form {
   questionCount: number;
   status: FormStatus;
   link: string;
-  questions: QuestionSection[];
+  questions: QuestionPage[];
   respondentCount: number;
   respondents: Respondent[];
 }
