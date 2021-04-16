@@ -408,7 +408,7 @@ export default class DialogQuestion extends Vue {
     });
   }
   deleteOption(selectedOption: Option): void {
-    const newOptionList = this.currentQuestion.options!.reduce(function(result: Option[], option: Option) {
+    const newOptionList = this.currentQuestion.options!.reduce((result: Option[], option: Option) => {
       if (selectedOption.text !== option.text) {
         result.push(option);
       }
