@@ -32,6 +32,7 @@
         :items-per-page="10"
         :loading="isLoading"
         class="elevation-1 full-width"
+        @click:row="onRowClick"
       >
       </v-data-table>
     </v-flex>
@@ -117,9 +118,14 @@ export default class ResponsePage extends Vue {
           parsedBody[`${key}`] = '-';
         }
       });
+      parsedBody.formId = this.selectedForm.uuid;
+      parsedBody.respondentId = respondent.uuid;
       newBody.push(parsedBody);
     });
     this.respondentBody = newBody;
+  }
+  onRowClick(response: any): void {
+    this.$router.push(`/dashboard/form/${response.formId}/${response.respondentId}`);
   }
 }
 </script>

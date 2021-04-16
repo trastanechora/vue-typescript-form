@@ -8,6 +8,7 @@ import Forbidden from '@/views/Forbidden.vue';
 import NotFound from '@/views/NotFound.vue';
 import Questionnaire from '@/views/Questionnaire.vue';
 import Response from '@/views/Response.vue';
+import ResponseDetail from '@/views/ResponseDetail.vue';
 import ThankYou from '@/views/ThankYou.vue';
 import Profile from '@/views/Profile.vue';
 import Form from '@/views/Form.vue';
@@ -88,6 +89,11 @@ const routes: Array<RouteConfig> = [
             path: ':id',
             name: 'View Response',
             component: Response
+          },
+          {
+            path: ':formId/:respondentId',
+            name: 'View Detailed Response',
+            component: ResponseDetail
           }
         ]
       },
