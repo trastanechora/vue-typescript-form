@@ -437,7 +437,7 @@ export default class AddFormPage extends Vue {
       try {
         const startDate = new Date(this.startDate);
         data.startDate = startDate.toISOString();
-      } finally {
+      } catch {
         console.warn('Batas Waktu tidak valid');
       }
     }
@@ -445,7 +445,7 @@ export default class AddFormPage extends Vue {
       try {
         const dueDate = new Date(this.dueDate);
         data.dueDate = dueDate.toISOString();
-      } finally {
+      } catch {
         console.warn('Batas Waktu tidak valid');
       }
     }
@@ -493,6 +493,10 @@ export default class AddFormPage extends Vue {
       this.status = true;
     } else {
       this.status = false;
+    }
+    if (this.formData.startDate) {
+      this.startDateProvided = true;
+      this.startDate = this.formData.startDate.slice(0, 10);
     }
     if (this.formData.dueDate) {
       this.dueDateProvided = true;
