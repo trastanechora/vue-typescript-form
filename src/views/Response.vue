@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { TableHeader, Form, Question, QuestionSection } from '@/@types';
+import { TableHeader, Form, Question, QuestionSection, QuestionPage } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 
@@ -86,24 +86,28 @@ export default class ResponsePage extends Vue {
   }
   createHeader(): void {
     const newHeader: any = [];
-    this.selectedForm.questions.forEach((quesitonSection: QuestionSection) => {
-      quesitonSection.questionList.forEach((question: Question) => {
-        newHeader.push({
-          text: question.text,
-          value: question.key,
-          width: 250,
-          align: 'center'
+    this.selectedForm.questions.forEach((questionPage: QuestionPage) => {
+      questionPage.sectionList.forEach((questionSection: QuestionSection) => {
+        questionSection.questionList.forEach((question: Question) => {
+          newHeader.push({
+            text: question.text,
+            value: question.key,
+            width: 250,
+            align: 'center'
+          });
         });
       });
     });
     this.respondentHeader = newHeader;
   }
   createCSVHeader(): void {
-    this.selectedForm.questions.forEach((quesitonSection: QuestionSection) => {
-      quesitonSection.questionList.forEach((question: Question) => {
-        this.respondentCSVHeader[`${question.key}`] = {
-          title: question.text
-        };
+    this.selectedForm.questions.forEach((questionPage: QuestionPage) => {
+      questionPage.sectionList.forEach((quesitonSection: QuestionSection) => {
+        quesitonSection.questionList.forEach((question: Question) => {
+          this.respondentCSVHeader[`${question.key}`] = {
+            title: question.text
+          };
+        });
       });
     });
   }
