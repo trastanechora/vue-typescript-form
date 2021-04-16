@@ -74,10 +74,25 @@
                 v-on="on"
                 @click="copyToClipboard(item.link)"
               >
-                <v-icon>mdi-share</v-icon>
+                <v-icon small>mdi-content-copy</v-icon>
               </v-btn>
             </template>
             <span>Salin Tautan</span>
+          </v-tooltip>
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
+                @click="openNewTab(item.link)"
+              >
+                <v-icon>mdi-share</v-icon>
+              </v-btn>
+            </template>
+            <span>Buka</span>
           </v-tooltip>
         </template>
         <template v-slot:[`item.userAction`]="{ item }">
@@ -134,7 +149,7 @@ export default class FormPage extends Vue {
     { text: 'Batas Waktu', value: 'dueDate', width: 150, align: 'center' },
     { text: 'Tanggal Dibuat', value: 'createdAt', width: 150, align: 'center' },
     { text: 'Diedit Terakhir', value: 'updatedAt', width: 150, align: 'center' },
-    { text: 'Link', value: 'link', align: 'center', sortable: false },
+    { text: 'Link', value: 'link', width: 150, align: 'center', sortable: false },
     {
       text: 'Tindakan',
       value: 'userAction',
@@ -202,6 +217,9 @@ export default class FormPage extends Vue {
       color: 'dark',
       timeout: 4000
     });
+  }
+  openNewTab(link: string): void {
+    window.open(link, '_blank');
   }
   toResponseList(uuid: string): void {
     this.$router.push(`/dashboard/form/${uuid}`);
