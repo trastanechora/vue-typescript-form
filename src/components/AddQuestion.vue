@@ -64,7 +64,7 @@
                       item-value="value"
                       label="Tipe Pertanyaan"
                       class="required"
-                      :rules="notEmpty('Tipe Pertanyaan')"
+                      :rules="notEmptyOption(false)"
                       :disabled="isLoading"
                       return-object
                       :loading="isLoading"
@@ -243,7 +243,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator';
 import { VForm, Question, QuestionType, QuestionTypeObject, Option, TextfieldType } from '@/@types';
-import { notEmptyRules } from '@/@utils';
+import { notEmptyRules, notEmptyOptionRules } from '@/@utils';
 @Component
 export default class DialogQuestion extends Vue {
   /* ------------------------------------
@@ -306,10 +306,6 @@ export default class DialogQuestion extends Vue {
     {
       label: 'Jawaban Singkat',
       value: QuestionType.TEXT_FIELD
-    },
-    {
-      label: 'Jawaban Numerik',
-      value: QuestionType.NUMERIC_FIELD
     },
     {
       label: 'Jawaban Paragraf',
@@ -435,6 +431,9 @@ export default class DialogQuestion extends Vue {
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
   }
+  notEmptyOption(isMultiple: boolean): any[] {
+    return notEmptyOptionRules(isMultiple);
+  }
   saveImage(file: any): void {
     if (file) {
       const reader = new FileReader();
@@ -496,6 +495,14 @@ export default class DialogQuestion extends Vue {
           value: ''
         }
       ];
+      this.currentQuestion.validation = {
+        text: 'Bebas',
+        value: TextfieldType.FREETEXT
+      };
+      this.imageProvided = false;
+      this.currentQuestion.image = undefined;
+      this.descriptionProvided = false;
+      this.currentQuestion.description = '';
     }
   }
 }
