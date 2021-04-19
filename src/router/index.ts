@@ -3,7 +3,6 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Dashboard from '@/views/Dashboard.vue';
 import AddForm from '@/views/AddForm.vue';
-import Login from '@/views/Login.vue';
 import Forbidden from '@/views/Forbidden.vue';
 import NotFound from '@/views/NotFound.vue';
 import Questionnaire from '@/views/Questionnaire.vue';
@@ -30,11 +29,6 @@ const routes: Array<RouteConfig> = [
         path: '',
         name: 'Home',
         component: Home
-      },
-      {
-        path: '/login',
-        name: 'Login',
-        component: Login
       },
       {
         path: '/thank-you',

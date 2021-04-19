@@ -80,7 +80,7 @@ export default class AppBar extends Vue {
 
   logout(): void {
     this.$store.dispatch('auth/logout').then(() => {
-      this.$router.push('/login');
+      this.$router.push('/');
     });
   }
 }
