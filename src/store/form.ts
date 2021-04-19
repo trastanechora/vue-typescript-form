@@ -23,8 +23,8 @@ const state = (): FormState => ({
     link: '',
     questions: [
       {
-        title: 'Bagian ',
-        questionList: []
+        title: 'Halaman ',
+        sectionList: []
       }
     ],
     respondents: []
