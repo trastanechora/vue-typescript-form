@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Form, Question, QuestionSection } from '@/@types';
+import { Form, Question, QuestionSection, QuestionPage } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 
@@ -80,11 +80,13 @@ export default class ResponsePage extends Vue {
   }
   createTableData(): void {
     const tableData: any = [];
-    this.selectedForm.questions.forEach((quesitonSection: QuestionSection) => {
-      quesitonSection.questionList.forEach((question: Question) => {
-        tableData.push({
-          question: question.text,
-          key: question.key
+    this.selectedForm.questions.forEach((questionPage: QuestionPage) => {
+      questionPage.sectionList.forEach((quesitonSection: QuestionSection) => {
+        quesitonSection.questionList.forEach((question: Question) => {
+          tableData.push({
+            question: question.text,
+            key: question.key
+          });
         });
       });
     });
