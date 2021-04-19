@@ -16,6 +16,15 @@ export enum QuestionType {
   TIME = 'time'
 }
 
+export enum TextfieldType {
+  FREETEXT = 'freetext',
+  ALPHANUMERIC = 'alphanumeric',
+  NUMERIC = 'numeric',
+  ALPHABET = 'alphabet',
+  TELEPHONE = 'telephone',
+  EMAIL = 'email'
+}
+
 export enum FormStatus {
   UNSTARTED = 'unstarted',
   OPEN = 'open',
@@ -26,7 +35,7 @@ export enum FormStatus {
 
 export interface Option {
   text: string;
-  value: string | number | boolean;
+  value: string | number | boolean | TextfieldType;
   otherValue?: string;
   icon?: string;
 }
@@ -40,6 +49,7 @@ export interface Question {
   key: string;
   text: string;
   type: QuestionTypeObject;
+  validation?: Option;
   required: boolean;
   description?: string;
   options?: Option[];
