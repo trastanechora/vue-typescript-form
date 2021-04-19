@@ -5,7 +5,8 @@
         <v-form ref="addForm" v-model="valid" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 class="mb-3">
-              <h1 class="primary--text">Buat Form Baru</h1>
+              <h1 v-if="isEdit" class="primary--text">Edit Form</h1>
+              <h1 v-else class="primary--text">Buat Form Baru</h1>
               <hr />
             </v-flex>
             <v-flex xs12>
@@ -36,7 +37,7 @@
                 :loading="isLoading"
               ></v-textarea>
             </v-flex>
-            <v-flex xs12 class="mt-3">
+            <v-flex xs12 class="mt-3 text-center">
               <v-btn
                 v-if="!startDateProvided"
                 text
@@ -264,7 +265,7 @@
               </v-expansion-panels>
             </div>
             <v-flex xs12 class="my-6 form-actions">
-              <v-card flat>
+              <v-card outlined>
                 <v-card-text>
                   <v-row justify="space-between" class="ma-0 pa-0">
                     <v-layout wrap>
@@ -291,6 +292,7 @@
                           @click="openAddQuestionDialog"
                           :disabled="isLoading"
                           :loading="isLoading"
+                          class="mt-4"
                         >
                           <v-icon left>mdi-plus</v-icon>Tambah Pertanyaan
                         </v-btn>
@@ -299,7 +301,13 @@
                     <v-spacer />
                     <v-layout wrap>
                       <v-flex xs12>
-                        <v-switch v-if="isEdit" v-model="status" label="Status" class="mt-0 pt-1 pr-5" />
+                        <v-switch
+                          v-if="isEdit"
+                          v-model="status"
+                          label="Status"
+                          class="mt-0 mb-4 pt-1 pr-5"
+                          hide-details
+                        />
                         <v-btn
                           v-if="isEdit"
                           rounded
