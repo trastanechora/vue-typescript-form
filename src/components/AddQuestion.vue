@@ -69,46 +69,59 @@
                       return-object
                       :loading="isLoading"
                     ></v-select>
-                    <v-flex xs12>
-                      <v-text-field
-                        v-model="currentQuestion.text"
-                        outlined
-                        clearable
-                        label="Pertanyaan"
-                        type="text"
-                        autocomplete="off"
-                        class="required"
-                        :rules="notEmpty('Pertanyaan')"
-                        :disabled="isLoading"
-                        :loading="isLoading"
-                      ></v-text-field>
-                    </v-flex>
-                    <v-flex v-if="descriptionProvided" xs12>
-                      <v-text-field
-                        v-model="currentQuestion.description"
-                        filled
-                        clearable
-                        label="Deskripsi"
-                        type="text"
-                        autocomplete="off"
-                        :disabled="isLoading"
-                        :loading="isLoading"
-                      ></v-text-field>
-                    </v-flex>
-                    <v-flex v-if="imageProvided" xs12>
-                      <v-file-input
-                        v-if="!currentQuestion.image"
-                        accept="image/*"
-                        label="Gambar"
-                        :disabled="isLoading"
-                        :loading="isLoading"
-                        @change="saveImage"
-                      ></v-file-input>
-                      <div v-else>
-                        <v-btn text small color="secondary" disabled>Pratinjau gambar:</v-btn>
-                        <v-img :src="currentQuestion.image" max-width="300" max-height="200" class="ml-3"></v-img>
-                      </div>
-                    </v-flex>
+                  </v-flex>
+                  <v-flex xs12 v-if="currentQuestion.type.label === 'Jawaban Singkat'">
+                    <v-select
+                      v-model="currentQuestion.validation"
+                      outlined
+                      :items="textfieldType"
+                      item-text="text"
+                      item-value="value"
+                      label="Validasi Pertanyaan"
+                      :disabled="isLoading"
+                      return-object
+                      :loading="isLoading"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs12>
+                    <v-text-field
+                      v-model="currentQuestion.text"
+                      outlined
+                      clearable
+                      label="Pertanyaan"
+                      type="text"
+                      autocomplete="off"
+                      class="required"
+                      :rules="notEmpty('Pertanyaan')"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex v-if="descriptionProvided" xs12>
+                    <v-text-field
+                      v-model="currentQuestion.description"
+                      filled
+                      clearable
+                      label="Deskripsi"
+                      type="text"
+                      autocomplete="off"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex v-if="imageProvided" xs12>
+                    <v-file-input
+                      v-if="!currentQuestion.image"
+                      accept="image/*"
+                      label="Gambar"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      @change="saveImage"
+                    ></v-file-input>
+                    <div v-else>
+                      <v-btn text small color="secondary" disabled>Pratinjau gambar:</v-btn>
+                      <v-img :src="currentQuestion.image" max-width="300" max-height="200" class="ml-3"></v-img>
+                    </div>
                   </v-flex>
                 </v-layout>
               </v-form>
@@ -229,7 +242,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator';
-import { VForm, Question, QuestionType, QuestionTypeObject, Option } from '@/@types';
+import { VForm, Question, QuestionType, QuestionTypeObject, Option, TextfieldType } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 @Component
 export default class DialogQuestion extends Vue {
@@ -274,6 +287,10 @@ export default class DialogQuestion extends Vue {
       label: '',
       value: QuestionType.EMPTY
     },
+    validation: {
+      text: 'Bebas',
+      value: TextfieldType.FREETEXT
+    },
     required: false,
     text: '',
     description: '',
@@ -315,6 +332,32 @@ export default class DialogQuestion extends Vue {
       value: QuestionType.TIME
     }
   ];
+  textfieldType: Option[] = [
+    {
+      text: 'Bebas',
+      value: TextfieldType.FREETEXT
+    },
+    {
+      text: 'Alfanumerik',
+      value: TextfieldType.ALPHANUMERIC
+    },
+    {
+      text: 'Numerik',
+      value: TextfieldType.NUMERIC
+    },
+    {
+      text: 'Alfabet',
+      value: TextfieldType.ALPHABET
+    },
+    {
+      text: 'No Telepon',
+      value: TextfieldType.TELEPHONE
+    },
+    {
+      text: 'Email',
+      value: TextfieldType.EMAIL
+    }
+  ];
 
   /* ------------------------------------
   => Setter and Getter
@@ -339,6 +382,7 @@ export default class DialogQuestion extends Vue {
         key: this.questionKey,
         required: this.currentQuestion.required,
         type: this.currentQuestion.type,
+        validation: this.currentQuestion.validation,
         text: this.currentQuestion.text,
         options: this.currentQuestion.options
       };
@@ -360,6 +404,7 @@ export default class DialogQuestion extends Vue {
         key: this.currentQuestion.key,
         required: this.currentQuestion.required,
         type: this.currentQuestion.type,
+        validation: this.currentQuestion.validation,
         text: this.currentQuestion.text,
         options: this.currentQuestion.options
       };
