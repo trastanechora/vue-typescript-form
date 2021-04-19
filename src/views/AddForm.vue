@@ -300,7 +300,7 @@
                     </v-layout>
                     <v-spacer />
                     <v-layout wrap>
-                      <v-flex xs12>
+                      <v-flex xs12 class="ma-auto">
                         <v-switch
                           v-if="isEdit"
                           v-model="status"
@@ -353,7 +353,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 import draggable from 'vuedraggable';
 
-import { Form, FormStatus, Question, QuestionSection, QuestionType, QuestionPage } from '@/@types';
+import { VForm, Form, FormStatus, Question, QuestionSection, QuestionType, QuestionPage } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
 import AddQuestion from '@/components/AddQuestion.vue';
@@ -492,67 +492,73 @@ export default class AddFormPage extends Vue {
     this.formData.questions[pageIndex].sectionList.splice(sectionIndex, 1);
   }
   saveForm(): void {
-    const data = { ...this.formData };
-    const newDate = new Date();
-    const formId = uuid.v1();
-    data.uuid = formId;
-    data.createdAt = newDate.toISOString();
-    data.questionCount = this.getQuestionCount();
-    data.authorUuid = this.$store.state.user.currentUser.uuid;
-    data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
-    if (this.startDateProvided) {
-      try {
-        const startDate = new Date(this.startDate);
-        data.startDate = startDate.toISOString();
-      } catch {
-        console.warn('Batas Waktu tidak valid');
+    const addForm = this.$refs.addForm as VForm;
+    if (addForm.validate()) {
+      const data = { ...this.formData };
+      const newDate = new Date();
+      const formId = uuid.v1();
+      data.uuid = formId;
+      data.createdAt = newDate.toISOString();
+      data.questionCount = this.getQuestionCount();
+      data.authorUuid = this.$store.state.user.currentUser.uuid;
+      data.link = `${process.env.VUE_APP_URL}/questionnaire/${formId}`;
+      if (this.startDateProvided) {
+        try {
+          const startDate = new Date(this.startDate);
+          data.startDate = startDate.toISOString();
+        } catch {
+          console.warn('Batas Waktu tidak valid');
+        }
       }
-    }
-    if (this.dueDateProvided) {
-      try {
-        const dueDate = new Date(this.dueDate);
-        data.dueDate = dueDate.toISOString();
-      } catch {
-        console.warn('Batas Waktu tidak valid');
+      if (this.dueDateProvided) {
+        try {
+          const dueDate = new Date(this.dueDate);
+          data.dueDate = dueDate.toISOString();
+        } catch {
+          console.warn('Batas Waktu tidak valid');
+        }
       }
+      this.$store.dispatch('form/saveForm', data).then(() => {
+        this.$router.push('/dashboard/form');
+      });
     }
-    this.$store.dispatch('form/saveForm', data).then(() => {
-      this.$router.push('/dashboard/form');
-    });
   }
   editForm(): void {
-    const data = { ...this.formData };
-    const newDate = new Date();
-    data.updatedAt = newDate.toISOString();
-    data.questionCount = this.getQuestionCount();
-    if (this.status) {
-      data.status = FormStatus.OPEN;
-    } else {
-      data.status = FormStatus.CLOSED;
-    }
-    if (this.startDateProvided) {
-      try {
-        const startDate = new Date(this.startDate);
-        data.startDate = startDate.toISOString();
-      } finally {
-        console.warn('Waktu Mulai tidak valid');
+    const addForm = this.$refs.addForm as VForm;
+    if (addForm.validate()) {
+      const data = { ...this.formData };
+      const newDate = new Date();
+      data.updatedAt = newDate.toISOString();
+      data.questionCount = this.getQuestionCount();
+      if (this.status) {
+        data.status = FormStatus.OPEN;
+      } else {
+        data.status = FormStatus.CLOSED;
       }
-    } else {
-      delete data.startDate;
-    }
-    if (this.dueDateProvided) {
-      try {
-        const dueDate = new Date(this.dueDate);
-        data.dueDate = dueDate.toISOString();
-      } finally {
-        console.warn('Batas Waktu tidak valid');
+      if (this.startDateProvided) {
+        try {
+          const startDate = new Date(this.startDate);
+          data.startDate = startDate.toISOString();
+        } finally {
+          console.warn('Waktu Mulai tidak valid');
+        }
+      } else {
+        delete data.startDate;
       }
-    } else {
-      delete data.dueDate;
+      if (this.dueDateProvided) {
+        try {
+          const dueDate = new Date(this.dueDate);
+          data.dueDate = dueDate.toISOString();
+        } finally {
+          console.warn('Batas Waktu tidak valid');
+        }
+      } else {
+        delete data.dueDate;
+      }
+      this.$store.dispatch('form/editForm', data).then(() => {
+        this.$router.push('/dashboard/form');
+      });
     }
-    this.$store.dispatch('form/editForm', data).then(() => {
-      this.$router.push('/dashboard/form');
-    });
   }
   getFormData(): void {
     this.formData = this.$store.state.form.selectedForm;
@@ -572,7 +578,6 @@ export default class AddFormPage extends Vue {
     if (this.formData.imageBanner) {
       this.posterProvided = true;
     }
-    console.warn(this.formData);
   }
   getQuestionCount(): number {
     let newQuestionCount: number = 0;
