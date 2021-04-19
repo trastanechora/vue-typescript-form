@@ -60,20 +60,23 @@
       <v-layout wrap>
         <v-flex xs12>
           <v-window v-model="currentStep">
+            <!-- {{ Page List }} -->
             <v-window-item v-for="(questionPage, index) in formData.questions" :key="`${index + 1}-content`">
               <v-form :ref="`questionnaireForm-${index}`" v-model="valid" lazy-validation>
                 <div v-for="(questionList, index) in questionPage.sectionList" :key="index"></div>
+                <!-- {{ Section List }} -->
                 <v-card
-                  v-for="sectionItem in questionPage.sectionList"
+                  v-for="(sectionItem, sectionIndex) in questionPage.sectionList"
                   :key="sectionItem.key"
                   class="ma-1 mb-3"
                   outlined
                 >
                   <v-card-text>
-                    <!-- {{ sectionItem }} -->
+                    <!-- {{ question List }} -->
                     <div>
+                      <v-chip color="primary" class="mb-2">Bagian {{ sectionIndex + 1 }}</v-chip>
                       <v-card v-for="item in sectionItem.questionList" :key="item.key" class="ma-1 mb-3">
-                        <v-card-text>
+                        <v-card-text :class="item.required ? 'required' : ''">
                           <v-img v-if="item.image" :src="item.image"></v-img>
                           <div>
                             <small>{{ item.type.label }}</small>
@@ -88,7 +91,8 @@
                               clearable
                               type="text"
                               autocomplete="off"
-                              :rules="item.required ? notEmpty('Jawaban ini') : []"
+                              :placeholder="item.validation.value === 'telephone' ? 'Mulai dengan angka 0' : ''"
+                              :rules="textfieldRules(item.validation.value, item.required)"
                               :disabled="isLoading"
                               :loading="isLoading"
                             ></v-text-field>
@@ -252,7 +256,15 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 
 import { Form, FormStatus, Respondent, Question, QuestionType, QuestionSection, Option, QuestionPage } from '@/@types';
-import { notEmptyRules, notEmptyOptionRules } from '@/@utils';
+import {
+  notEmptyRules,
+  notEmptyOptionRules,
+  phoneNumberRules,
+  emailRules,
+  numericRules,
+  alphabetRules,
+  alphanumericRules
+} from '@/@utils';
 
 @Component
 export default class QuestionnairePage extends Vue {
@@ -327,6 +339,27 @@ export default class QuestionnairePage extends Vue {
   ------------------------------------ */
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
+  }
+
+  phoneRules(fieldIdentifier: string, isRequired: boolean): any[] {
+    return phoneNumberRules(fieldIdentifier, isRequired);
+  }
+
+  textfieldRules(type: any, isRequired: boolean): any {
+    switch (type) {
+      case 'telephone':
+        return phoneNumberRules('Jawaban ini (nomor telepon)', isRequired);
+      case 'email':
+        return emailRules('Jawaban ini (email)', isRequired);
+      case 'numeric':
+        return numericRules('Jawaban ini (numerik)', isRequired);
+      case 'alphabet':
+        return alphabetRules('Jawaban ini (alfabet)', isRequired);
+      case 'alphanumeric':
+        return alphanumericRules('Jawaban ini (alfanumerik)', isRequired);
+      default:
+        return [];
+    }
   }
 
   notEmptyOptionRules(isMultiple: boolean): any[] {
