@@ -1,4 +1,4 @@
-import Store, { FormState, Form, FormStatus, Respondent } from '@/@types';
+import Store, { FormState, Form, FormStatus, Respondent, FormStateType } from '@/@types';
 import { FORM_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
@@ -6,7 +6,7 @@ import { FORM_ENDPOINT } from '@/@api';
   ----------------------------------------------- */
 const state = (): FormState => ({
   isLoading: false,
-  isEdit: false,
+  stateType: FormStateType.NEW,
   selectedForm: {
     uuid: '',
     authorUuid: '',
@@ -40,8 +40,8 @@ const mutations = {
   setLoading(state: FormState, param: boolean): void {
     state.isLoading = param;
   },
-  setEditState(state: FormState, param: boolean): void {
-    state.isEdit = param;
+  setStateType(state: FormState, param: FormStateType): void {
+    state.stateType = param;
   },
   setSelectedForm(state: FormState, param: Form): void {
     state.selectedForm = param;
@@ -58,8 +58,8 @@ const mutations = {
   => Actions
   ----------------------------------------------- */
 const actions: any = {
-  async updateEditState(store: Store<FormState> | any, param: boolean): Promise<void> {
-    await store.commit('setEditState', param);
+  async updateStateType(store: Store<FormState> | any, param: FormStateType): Promise<void> {
+    await store.commit('setStateType', param);
   },
   async updateSelectedForm(store: Store<FormState> | any, params: Form): Promise<boolean> {
     await store.commit('setLoading', true);

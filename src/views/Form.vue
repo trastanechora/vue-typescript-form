@@ -112,6 +112,21 @@
                 :disabled="isLoading"
                 v-bind="attrs"
                 v-on="on"
+                @click="duplicateForm(item)"
+              >
+                <v-icon small>mdi-content-duplicate</v-icon>
+              </v-btn>
+            </template>
+            <span>Gandakan Form</span>
+          </v-tooltip>
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                :loading="isLoading"
+                :disabled="isLoading"
+                v-bind="attrs"
+                v-on="on"
                 @click="showDeleteDialog(item)"
               >
                 <v-icon>mdi-trash-can</v-icon>
@@ -128,7 +143,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { TableHeader, Form, FormStatus } from '@/@types';
+import { TableHeader, Form, FormStatus, FormStateType } from '@/@types';
 import { dateFormatter, statusFormatter } from '@/@utils';
 import DialogConfirmation from '@/components/DialogConfirmation.vue';
 
@@ -225,17 +240,22 @@ export default class FormPage extends Vue {
     this.$router.push(`/dashboard/form/${uuid}`);
   }
   async addForm(): Promise<void> {
-    await this.$store.dispatch('form/updateEditState', false);
+    await this.$store.dispatch('form/updateStateType', FormStateType.NEW);
     this.$router.push('/dashboard/form/add-edit');
   }
   async editForm(item: Form): Promise<void> {
-    await this.$store.dispatch('form/updateEditState', true);
+    await this.$store.dispatch('form/updateStateType', FormStateType.EDIT);
     await this.$store.dispatch('form/updateSelectedForm', item);
     this.$router.push('/dashboard/form/add-edit');
   }
   async showDeleteDialog(item: Form): Promise<void> {
     await this.$store.dispatch('form/updateSelectedForm', item);
     this.dialog = true;
+  }
+  async duplicateForm(item: Form): Promise<void> {
+    await this.$store.dispatch('form/updateStateType', FormStateType.DUPLICATE);
+    await this.$store.dispatch('form/updateSelectedForm', item);
+    this.$router.push('/dashboard/form/add-edit');
   }
   closeDeleteDialog(): void {
     this.dialog = false;

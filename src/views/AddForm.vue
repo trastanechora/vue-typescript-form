@@ -5,7 +5,7 @@
         <v-form ref="addForm" v-model="valid" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 class="mb-3">
-              <h1 v-if="isEdit" class="primary--text">Edit Form</h1>
+              <h1 v-if="formStateType === 'edit'" class="primary--text">Edit Form</h1>
               <h1 v-else class="primary--text">Buat Form Baru</h1>
               <hr />
             </v-flex>
@@ -302,14 +302,14 @@
                     <v-layout wrap>
                       <v-flex xs12 class="ma-auto">
                         <v-switch
-                          v-if="isEdit"
+                          v-if="formStateType === 'edit'"
                           v-model="status"
                           label="Status"
                           class="mt-0 mb-4 pt-1 pr-5"
                           hide-details
                         />
                         <v-btn
-                          v-if="isEdit"
+                          v-if="formStateType === 'edit'"
                           rounded
                           color="primary"
                           @click="editForm"
@@ -353,7 +353,16 @@ import { Component, Vue } from 'vue-property-decorator';
 import { uuid } from 'vue-uuid';
 import draggable from 'vuedraggable';
 
-import { VForm, Form, FormStatus, Question, QuestionSection, QuestionType, QuestionPage } from '@/@types';
+import {
+  VForm,
+  Form,
+  FormStatus,
+  Question,
+  QuestionSection,
+  QuestionType,
+  QuestionPage,
+  FormStateType
+} from '@/@types';
 import { notEmptyRules } from '@/@utils';
 
 import AddQuestion from '@/components/AddQuestion.vue';
@@ -426,8 +435,8 @@ export default class AddFormPage extends Vue {
     return this.$store.state.form.isLoading;
   }
 
-  get isEdit(): boolean {
-    return this.$store.state.form.isEdit;
+  get formStateType(): FormStateType {
+    return this.$store.state.form.stateType;
   }
 
   get formList(): Form[] {
@@ -438,7 +447,8 @@ export default class AddFormPage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   async mounted(): Promise<void> {
-    if (this.isEdit) {
+    console.warn('formStateType', this.formStateType);
+    if (this.formStateType === FormStateType.EDIT || this.formStateType === FormStateType.DUPLICATE) {
       await this.getFormData();
     }
   }
