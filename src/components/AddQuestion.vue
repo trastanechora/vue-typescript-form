@@ -58,13 +58,12 @@
                     <v-select
                       v-model="currentQuestion.type"
                       outlined
-                      clearable
                       :items="questionTypeList"
                       item-text="label"
                       item-value="value"
                       label="Tipe Pertanyaan"
                       class="required"
-                      :rules="notEmptyOption(false)"
+                      :rules="notEmptySelect('Tipe Pertanyaan')"
                       :disabled="isLoading"
                       return-object
                       :loading="isLoading"
@@ -78,6 +77,19 @@
                       item-text="text"
                       item-value="value"
                       label="Validasi Pertanyaan"
+                      :disabled="isLoading"
+                      return-object
+                      :loading="isLoading"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs12 v-if="currentQuestion.type.label === 'File'">
+                    <v-select
+                      v-model="currentQuestion.validation"
+                      outlined
+                      :items="fileType"
+                      item-text="text"
+                      item-value="value"
+                      label="Jenis File"
                       :disabled="isLoading"
                       return-object
                       :loading="isLoading"
@@ -242,8 +254,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator';
-import { VForm, Question, QuestionType, QuestionTypeObject, Option, TextfieldType } from '@/@types';
-import { notEmptyRules, notEmptyOptionRules } from '@/@utils';
+import { VForm, Question, QuestionType, QuestionTypeObject, Option, TextfieldType, FileType } from '@/@types';
+import { notEmptyRules, notEmptySelectRules } from '@/@utils';
 @Component
 export default class DialogQuestion extends Vue {
   /* ------------------------------------
@@ -326,6 +338,10 @@ export default class DialogQuestion extends Vue {
     {
       label: 'Waktu',
       value: QuestionType.TIME
+    },
+    {
+      label: 'File',
+      value: QuestionType.FILE
     }
   ];
   textfieldType: Option[] = [
@@ -352,6 +368,20 @@ export default class DialogQuestion extends Vue {
     {
       text: 'Email',
       value: TextfieldType.EMAIL
+    }
+  ];
+  fileType: Option[] = [
+    {
+      text: 'Gambar',
+      value: FileType.IMAGE
+    },
+    {
+      text: 'Dokumen',
+      value: FileType.DOCUMENT
+    },
+    {
+      text: 'Lain-lain',
+      value: FileType.OTHER
     }
   ];
 
@@ -431,8 +461,8 @@ export default class DialogQuestion extends Vue {
   notEmpty(identifier: string): any[] {
     return notEmptyRules(identifier);
   }
-  notEmptyOption(isMultiple: boolean): any[] {
-    return notEmptyOptionRules(isMultiple);
+  notEmptySelect(identifier: string): any[] {
+    return notEmptySelectRules(identifier);
   }
   saveImage(file: any): void {
     if (file) {

@@ -13,7 +13,14 @@ export enum QuestionType {
   CHECKBOX_ROW = 'checkbox_row',
   SCALE = 'scale',
   DATE = 'date',
-  TIME = 'time'
+  TIME = 'time',
+  FILE = 'file'
+}
+
+export enum FileType {
+  IMAGE = 'image',
+  DOCUMENT = 'document',
+  OTHER = 'other'
 }
 
 export enum TextfieldType {
@@ -41,7 +48,7 @@ export enum FormStateType {
 
 export interface Option {
   text: string;
-  value: string | number | boolean | TextfieldType;
+  value: string | number | boolean | TextfieldType | FileType;
   otherValue?: string;
   icon?: string;
 }

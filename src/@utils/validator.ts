@@ -8,6 +8,10 @@ export const notEmptyOptionRules = (isMultiple: boolean): CallableFunction[] => 
   ];
 };
 
+export const notEmptySelectRules = (fieldIdentifier: string): CallableFunction[] => {
+  return [(v: any): boolean | string => !!v.label || `${fieldIdentifier} harus diisi`];
+};
+
 export const phoneNumberRules = (fieldIdentifier: string, isRequired: boolean = true): CallableFunction[] => {
   if (isRequired) {
     return [
