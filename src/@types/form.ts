@@ -33,6 +33,12 @@ export enum FormStatus {
   DELETED = 'deleted'
 }
 
+export enum FormStateType {
+  NEW = 'new',
+  EDIT = 'edit',
+  DUPLICATE = 'duplicate'
+}
+
 export interface Option {
   text: string;
   value: string | number | boolean | TextfieldType;
@@ -95,7 +101,7 @@ export interface Form {
 ------------------------------------ */
 export interface FormState {
   isLoading: boolean;
-  isEdit: boolean;
+  stateType: FormStateType;
   selectedForm: Form;
   formList: Form[];
   respondentList: Respondent[];
