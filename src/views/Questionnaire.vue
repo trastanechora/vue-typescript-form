@@ -209,6 +209,28 @@
                               </v-menu>
                             </v-container>
                           </v-layout>
+                          <v-layout v-else-if="item.type.value === 'file'">
+                            <v-container fluid>
+                              <v-file-input
+                                chips
+                                show-size
+                                truncate-length="50"
+                                :accept="
+                                  item.validation.value === 'image'
+                                    ? 'image/*'
+                                    : item.validation.value === 'document'
+                                    ? '.doc,.docx,.xml,.pdf'
+                                    : ''
+                                "
+                                :rules="fileInputRulesHandler(item.text, item.validation.value, 2000, item.required)"
+                                @change="
+                                  event => {
+                                    saveFile(event, item.key);
+                                  }
+                                "
+                              ></v-file-input>
+                            </v-container>
+                          </v-layout>
                         </v-card-text>
                       </v-card>
                     </div>
@@ -263,7 +285,8 @@ import {
   emailRules,
   numericRules,
   alphabetRules,
-  alphanumericRules
+  alphanumericRules,
+  fileInputRules
 } from '@/@utils';
 
 @Component
@@ -332,6 +355,8 @@ export default class QuestionnairePage extends Vue {
       });
     this.formData = this.$store.state.form.selectedForm;
     await this.createAnswerSkeleton();
+    await this.createDialogSkeleton();
+    console.warn('created', this.formData);
   }
 
   /* ------------------------------------
@@ -376,6 +401,20 @@ export default class QuestionnairePage extends Vue {
       });
     });
     this.answerSkeleton = newAnswerSkeleton;
+  }
+
+  createDialogSkeleton(): void {
+    const newDialogSkeleton: any = {};
+    this.formData.questions.forEach((questionPage: QuestionPage) => {
+      questionPage.sectionList.forEach((questionSection: QuestionSection) => {
+        questionSection.questionList.forEach((question: Question) => {
+          if (question.type.value === 'date' || question.type.value === 'time') {
+            newDialogSkeleton[`${question.key}`] = false;
+          }
+        });
+      });
+    });
+    this.dialogSkeleton = newDialogSkeleton;
   }
 
   getValueType(type: QuestionType): string | string[] | number | number[] | boolean | boolean[] | Option {
@@ -430,18 +469,14 @@ export default class QuestionnairePage extends Vue {
     return today < startDate;
   }
 
-  // async parseImage(): Promise<void> {
-  //   if (this.formData.imageBanner) {
-  //     const arrayBufferView = new Uint8Array(this.formData.imageBanner);
-  //     const blobImage = new Blob([arrayBufferView], { type: 'image/jpeg' });
-  //     const reader = new FileReader();
-  //     await reader.readAsDataURL(blobImage);
-  //     reader.onloadend = () => {
-  //       const base64data = reader.result;
-  //       this.parsedImage = base64data;
-  //     };
-  //   }
-  // }
+  saveFile(blob: Blob, key: string): void {
+    this.answerSkeleton[`${key}`] = blob;
+    console.warn('result', this.answerSkeleton);
+  }
+
+  fileInputRulesHandler(fieldIdentifier: string, type: string, maxSize: number, isRequired: boolean): any {
+    return fileInputRules(fieldIdentifier, type, maxSize, isRequired);
+  }
 
   /* ------------------------------------
   => Watcher

@@ -447,7 +447,6 @@ export default class AddFormPage extends Vue {
   => Mounted (Lifecycle)
   ------------------------------------ */
   async mounted(): Promise<void> {
-    console.warn('formStateType', this.formStateType);
     if (this.formStateType === FormStateType.EDIT || this.formStateType === FormStateType.DUPLICATE) {
       await this.getFormData();
     }

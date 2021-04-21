@@ -1,3 +1,5 @@
+import { FileType } from '../@types';
+
 export const notEmptyRules = (fieldIdentifier: string): CallableFunction[] => {
   return [(v: string | number): boolean | string => !!v || `${fieldIdentifier} harus diisi`];
 };
@@ -84,5 +86,39 @@ export const alphanumericRules = (fieldIdentifier: string, isRequired: boolean =
     ];
   } else {
     return [(v: string): boolean | string => !v || /^[\w\-\s]+$/.test(v) || `Format ${fieldIdentifier} tidak valid`];
+  }
+};
+
+export const fileInputRules = (
+  fieldIdentifier: string,
+  type: string,
+  maxSize: number,
+  isRequired: boolean
+): CallableFunction[] => {
+  if (type === 'image') {
+    if (isRequired) {
+      return [
+        (v: Blob): boolean | string => !!v || `${fieldIdentifier} harus diisi`,
+        (v: Blob): boolean | string =>
+          (v && v.size < maxSize * 1000) || `Ukuran file tidak boleh melebihi ${(maxSize * 1000) / 1000000}MB`
+      ];
+    } else {
+      return [
+        (v: Blob): boolean | string =>
+          !v || v.size < maxSize * 1000 || `Ukuran file tidak boleh melebihi ${(maxSize * 1000) / 1000000}MB`
+      ];
+    }
+  } else if (type === FileType.DOCUMENT) {
+    return [
+      (v: Blob): boolean | string => !!v || `${fieldIdentifier} harus diisi`,
+      (v: Blob): boolean | string =>
+        (v && v.size < maxSize * 1000) || `Ukuran file tidak boleh melebihi ${(maxSize * 1000) / 1000000}MB`
+    ];
+  } else {
+    return [
+      (v: Blob): boolean | string => !!v || `${fieldIdentifier} harus diisi`,
+      (v: Blob): boolean | string =>
+        (v && v.size < maxSize * 1000) || `Ukuran file tidak boleh melebihi ${(maxSize * 1000) / 1000000}MB`
+    ];
   }
 };
