@@ -96,16 +96,22 @@
                   </template>
                   <v-date-picker v-model="startDate" no-title @input="startDatePickerMenu = false"></v-date-picker>
                 </v-menu>
-                <v-btn
-                  text
-                  small
-                  color="secondary"
-                  @click="startDateProvided = false"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                  class="ml-2 mt-5"
-                  ><v-icon small>mdi-minus</v-icon>Hapus Waktu Mulai</v-btn
-                >
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      text
+                      small
+                      color="secondary"
+                      @click="startDateProvided = false"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2 mt-5"
+                      v-on="on"
+                      ><v-icon small left>mdi-close-circle</v-icon>Hapus</v-btn
+                    >
+                  </template>
+                  <span>Hapus Waktu Mulai</span>
+                </v-tooltip>
               </v-row>
             </v-flex>
             <v-flex xs12 class="mt-3">
@@ -132,16 +138,22 @@
                   </template>
                   <v-date-picker v-model="dueDate" no-title @input="dueDatePickerMenu = false"></v-date-picker>
                 </v-menu>
-                <v-btn
-                  text
-                  small
-                  color="secondary"
-                  @click="dueDateProvided = false"
-                  :disabled="isLoading"
-                  :loading="isLoading"
-                  class="ml-2 mt-5"
-                  ><v-icon small>mdi-minus</v-icon>Hapus Batas Waktu</v-btn
-                >
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      text
+                      small
+                      color="secondary"
+                      @click="dueDateProvided = false"
+                      :disabled="isLoading"
+                      :loading="isLoading"
+                      class="ml-2 mt-5"
+                      v-on="on"
+                      ><v-icon small left>mdi-close-circle</v-icon>Hapus</v-btn
+                    >
+                  </template>
+                  <span>Hapus Batas Waktu</span>
+                </v-tooltip>
               </v-row>
             </v-flex>
             <v-row v-if="posterProvided" justify="space-between" class="ma-0 pa-0 mt-5">
@@ -155,28 +167,44 @@
                 <v-btn text small color="secondary" disabled>Pratinjau poster:</v-btn>
                 <v-img :src="formData.imageBanner" max-width="400" max-height="200" class="ml-3"></v-img>
               </div>
-              <v-btn text small @click="deletePoster" :disabled="isLoading" :loading="isLoading" class="ml-2 mt-5"
-                ><v-icon small>mdi-minus</v-icon>Hapus Poster</v-btn
-              >
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    text
+                    small
+                    @click="deletePoster"
+                    :disabled="isLoading"
+                    :loading="isLoading"
+                    class="ml-2 mt-5"
+                    v-on="on"
+                    ><v-icon small left>mdi-close-circle</v-icon>Hapus</v-btn
+                  >
+                </template>
+                <span>Hapus Poster</span>
+              </v-tooltip>
             </v-row>
             <v-flex xs12 class="mb-3 mt-6">
               <h2 class="primary--text">List Pertanyaan</h2>
               <hr />
             </v-flex>
             <!-- QUESTION LIST -->
-            <div v-for="(questionPage, pageIndex) in formData.questions" :key="pageIndex" class="full-width">
+            <div
+              v-for="(questionPage, pageIndex) in formData.questions"
+              :key="pageIndex"
+              class="full-width mb-6 position-relative"
+            >
               <h3 v-if="formData.questions.length > 1" class="primary--text mb-2 text-center">
                 {{ questionPage.title + (pageIndex + 1) }}
                 <v-btn
                   v-if="pageIndex > 0"
                   color="primary"
-                  class="ml-2"
+                  class="ml-2 absolute-right"
                   outlined
                   rounded
                   @click="removePage(questionPage, pageIndex)"
-                  x-small
+                  small
                 >
-                  <v-icon left small>mdi-close-circle</v-icon> Hapus
+                  <v-icon left small>mdi-trash-can</v-icon> Hapus Halaman
                 </v-btn>
               </h3>
               <v-expansion-panels
@@ -185,17 +213,31 @@
                 :key="sectionIndex"
               >
                 <h4 v-if="questionPage.sectionList.length > 1" class="primary--text mb-2">
-                  {{ questionSection.title + (sectionIndex + 1) }}
+                  <span v-if="questionSection && questionSection.customTitle">{{ questionSection.title }}</span>
+                  <span v-else>{{ 'Bagian ' + (sectionIndex + 1) }}</span>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                        icon
+                        class="ml-2"
+                        @click="openEditSectionDialog(questionSection, pageIndex, sectionIndex)"
+                        v-on="on"
+                      >
+                        <v-icon small>mdi-pencil</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Ubah Nama Bagian Ini</span>
+                  </v-tooltip>
                   <v-btn
                     v-if="sectionIndex > 0"
                     color="primary"
-                    class="ml-2"
+                    class="ml-2 absolute-right"
                     outlined
                     rounded
                     @click="removeSection(questionSection, sectionIndex, pageIndex)"
-                    x-small
+                    small
                   >
-                    <v-icon left small>mdi-close-circle</v-icon> Hapus
+                    <v-icon left small>mdi-close-circle</v-icon> Hapus Bagian
                   </v-btn>
                 </h4>
                 <draggable
@@ -216,7 +258,7 @@
                           <v-fade-transition leave-absolute>
                             <v-row v-if="!open" no-gutters style="width: 100%">
                               <v-col cols="6">{{ item.type.label }}</v-col>
-                              <v-col cols="6">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
+                              <v-col cols="6" class="error--text">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
                             </v-row>
                           </v-fade-transition>
                         </v-col>
@@ -263,6 +305,18 @@
                   </v-expansion-panel>
                 </draggable>
               </v-expansion-panels>
+              <v-btn
+                color="primary"
+                small
+                text
+                @click="addSection(pageIndex)"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="mb-2"
+              >
+                <v-icon left small>mdi-plus</v-icon>Tambah Bagian
+              </v-btn>
+              <hr class="primary--text" />
             </div>
             <v-flex xs12 class="my-6 form-actions">
               <v-card outlined>
@@ -270,16 +324,6 @@
                   <v-row justify="space-between" class="ma-0 pa-0">
                     <v-layout wrap>
                       <v-flex xs12>
-                        <v-btn
-                          color="primary"
-                          small
-                          text
-                          @click="addSection"
-                          :disabled="isLoading"
-                          :loading="isLoading"
-                        >
-                          <v-icon left small>mdi-plus</v-icon>Tambah Bagian
-                        </v-btn>
                         <v-btn color="primary" small text @click="addPage" :disabled="isLoading" :loading="isLoading">
                           <v-icon left small>mdi-plus</v-icon>Tambah Halaman
                         </v-btn>
@@ -345,6 +389,12 @@
       @add="addQuestion"
       @edit="editQuestion"
     />
+    <NameChangeDialog
+      :dialog="nameEditDialog"
+      :selected-section="selectedSection"
+      :close-dialog="closeEditSectionDialog"
+      @save="saveSectionName"
+    />
   </v-layout>
 </template>
 
@@ -366,11 +416,13 @@ import {
 import { notEmptyRules } from '@/@utils';
 
 import AddQuestion from '@/components/AddQuestion.vue';
+import NameChangeDialog from '@/components/NameChangeDialog.vue';
 
 @Component({
   components: {
     draggable,
-    AddQuestion
+    AddQuestion,
+    NameChangeDialog
   }
 })
 export default class AddFormPage extends Vue {
@@ -379,6 +431,7 @@ export default class AddFormPage extends Vue {
   ------------------------------------ */
   newKey: string = '';
   dialog: boolean = false;
+  nameEditDialog: boolean = false;
   isEditQuestion: boolean = false;
   valid: boolean = true;
   dragState: boolean = false;
@@ -388,6 +441,8 @@ export default class AddFormPage extends Vue {
   startDateProvided: boolean = false;
   dueDateProvided: boolean = false;
   posterProvided: boolean = false;
+  targetPage: number = 0;
+  targetSection: number = 0;
   startDate: string = '';
   dueDate: string = '';
   formData: Form = {
@@ -425,6 +480,10 @@ export default class AddFormPage extends Vue {
       value: QuestionType.EMPTY
     },
     required: false
+  };
+  selectedSection: QuestionSection = {
+    title: '',
+    questionList: []
   };
 
   /* ------------------------------------
@@ -488,11 +547,24 @@ export default class AddFormPage extends Vue {
     });
     this.formData.questions.splice(pageIndex, 1);
   }
-  addSection(): void {
-    this.formData.questions[this.formData.questions.length - 1].sectionList.push({
+  addSection(pageIndex: number): void {
+    this.formData.questions[pageIndex].sectionList.push({
       title: 'Bagian ',
       questionList: []
     });
+  }
+  openEditSectionDialog(section: QuestionSection, pageIndex: number, sectionIndex: number): void {
+    this.selectedSection = section;
+    this.targetPage = pageIndex;
+    this.targetSection = sectionIndex;
+    this.nameEditDialog = true;
+  }
+  closeEditSectionDialog() {
+    this.nameEditDialog = false;
+  }
+  saveSectionName(section: QuestionSection) {
+    this.formData.questions[this.targetPage].sectionList[this.targetSection] = section;
+    this.nameEditDialog = false;
   }
   removeSection(section: QuestionSection, sectionIndex: number, pageIndex: number): void {
     section.questionList.forEach(question => {
@@ -683,5 +755,12 @@ export default class AddFormPage extends Vue {
   position: sticky;
   bottom: 40px;
   z-index: 10;
+}
+.absolute-right {
+  position: absolute;
+  right: 0;
+}
+.position-relative {
+  position: relative;
 }
 </style>
