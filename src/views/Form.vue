@@ -253,8 +253,11 @@ export default class FormPage extends Vue {
     this.dialog = true;
   }
   async duplicateForm(item: Form): Promise<void> {
+    const tobeDuplicateForm = item;
+    tobeDuplicateForm.respondentCount = 0;
+    tobeDuplicateForm.respondents = [];
     await this.$store.dispatch('form/updateStateType', FormStateType.DUPLICATE);
-    await this.$store.dispatch('form/updateSelectedForm', item);
+    await this.$store.dispatch('form/updateSelectedForm', tobeDuplicateForm);
     this.$router.push('/dashboard/form/add-edit');
   }
   closeDeleteDialog(): void {
