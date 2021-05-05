@@ -117,7 +117,11 @@ export default class ResponsePage extends Vue {
       const parsedBody: any = {};
       Object.keys(this.respondentCSVHeader).forEach((key: string) => {
         if (respondent.answers[`${key}`]) {
-          parsedBody[`${key}`] = respondent.answers[`${key}`];
+          if (typeof respondent.answers[`${key}`] === 'object') {
+            parsedBody[`${key}`] = respondent.answers[`${key}`].name;
+          } else {
+            parsedBody[`${key}`] = respondent.answers[`${key}`];
+          }
         } else {
           parsedBody[`${key}`] = '-';
         }
@@ -130,6 +134,9 @@ export default class ResponsePage extends Vue {
   }
   onRowClick(response: any): void {
     this.$router.push(`/dashboard/form/${response.formId}/${response.respondentId}`);
+  }
+  getSlotName(headerItem: any): string {
+    return headerItem.value;
   }
 }
 </script>
