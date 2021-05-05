@@ -74,7 +74,10 @@
                   <v-card-text>
                     <!-- {{ question List }} -->
                     <div>
-                      <v-chip color="primary" class="mb-2">Bagian {{ sectionIndex + 1 }}</v-chip>
+                      <v-chip v-if="sectionItem && sectionItem.customTitle" color="primary" class="mb-2">{{
+                        sectionItem.title
+                      }}</v-chip>
+                      <v-chip v-else color="primary" class="mb-2">Bagian {{ sectionIndex + 1 }}</v-chip>
                       <v-card v-for="item in sectionItem.questionList" :key="item.key" class="ma-1 mb-3">
                         <v-card-text :class="item.required ? 'required' : ''">
                           <v-img v-if="item.image" :src="item.image"></v-img>
@@ -93,17 +96,6 @@
                               autocomplete="off"
                               :placeholder="item.validation.value === 'telephone' ? 'Mulai dengan angka 0' : ''"
                               :rules="textfieldRules(item.validation.value, item.required)"
-                              :disabled="isLoading"
-                              :loading="isLoading"
-                            ></v-text-field>
-                          </v-layout>
-                          <v-layout v-if="item.type.value === 'numeric_field'">
-                            <v-text-field
-                              v-model="answerSkeleton[`${item.key}`]"
-                              clearable
-                              type="number"
-                              autocomplete="off"
-                              :rules="item.required ? notEmpty('Jawaban ini') : []"
                               :disabled="isLoading"
                               :loading="isLoading"
                             ></v-text-field>
@@ -238,7 +230,7 @@
                 </v-card>
                 <v-layout row class="px-4 py-3">
                   <v-flex xs12 class="mb-2 text-end">
-                    <span class="pagination-label primary--text"
+                    <span v-if="formData.questions.length > 1" class="pagination-label primary--text"
                       >Halaman {{ currentStep + 1 }} dari {{ formData.questions.length }}</span
                     >
                     <v-btn v-if="currentStep > 0" text class="mr-2" :disabled="isLoading" @click="previousStep(index)">
@@ -332,6 +324,7 @@ export default class QuestionnairePage extends Vue {
   answerSkeleton: any = {};
   dialogSkeleton: any = {};
   currentStep: number = 1;
+  arrayBuffer: any;
 
   /* ------------------------------------
   => Setter and Getter
@@ -382,6 +375,8 @@ export default class QuestionnairePage extends Vue {
         return alphabetRules('Jawaban ini (alfabet)', isRequired);
       case 'alphanumeric':
         return alphanumericRules('Jawaban ini (alfanumerik)', isRequired);
+      case 'freetext':
+        return isRequired ? notEmptyRules('Jawaban ini') : [];
       default:
         return [];
     }
@@ -469,9 +464,37 @@ export default class QuestionnairePage extends Vue {
     return today < startDate;
   }
 
+  // async saveFile(blob: Blob, key: string): Promise<void> {
+  //   console.warn('result', this.answerSkeleton);
+  //   const fileObject = await this.convertBlobToByteArray(blob);
+  //   this.answerSkeleton[`${key}`] = fileObject;
+  // }
+
   saveFile(blob: Blob, key: string): void {
     this.answerSkeleton[`${key}`] = blob;
-    console.warn('result', this.answerSkeleton);
+  }
+
+  convertBlobToByteArray(blob: any): any {
+    const arrayPromise = new Promise(function(resolve) {
+      const reader = new FileReader();
+
+      reader.onloadend = function() {
+        resolve(reader.result);
+      };
+
+      reader.readAsArrayBuffer(blob);
+    });
+
+    return arrayPromise.then(function(array: any) {
+      const byteArray = new Uint8Array(array);
+      // const processedBlob = new Blob([byteArray], { type: blob.type });
+      // console.warn('processedBlob', processedBlob);
+      return {
+        byteArray: byteArray,
+        type: blob.type,
+        name: blob.name
+      };
+    });
   }
 
   fileInputRulesHandler(fieldIdentifier: string, type: string, maxSize: number, isRequired: boolean): any {
