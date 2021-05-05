@@ -76,6 +76,7 @@ export interface QuestionPage {
 
 export interface QuestionSection {
   title: string;
+  customTitle?: boolean;
   questionList: Question[];
 }
 
