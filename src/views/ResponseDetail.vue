@@ -28,12 +28,32 @@
           <tbody>
             <tr v-for="item in tableData" :key="item.name">
               <td>{{ item.question }}</td>
-              <td>{{ item.answer }}</td>
+              <td v-if="typeof item.answer === 'object'">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon small class="mr-0" color="primary" v-on="on" @click="download(item.answer)">
+                      <v-icon small>mdi-download</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Unduh</span>
+                </v-tooltip>
+                <v-tooltip top v-if="item.answer && item.answer.type.substring(0, 5) === 'image'">
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon small class="mr-2" color="primary" v-on="on" @click="showPreview(item.answer)">
+                      <v-icon small>mdi-eye</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Lihat</span>
+                </v-tooltip>
+                {{ item.answer.name }}
+              </td>
+              <td v-else>{{ item.answer }}</td>
             </tr>
           </tbody>
         </template>
       </v-simple-table>
     </v-flex>
+    <ImagePreview :dialog="imagePreviewDialog" :image="imageLink" :close-dialog="closePreview" />
   </v-layout>
 </template>
 
@@ -42,15 +62,18 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Form, Question, QuestionSection, QuestionPage } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
+import ImagePreview from '@/components/ImagePreview.vue';
 
 @Component({
-  components: { AppBar }
+  components: { AppBar, ImagePreview }
 })
 export default class ResponsePage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
   tableData: any = [];
+  imagePreviewDialog: boolean = false;
+  imageLink: string = '';
 
   /* ------------------------------------
   => Setter and Getter
@@ -104,6 +127,37 @@ export default class ResponsePage extends Vue {
       });
     }
     this.tableData = tableData;
+  }
+  download(blob: any) {
+    // Create an object URL for the blob object
+    const url = URL.createObjectURL(blob);
+
+    // Create a new anchor element
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = blob.name || 'download';
+
+    // Click handler that releases the object URL after the element has been clicked
+    // This is required for one-off downloads of the blob content
+    const clickHandler = () => {
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.removeEventListener('click', clickHandler);
+      }, 150);
+    };
+
+    a.addEventListener('click', clickHandler, false);
+    a.click();
+
+    return a;
+  }
+  showPreview(blob: any): void {
+    this.imageLink = URL.createObjectURL(blob);
+    this.imagePreviewDialog = true;
+  }
+  closePreview(): void {
+    this.imagePreviewDialog = false;
+    this.imageLink = '';
   }
 }
 </script>
