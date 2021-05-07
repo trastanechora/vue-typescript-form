@@ -28,7 +28,7 @@
           <tbody>
             <tr v-for="item in tableData" :key="item.name">
               <td>{{ item.question }}</td>
-              <td v-if="typeof item.answer === 'object'">
+              <td v-if="typeof item.answer === 'object' && !item.answer.length">
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
                     <v-btn icon small class="mr-0" color="primary" v-on="on" @click="download(item.answer)">

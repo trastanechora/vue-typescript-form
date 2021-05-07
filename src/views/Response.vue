@@ -117,7 +117,7 @@ export default class ResponsePage extends Vue {
       const parsedBody: any = {};
       Object.keys(this.respondentCSVHeader).forEach((key: string) => {
         if (respondent.answers[`${key}`]) {
-          if (typeof respondent.answers[`${key}`] === 'object') {
+          if (typeof respondent.answers[`${key}`] === 'object' && !respondent.answers[`${key}`].length) {
             parsedBody[`${key}`] = respondent.answers[`${key}`].name;
           } else {
             parsedBody[`${key}`] = respondent.answers[`${key}`];
