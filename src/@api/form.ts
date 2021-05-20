@@ -1,4 +1,7 @@
-// import { uuid } from 'vue-uuid';
+import { RESPONDENT_ENDPOINT } from '@/@api';
+import { convertByteArrayToBlob } from '@/@utils';
+import { Respondent } from '@/@types';
+
 const DB_NAME = 'formdb';
 const DB_VERSION = 1;
 let DB: any;
@@ -43,28 +46,38 @@ export const FORM_ENDPOINT: any = {
   ------------------------------------ */
   async getForms(userUuid: string): Promise<any> {
     const db: any = await this.getDb();
-    return new Promise(resolve => {
-      const trans = db.transaction(['forms'], 'readonly');
-      const store = trans.objectStore('forms');
-      const forms: any = [];
-      store.openCursor().onsuccess = (e: any) => {
-        const cursor = e.target.result;
-        if (cursor) {
-          if (cursor.value.authorUuid === userUuid) {
-            forms.push(cursor.value);
-          }
-          cursor.continue();
+    const trans = db.transaction(['forms'], 'readonly');
+    const store = trans.objectStore('forms');
+    const forms: any = [];
+    const editedForms: any = [];
+    store.openCursor().onsuccess = (e: any) => {
+      const cursor = e.target.result;
+      if (cursor) {
+        if (cursor.value.authorUuid === userUuid) {
+          const targetForm = cursor.value;
+          forms.push(targetForm);
         }
-      };
-      trans.oncomplete = () => {
-        resolve(forms);
+        cursor.continue();
+      }
+    };
+
+    return new Promise(resolve => {
+      trans.oncomplete = async () => {
+        for (let currentFormIndex = 0; currentFormIndex < forms.length; currentFormIndex++) {
+          const currentForm = { ...forms[currentFormIndex] };
+          const rawRespondents = await RESPONDENT_ENDPOINT.getRespondentByFormId(currentForm.uuid);
+          currentForm.respondentCount = rawRespondents.length;
+          editedForms.push(currentForm);
+        }
+        resolve(editedForms);
       };
     });
   },
   /* ------------------------------------
   => [GET] Get Form by UUID
   ------------------------------------ */
-  async getFormById(id: string): Promise<Form> {
+  async retrieveFormById(id: string): Promise<Form> {
+    // This function is a helper
     const db: any = await this.getDb();
     return new Promise((resolve, reject) => {
       const trans = db.transaction(['forms'], 'readonly');
@@ -82,6 +95,36 @@ export const FORM_ENDPOINT: any = {
         }
       };
     });
+  },
+  async getFormById(id: string): Promise<Form> {
+    const selectedForm = await this.retrieveFormById(id);
+    const rawRespondents = await RESPONDENT_ENDPOINT.getRespondentByFormId(selectedForm.uuid);
+    const respondentLength: number = rawRespondents.length;
+    const answers = rawRespondents[0].answers;
+    const answerKey: string[] = [];
+    Object.keys(answers).forEach((key: string) => {
+      answerKey.push(key);
+    });
+    const processedRespondents: Respondent[] = [];
+    for (let respondentIndex = 0; respondentIndex < respondentLength; respondentIndex++) {
+      const processedRespondent = rawRespondents[respondentIndex];
+      const processedAnswers = rawRespondents[respondentIndex].answers;
+      for (let answerIndex = 0; answerIndex < answerKey.length; answerIndex++) {
+        if (
+          typeof rawRespondents[respondentIndex].answers[`${answerKey[answerIndex]}`] === 'object' &&
+          !rawRespondents[respondentIndex].answers[`${answerKey[answerIndex]}`].length
+        ) {
+          processedAnswers[`${answerKey[answerIndex]}`] = await convertByteArrayToBlob(
+            rawRespondents[respondentIndex].answers[`${answerKey[answerIndex]}`]
+          );
+        }
+        processedRespondent.answers = processedAnswers;
+      }
+      processedRespondents.push(processedRespondent);
+    }
+    selectedForm.respondents = processedRespondents;
+    selectedForm.respondentCount = respondentLength;
+    return selectedForm;
   },
   /* ------------------------------------
   => [POST] Insert New Form
