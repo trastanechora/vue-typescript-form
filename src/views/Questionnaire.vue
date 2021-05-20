@@ -318,6 +318,7 @@ export default class QuestionnairePage extends Vue {
   };
   respondentData: Respondent = {
     uuid: '',
+    formId: '',
     answers: {},
     submitDate: ''
   };
@@ -349,7 +350,6 @@ export default class QuestionnairePage extends Vue {
     this.formData = this.$store.state.form.selectedForm;
     await this.createAnswerSkeleton();
     await this.createDialogSkeleton();
-    console.warn('created', this.formData);
   }
 
   /* ------------------------------------
@@ -425,11 +425,12 @@ export default class QuestionnairePage extends Vue {
     }
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     this.respondentData.uuid = uuid.v1();
     const newDate = new Date();
     this.respondentData.submitDate = newDate.toISOString();
-    this.respondentData.answers = this.answerSkeleton;
+    this.respondentData.answers = await this.answerSkeleton;
+    this.respondentData.formId = this.$route.params.id;
     this.$store.dispatch('form/submitResponse', this.respondentData).then(() => {
       this.$router.push('/thank-you');
     });
@@ -464,37 +465,8 @@ export default class QuestionnairePage extends Vue {
     return today < startDate;
   }
 
-  // async saveFile(blob: Blob, key: string): Promise<void> {
-  //   console.warn('result', this.answerSkeleton);
-  //   const fileObject = await this.convertBlobToByteArray(blob);
-  //   this.answerSkeleton[`${key}`] = fileObject;
-  // }
-
   saveFile(blob: Blob, key: string): void {
     this.answerSkeleton[`${key}`] = blob;
-  }
-
-  convertBlobToByteArray(blob: any): any {
-    const arrayPromise = new Promise(function(resolve) {
-      const reader = new FileReader();
-
-      reader.onloadend = function() {
-        resolve(reader.result);
-      };
-
-      reader.readAsArrayBuffer(blob);
-    });
-
-    return arrayPromise.then(function(array: any) {
-      const byteArray = new Uint8Array(array);
-      // const processedBlob = new Blob([byteArray], { type: blob.type });
-      // console.warn('processedBlob', processedBlob);
-      return {
-        byteArray: byteArray,
-        type: blob.type,
-        name: blob.name
-      };
-    });
   }
 
   fileInputRulesHandler(fieldIdentifier: string, type: string, maxSize: number, isRequired: boolean): any {
