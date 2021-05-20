@@ -42,3 +42,30 @@ export const statusFormatter = (status: FormStatus): any => {
       break;
   }
 };
+
+export const convertBlobToByteArray = (blob: any): any => {
+  const arrayPromise = new Promise(function(resolve) {
+    const reader = new FileReader();
+
+    reader.onloadend = function() {
+      resolve(reader.result);
+    };
+
+    reader.readAsArrayBuffer(blob);
+  });
+
+  return arrayPromise.then(function(array: any) {
+    const byteArray = new Uint8Array(array);
+    return {
+      byteArray: byteArray,
+      type: blob.type,
+      name: blob.name
+    };
+  });
+};
+
+export const convertByteArrayToBlob = (byteArrayObject: any): any => {
+  const processedBlob: any = new Blob([byteArrayObject.byteArray], { type: byteArrayObject.type });
+  processedBlob.name = byteArrayObject.name;
+  return processedBlob;
+};
