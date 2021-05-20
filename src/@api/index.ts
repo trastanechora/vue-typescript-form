@@ -4,4 +4,5 @@
 ------------------------------------------------- */
 export * from './user';
 export * from './form';
+export * from './respondent';
 export * from './board';
