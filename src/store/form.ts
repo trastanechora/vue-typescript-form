@@ -1,5 +1,5 @@
 import Store, { FormState, Form, FormStatus, Respondent, FormStateType } from '@/@types';
-import { FORM_ENDPOINT } from '@/@api';
+import { FORM_ENDPOINT, RESPONDENT_ENDPOINT } from '@/@api';
 
 /* ------------------------------------------------
   => State
@@ -163,10 +163,7 @@ const actions: any = {
   },
   async submitResponse(store: Store<FormState> | any, params: Respondent): Promise<boolean> {
     await store.commit('setLoading', true);
-    const currentData = store.state.selectedForm;
-    currentData.respondents.push(params);
-    currentData.respondentCount = currentData.respondents.length;
-    return FORM_ENDPOINT.editForm(currentData)
+    return RESPONDENT_ENDPOINT.saveRespondent(params)
       .then((res: any) => {
         store.commit('setLoading', false);
         store.commit(
