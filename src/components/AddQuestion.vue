@@ -67,7 +67,11 @@
                       :disabled="isLoading"
                       return-object
                       :loading="isLoading"
-                    ></v-select>
+                    >
+                      <template v-slot:[`item`]="{ item }">
+                        <v-icon small left>{{ item.icon }}</v-icon> {{ item.label }}
+                      </template>
+                    </v-select>
                   </v-flex>
                   <v-flex xs12 v-if="currentQuestion.type.label === 'Jawaban Singkat'">
                     <v-select
@@ -317,31 +321,38 @@ export default class DialogQuestion extends Vue {
   questionTypeList: QuestionTypeObject[] = [
     {
       label: 'Jawaban Singkat',
-      value: QuestionType.TEXT_FIELD
+      value: QuestionType.TEXT_FIELD,
+      icon: 'mdi-format-text'
     },
     {
       label: 'Jawaban Paragraf',
-      value: QuestionType.TEXT_AREA
+      value: QuestionType.TEXT_AREA,
+      icon: 'mdi-text'
     },
     {
       label: 'Pilihan Ganda',
-      value: QuestionType.RADIO
+      value: QuestionType.RADIO,
+      icon: 'mdi-radiobox-marked'
     },
     {
       label: 'Kotak Centang',
-      value: QuestionType.CHECKBOX
+      value: QuestionType.CHECKBOX,
+      icon: 'mdi-checkbox-marked'
     },
     {
       label: 'Tanggal',
-      value: QuestionType.DATE
+      value: QuestionType.DATE,
+      icon: 'mdi-calendar-range'
     },
     {
       label: 'Waktu',
-      value: QuestionType.TIME
+      value: QuestionType.TIME,
+      icon: 'mdi-clock-outline'
     },
     {
       label: 'File',
-      value: QuestionType.FILE
+      value: QuestionType.FILE,
+      icon: 'mdi-attachment'
     }
   ];
   textfieldType: Option[] = [
