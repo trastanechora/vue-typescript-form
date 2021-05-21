@@ -257,7 +257,10 @@
                         <v-col cols="8" class="text--secondary">
                           <v-fade-transition leave-absolute>
                             <v-row v-if="!open" no-gutters style="width: 100%">
-                              <v-col cols="6">{{ item.type.label }}</v-col>
+                              <v-col cols="6"
+                                ><v-icon left small>{{ item.type.icon }}</v-icon
+                                >{{ item.type.label }}</v-col
+                              >
                               <v-col cols="6" class="error--text">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
                             </v-row>
                           </v-fade-transition>
@@ -287,7 +290,8 @@
                           ></v-row>
                         </v-col>
                         <v-col cols="6" class="text-right">
-                          <v-chip class="ma-2"> {{ item.type.label }} </v-chip
+                          <v-chip class="ma-2"
+                            ><v-icon left small>{{ item.type.icon }}</v-icon> {{ item.type.label }} </v-chip
                           ><v-chip v-if="item.required" class="ma-2" color="error" outlined>
                             Wajib Diisi
                           </v-chip></v-col
