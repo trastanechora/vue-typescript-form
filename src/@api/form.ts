@@ -144,7 +144,7 @@ export const FORM_ENDPOINT: any = {
     });
   },
   /* ------------------------------------
-  => [PUT] Edit Form and Submit Response
+  => [PUT] Edit Form
   ------------------------------------ */
   async editForm(formData: Form): Promise<Form> {
     const db: any = await this.getDb();
