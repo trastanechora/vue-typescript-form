@@ -82,6 +82,7 @@
                         <v-card-text :class="item.required ? 'required' : ''">
                           <v-img v-if="item.image" :src="item.image"></v-img>
                           <div>
+                            <v-icon x-small left>{{ item.type.icon }}</v-icon>
                             <small>{{ item.type.label }}</small>
                           </div>
                           <p class="headline">
