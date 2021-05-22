@@ -100,6 +100,11 @@ export const FORM_ENDPOINT: any = {
     const selectedForm = await this.retrieveFormById(id);
     const rawRespondents = await RESPONDENT_ENDPOINT.getRespondentByFormId(selectedForm.uuid);
     const respondentLength: number = rawRespondents.length;
+    if (respondentLength === 0) {
+      selectedForm.respondents = [];
+      selectedForm.respondentCount = 0;
+      return selectedForm;
+    }
     const answers = rawRespondents[0].answers;
     const answerKey: string[] = [];
     Object.keys(answers).forEach((key: string) => {
