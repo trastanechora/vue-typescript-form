@@ -254,8 +254,7 @@ export default class FormPage extends Vue {
   }
   async duplicateForm(item: Form): Promise<void> {
     const tobeDuplicateForm = item;
-    tobeDuplicateForm.respondentCount = 0;
-    tobeDuplicateForm.respondents = [];
+    tobeDuplicateForm.updatedAt = '';
     await this.$store.dispatch('form/updateStateType', FormStateType.DUPLICATE);
     await this.$store.dispatch('form/updateSelectedForm', tobeDuplicateForm);
     this.$router.push('/dashboard/form/add-edit');
