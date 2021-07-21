@@ -455,12 +455,18 @@ export default class QuestionnairePage extends Vue {
   }
 
   checkDueDate(): boolean {
+    if (!this.formData.dueDate) {
+      return false;
+    }
     const dueDate = new Date(this.formData.dueDate);
     const today = new Date();
     return today > dueDate;
   }
 
   checkStartDate(): boolean {
+    if (!this.formData.startDate) {
+      return false;
+    }
     const startDate = new Date(this.formData.startDate);
     const today = new Date();
     return today < startDate;

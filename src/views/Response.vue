@@ -86,6 +86,7 @@ export default class ResponsePage extends Vue {
   }
   createHeader(): void {
     const newHeader: any = [];
+    console.warn('this.selectedForm.questions', this.selectedForm.questions);
     this.selectedForm.questions.forEach((questionPage: QuestionPage) => {
       questionPage.sectionList.forEach((questionSection: QuestionSection) => {
         questionSection.questionList.forEach((question: Question) => {

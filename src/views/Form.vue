@@ -2,6 +2,9 @@
   <v-layout wrap class="pa-10">
     <v-flex xs12 class="mb-4">
       <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
+      <v-btn rounded color="primary" outlined @click="importForm" class="ml-2">
+        <v-icon left>mdi-upload-outline</v-icon>Import</v-btn
+      >
     </v-flex>
     <v-flex xs12>
       <v-data-table
@@ -210,11 +213,17 @@ export default class FormPage extends Vue {
     return statusFormatter(status).icon;
   }
   checkStartDate(date: string): boolean {
+    if (!date) {
+      return false;
+    }
     const dueDate = new Date(date);
     const today = new Date();
     return today <= dueDate;
   }
   checkDueDate(date: string): boolean {
+    if (!date) {
+      return false;
+    }
     const dueDate = new Date(date);
     const today = new Date();
     return today > dueDate;
@@ -242,6 +251,9 @@ export default class FormPage extends Vue {
   async addForm(): Promise<void> {
     await this.$store.dispatch('form/updateStateType', FormStateType.NEW);
     this.$router.push('/dashboard/form/add-edit');
+  }
+  async importForm(): Promise<void> {
+    this.$router.push('/dashboard/form/import');
   }
   async editForm(item: Form): Promise<void> {
     await this.$store.dispatch('form/updateStateType', FormStateType.EDIT);
