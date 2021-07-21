@@ -78,7 +78,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { dateFormatter } from '@/@utils';
-import { VForm, Question, QuestionType, FormStatus } from '@/@types';
+import { VForm, Question, QuestionType, FormStatus, TextfieldType } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 import { uuid } from 'vue-uuid';
 import XLSX from 'xlsx';
@@ -153,8 +153,13 @@ export default class FormPage extends Vue {
                 text: modifiedHeader,
                 tableHeader: modifiedHeader,
                 type: {
-                  label: '',
-                  value: QuestionType.EMPTY
+                  icon: 'mdi-format-text',
+                  label: 'Jawaban Singkat',
+                  value: QuestionType.TEXT_FIELD
+                },
+                validation: {
+                  text: 'Bebas',
+                  value: TextfieldType.FREETEXT
                 },
                 required: false,
                 isImport: true
@@ -167,8 +172,13 @@ export default class FormPage extends Vue {
                 text: currentHeader,
                 tableHeader: currentHeader,
                 type: {
-                  label: '',
-                  value: QuestionType.EMPTY
+                  icon: 'mdi-format-text',
+                  label: 'Jawaban Singkat',
+                  value: QuestionType.TEXT_FIELD
+                },
+                validation: {
+                  text: 'Bebas',
+                  value: TextfieldType.FREETEXT
                 },
                 required: false,
                 isImport: true
@@ -183,8 +193,13 @@ export default class FormPage extends Vue {
               text: modifiedHeader,
               tableHeader: modifiedHeader,
               type: {
-                label: '',
-                value: QuestionType.EMPTY
+                icon: 'mdi-format-text',
+                label: 'Jawaban Singkat',
+                value: QuestionType.TEXT_FIELD
+              },
+              validation: {
+                text: 'Bebas',
+                value: TextfieldType.FREETEXT
               },
               required: false,
               isImport: true

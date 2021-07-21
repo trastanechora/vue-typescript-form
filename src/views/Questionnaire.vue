@@ -351,6 +351,9 @@ export default class QuestionnairePage extends Vue {
     this.formData = this.$store.state.form.selectedForm;
     await this.createAnswerSkeleton();
     await this.createDialogSkeleton();
+    console.warn('this.answerSkeleton', this.answerSkeleton);
+    console.warn('this.dialogSkeleton', this.dialogSkeleton);
+    console.warn('question', this.formData.questions);
   }
 
   /* ------------------------------------
