@@ -61,12 +61,14 @@ export interface QuestionTypeObject {
 export interface Question {
   key: string;
   text: string;
+  tableHeader?: string;
   type: QuestionTypeObject;
   validation?: Option;
   required: boolean;
   description?: string;
   options?: Option[];
   image?: any;
+  isImport?: boolean;
 }
 
 export interface QuestionPage {
@@ -85,6 +87,8 @@ export interface Respondent {
   formId: string;
   answers: any;
   submitDate: string;
+  isImport?: boolean;
+  importId?: string;
 }
 
 export interface Form {
@@ -95,14 +99,16 @@ export interface Form {
   imageBanner: any;
   createdAt: string;
   updatedAt: string;
-  startDate: string;
-  dueDate: string;
+  startDate?: string;
+  dueDate?: string;
   questionCount: number;
   status: FormStatus;
   link: string;
   questions: QuestionPage[];
   respondentCount: number;
-  respondents: Respondent[];
+  respondents?: Respondent[];
+  isImport?: boolean;
+  importId?: string;
 }
 
 /* ------------------------------------

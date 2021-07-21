@@ -13,3 +13,8 @@ declare module 'vue-json-to-csv' {
   import VueJsonToCsv from 'vue-json-to-csv';
   export default VueJsonToCsv;
 }
+
+declare module 'vue-xlsx' {
+  import * as VueXlsx from 'vue-xlsx/dist/vue-xlsx.es.js';
+  export const { ...VueXlsx };
+}
