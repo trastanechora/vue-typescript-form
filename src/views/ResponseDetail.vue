@@ -113,7 +113,7 @@ export default class ResponsePage extends Vue {
         });
       });
     });
-    const filteredRespondent: any = this.selectedForm.respondents.filter(
+    const filteredRespondent: any = this.selectedForm.respondents?.filter(
       respondent => respondent.uuid === this.$route.params.respondentId
     );
     if (filteredRespondent.length > 0) {

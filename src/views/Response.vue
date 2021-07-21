@@ -114,7 +114,7 @@ export default class ResponsePage extends Vue {
   }
   createBody(): void {
     const newBody: any = [];
-    this.selectedForm.respondents.forEach((respondent: any) => {
+    this.selectedForm.respondents?.forEach((respondent: any) => {
       const parsedBody: any = {};
       Object.keys(this.respondentCSVHeader).forEach((key: string) => {
         if (respondent.answers[`${key}`]) {
