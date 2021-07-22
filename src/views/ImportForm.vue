@@ -73,14 +73,6 @@
     <v-dialog v-model="isImportLoading" persistent width="300">
       <v-card color="primary" dark>
         <v-card-text class="py-6">
-          <!-- Please stand by
-          <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
-          <v-progress-linear
-            color="light-green darken-4"
-            height="10"
-            v-model="importPercentage"
-            striped
-          ></v-progress-linear> -->
           <v-progress-linear v-model="importPercentage" height="25" color="white">
             <strong :class="importPercentage > 50 ? 'primary--text' : 'white--text'"
               >{{ Math.ceil(importPercentage) }}%</strong
