@@ -120,4 +120,5 @@ export interface FormState {
   selectedForm: Form;
   formList: Form[];
   respondentList: Respondent[];
+  postponeNotification: boolean;
 }

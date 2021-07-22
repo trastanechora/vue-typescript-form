@@ -51,8 +51,6 @@
                   persistent-hint
                   :hint="`Kolom nomor ${index + 1}.`"
                   :rules="textfieldRules()"
-                  :disabled="isLoading"
-                  :loading="isLoading"
                 ></v-text-field>
               </div>
             </v-form>
@@ -72,13 +70,37 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="isImportLoading" persistent width="300">
+      <v-card color="primary" dark>
+        <v-card-text class="py-6">
+          <!-- Please stand by
+          <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+          <v-progress-linear
+            color="light-green darken-4"
+            height="10"
+            v-model="importPercentage"
+            striped
+          ></v-progress-linear> -->
+          <v-progress-linear v-model="importPercentage" height="25" color="white">
+            <strong :class="importPercentage > 50 ? 'primary--text' : 'white--text'"
+              >{{ Math.ceil(importPercentage) }}%</strong
+            >
+          </v-progress-linear>
+          <div class="text-center">{{ importProgression }} / {{ dataLength }}</div>
+          <p class="text-caption text-center mt-2 mb-0">
+            Mohon untuk tidak memuat ulang halaman sebelum proses import selesai, atau data tidak akan tersimpan secara
+            penuh
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { dateFormatter } from '@/@utils';
-import { VForm, Question, QuestionType, FormStatus, TextfieldType } from '@/@types';
+import { VForm, Question, QuestionType, FormStatus, TextfieldType, Respondent } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 import { uuid } from 'vue-uuid';
 import XLSX from 'xlsx';
@@ -95,9 +117,13 @@ export default class FormPage extends Vue {
   file: any = null;
   excelFile: any = null;
   data: any = [];
+  dataLength: number = 0;
   headers: any = [];
   questions: Question[] = [];
   items: any = [];
+  isImportLoading: boolean = false;
+  importProgression: number = 0;
+  importPercentage: number = 0;
 
   /* ------------------------------------
   => Setter and Getter
@@ -110,9 +136,9 @@ export default class FormPage extends Vue {
   /* ------------------------------------
   => Mounted (Lifecycle)
   ------------------------------------ */
-  mounted(): void {
-    console.warn('Ready to rock!');
-  }
+  // mounted(): void {
+  //   console.warn('Ready to rock!');
+  // }
 
   onChange(event: any) {
     if (event) {
@@ -207,6 +233,7 @@ export default class FormPage extends Vue {
           }
         }
 
+        this.dataLength = dataRows.length;
         this.data = dataRows.map((row: any) => {
           const result: any = {};
           row.forEach((value: any, index: number) => {
@@ -242,7 +269,7 @@ export default class FormPage extends Vue {
     return dateFormatter(parsedDate);
   }
 
-  doImport(): void {
+  async doImport(): Promise<void> {
     const importForm = this.$refs.importForm as VForm;
     if (importForm.validate()) {
       const formId = uuid.v1();
@@ -287,17 +314,28 @@ export default class FormPage extends Vue {
         };
       });
 
-      listOfAnswers.forEach((answer: any) => {
-        this.$store.dispatch('form/submitResponse', answer);
-      });
+      this.dialog = false;
+      this.isImportLoading = true;
+      await this.$store.dispatch('form/updatePostponeNotification', true);
+      await this.importAnswer(listOfAnswers);
+      this.isImportLoading = false;
 
       this.$store.dispatch('form/saveForm', form).then(() => {
         this.$router.push('/dashboard/form');
       });
-
-      console.warn('listOfAnswers', listOfAnswers);
     } else {
       console.warn('Data is invalid!');
+    }
+  }
+
+  async importAnswer(listOfAnswers: Respondent[]): Promise<void> {
+    for (const answer of listOfAnswers) {
+      if (this.importPercentage > 99) {
+        await this.$store.dispatch('form/updatePostponeNotification', false);
+      }
+      await this.$store.dispatch('form/submitResponse', answer);
+      this.importProgression++;
+      this.importPercentage = (this.importProgression / this.dataLength) * 100;
     }
   }
 

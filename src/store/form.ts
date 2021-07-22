@@ -30,7 +30,8 @@ const state = (): FormState => ({
     respondents: []
   },
   formList: [],
-  respondentList: []
+  respondentList: [],
+  postponeNotification: false
 });
 
 /* ------------------------------------------------
@@ -39,6 +40,9 @@ const state = (): FormState => ({
 const mutations = {
   setLoading(state: FormState, param: boolean): void {
     state.isLoading = param;
+  },
+  setPostponeNotification(state: FormState, param: boolean): void {
+    state.postponeNotification = param;
   },
   setStateType(state: FormState, param: FormStateType): void {
     state.stateType = param;
@@ -58,6 +62,9 @@ const mutations = {
   => Actions
   ----------------------------------------------- */
 const actions: any = {
+  async updatePostponeNotification(store: Store<FormState> | any, param: boolean): Promise<void> {
+    await store.commit('setPostponeNotification', param);
+  },
   async updateStateType(store: Store<FormState> | any, param: FormStateType): Promise<void> {
     await store.commit('setStateType', param);
   },
@@ -167,16 +174,18 @@ const actions: any = {
     return RESPONDENT_ENDPOINT.saveRespondent(params)
       .then((res: any) => {
         store.commit('setLoading', false);
-        store.commit(
-          'ui/setSnackbar',
-          {
-            open: true,
-            message: 'Tanggapan Anda telah berhasil disimpan!',
-            color: 'green',
-            timeout: 4000
-          },
-          { root: true }
-        );
+        if (!store.state.postponeNotification) {
+          store.commit(
+            'ui/setSnackbar',
+            {
+              open: true,
+              message: 'Tanggapan Anda telah berhasil disimpan!',
+              color: 'green',
+              timeout: 4000
+            },
+            { root: true }
+          );
+        }
         return res;
       })
       .catch((err: any) => {
