@@ -183,156 +183,168 @@
                 <span>Hapus Poster</span>
               </v-tooltip>
             </v-row>
-            <v-flex xs12 class="mb-3 mt-6">
-              <h2 class="primary--text">List Pertanyaan</h2>
-              <hr />
-            </v-flex>
-            <!-- QUESTION LIST -->
-            <div
-              v-for="(questionPage, pageIndex) in formData.questions"
-              :key="pageIndex"
-              class="full-width mb-6 position-relative"
-            >
-              <h3 v-if="formData.questions.length > 1" class="primary--text mb-2 text-center">
-                {{ questionPage.title + (pageIndex + 1) }}
-                <v-btn
-                  v-if="pageIndex > 0"
-                  color="primary"
-                  class="ml-2 absolute-right"
-                  outlined
-                  rounded
-                  @click="removePage(questionPage, pageIndex)"
-                  small
-                >
-                  <v-icon left small>mdi-trash-can</v-icon> Hapus Halaman
-                </v-btn>
-              </h3>
-              <v-expansion-panels
-                class="full-width mb-4 section-title"
-                v-for="(questionSection, sectionIndex) in questionPage.sectionList"
-                :key="sectionIndex"
+            <v-layout v-if="isHideQuestions">
+              <v-btn
+                rounded
+                color="primary"
+                outlined
+                @click="openAddQuestionDialog"
+                :disabled="isLoading"
+                :loading="isLoading"
+                class="mx-auto"
               >
-                <h4 v-if="questionPage.sectionList.length > 1" class="primary--text mb-2">
-                  <span v-if="questionSection && questionSection.customTitle">{{ questionSection.title }}</span>
-                  <span v-else>{{ 'Bagian ' + (sectionIndex + 1) }}</span>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-btn
-                        icon
-                        class="ml-2"
-                        @click="openEditSectionDialog(questionSection, pageIndex, sectionIndex)"
-                        v-on="on"
-                      >
-                        <v-icon small>mdi-pencil</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Ubah Nama Bagian Ini</span>
-                  </v-tooltip>
+                <v-icon left>mdi-plus</v-icon>Tambah Pertanyaan
+              </v-btn>
+            </v-layout>
+            <v-layout v-else wrap>
+              <v-flex xs12 class="mb-3 mt-6">
+                <h2 class="primary--text">List Pertanyaan</h2>
+                <hr />
+              </v-flex>
+              <!-- QUESTION LIST -->
+              <div
+                v-for="(questionPage, pageIndex) in formData.questions"
+                :key="pageIndex"
+                class="full-width mb-6 position-relative"
+              >
+                <h3 v-if="formData.questions.length > 1" class="primary--text mb-2 text-center">
+                  {{ questionPage.title + (pageIndex + 1) }}
                   <v-btn
-                    v-if="sectionIndex > 0"
+                    v-if="pageIndex > 0"
                     color="primary"
                     class="ml-2 absolute-right"
                     outlined
                     rounded
-                    @click="removeSection(questionSection, sectionIndex, pageIndex)"
+                    @click="removePage(questionPage, pageIndex)"
                     small
                   >
-                    <v-icon left small>mdi-close-circle</v-icon> Hapus Bagian
+                    <v-icon left small>mdi-trash-can</v-icon> Hapus Halaman
                   </v-btn>
-                </h4>
-                <draggable
-                  v-model="questionSection.questionList"
-                  group="questions"
-                  @start="dragState = true"
-                  @end="dragState = false"
-                  tag="div"
-                  class="full-width"
+                </h3>
+                <v-expansion-panels
+                  class="full-width mb-4 section-title"
+                  v-for="(questionSection, sectionIndex) in questionPage.sectionList"
+                  :key="sectionIndex"
                 >
-                  <v-expansion-panel v-for="item in questionSection.questionList" :key="item.key" class="full-width">
-                    <v-expansion-panel-header v-slot="{ open }">
-                      <v-row no-gutters>
-                        <v-col cols="4">
-                          {{ item.text }}
-                        </v-col>
-                        <v-col cols="8" class="text--secondary">
-                          <v-fade-transition leave-absolute>
-                            <v-row v-if="!open" no-gutters style="width: 100%">
-                              <v-col cols="6"
-                                ><v-icon left small>{{ item.type.icon }}</v-icon
-                                >{{ item.type.label }}</v-col
-                              >
-                              <v-col cols="6" class="error--text">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
+                  <h4 v-if="questionPage.sectionList.length > 1" class="primary--text mb-2">
+                    <span v-if="questionSection && questionSection.customTitle">{{ questionSection.title }}</span>
+                    <span v-else>{{ 'Bagian ' + (sectionIndex + 1) }}</span>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          class="ml-2"
+                          @click="openEditSectionDialog(questionSection, pageIndex, sectionIndex)"
+                          v-on="on"
+                        >
+                          <v-icon small>mdi-pencil</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Ubah Nama Bagian Ini</span>
+                    </v-tooltip>
+                    <v-btn
+                      v-if="sectionIndex > 0"
+                      color="primary"
+                      class="ml-2 absolute-right"
+                      outlined
+                      rounded
+                      @click="removeSection(questionSection, sectionIndex, pageIndex)"
+                      small
+                    >
+                      <v-icon left small>mdi-close-circle</v-icon> Hapus Bagian
+                    </v-btn>
+                  </h4>
+                  <draggable
+                    v-model="questionSection.questionList"
+                    group="questions"
+                    @start="dragState = true"
+                    @end="dragState = false"
+                    tag="div"
+                    class="full-width"
+                  >
+                    <v-expansion-panel v-for="item in questionSection.questionList" :key="item.key" class="full-width">
+                      <v-expansion-panel-header v-slot="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4">
+                            {{ item.text }}
+                          </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <v-row v-if="!open" no-gutters style="width: 100%">
+                                <v-col cols="6"
+                                  ><v-icon left small>{{ item.type.icon }}</v-icon
+                                  >{{ item.type.label }}</v-col
+                                >
+                                <v-col cols="6" class="error--text">{{ item.required ? 'Wajib Diisi' : '' }}</v-col>
+                              </v-row>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content>
+                        <v-row
+                          ><v-col cols="6" class="text--secondary px-6">
+                            <v-row v-if="item.image">
+                              <v-img :src="item.image" max-width="300" max-height="150"></v-img>
                             </v-row>
-                          </v-fade-transition>
-                        </v-col>
-                      </v-row>
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                      <v-row
-                        ><v-col cols="6" class="text--secondary px-6">
-                          <v-row v-if="item.image">
-                            <v-img :src="item.image" max-width="300" max-height="150"></v-img>
-                          </v-row>
-                          <v-row>{{ item.description ? item.description : '' }}</v-row>
-                          <v-row v-if="item.type.value === 'radio' || item.type.value === 'checkbox'"
-                            ><v-list dense>
-                              <v-subheader>Pilihan Jawaban:</v-subheader>
-                              <v-list-item-group color="primary">
-                                <v-list-item v-for="(option, optionIndex) in item.options" :key="optionIndex" disabled>
-                                  <v-list-item-icon>
-                                    {{ optionIndex + 1 }}
-                                  </v-list-item-icon>
-                                  <v-list-item-content>
-                                    <v-list-item-title v-text="option.text"></v-list-item-title>
-                                  </v-list-item-content>
-                                </v-list-item>
-                              </v-list-item-group> </v-list
-                          ></v-row>
-                        </v-col>
-                        <v-col cols="6" class="text-right">
-                          <v-chip class="ma-2"
-                            ><v-icon left small>{{ item.type.icon }}</v-icon> {{ item.type.label }} </v-chip
-                          ><v-chip v-if="item.required" class="ma-2" color="error" outlined>
-                            Wajib Diisi
-                          </v-chip></v-col
-                        ></v-row
-                      >
-                      <v-row class="mx-2 mb-1">
-                        <v-spacer /><v-btn color="primary" text @click="openEditQuestionDialog(item)">
-                          <v-icon left>mdi-pencil</v-icon> Edit
-                        </v-btn>
-                        <v-btn color="primary" text @click="deleteQuestion(item)">
-                          <v-icon left>mdi-delete</v-icon> Hapus
-                        </v-btn></v-row
-                      >
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </draggable>
-              </v-expansion-panels>
-              <v-btn
-                color="primary"
-                small
-                text
-                @click="addSection(pageIndex)"
-                :disabled="isLoading"
-                :loading="isLoading"
-                class="mb-2"
-              >
-                <v-icon left small>mdi-plus</v-icon>Tambah Bagian
-              </v-btn>
-              <hr class="primary--text" />
-            </div>
-            <v-flex xs12 class="my-6 form-actions">
-              <v-card outlined>
-                <v-card-text>
-                  <v-row justify="space-between" class="ma-0 pa-0">
-                    <v-layout wrap>
-                      <v-flex xs12>
-                        <v-btn color="primary" small text @click="addPage" :disabled="isLoading" :loading="isLoading">
-                          <v-icon left small>mdi-plus</v-icon>Tambah Halaman
-                        </v-btn>
-                      </v-flex>
-                      <v-flex xs12>
+                            <v-row>{{ item.description ? item.description : '' }}</v-row>
+                            <v-row v-if="item.type.value === 'radio' || item.type.value === 'checkbox'"
+                              ><v-list dense>
+                                <v-subheader>Pilihan Jawaban:</v-subheader>
+                                <v-list-item-group color="primary">
+                                  <v-list-item
+                                    v-for="(option, optionIndex) in item.options"
+                                    :key="optionIndex"
+                                    disabled
+                                  >
+                                    <v-list-item-icon>
+                                      {{ optionIndex + 1 }}
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                      <v-list-item-title v-text="option.text"></v-list-item-title>
+                                    </v-list-item-content>
+                                  </v-list-item>
+                                </v-list-item-group> </v-list
+                            ></v-row>
+                          </v-col>
+                          <v-col cols="6" class="text-right">
+                            <v-chip class="ma-2"
+                              ><v-icon left small>{{ item.type.icon }}</v-icon> {{ item.type.label }} </v-chip
+                            ><v-chip v-if="item.required" class="ma-2" color="error" outlined>
+                              Wajib Diisi
+                            </v-chip></v-col
+                          ></v-row
+                        >
+                        <v-row class="mx-2 mb-1">
+                          <v-spacer /><v-btn color="primary" text @click="openEditQuestionDialog(item)">
+                            <v-icon left>mdi-pencil</v-icon> Edit
+                          </v-btn>
+                          <v-btn color="primary" text @click="deleteQuestion(item)">
+                            <v-icon left>mdi-delete</v-icon> Hapus
+                          </v-btn></v-row
+                        >
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                  </draggable>
+                </v-expansion-panels>
+                <v-btn
+                  color="primary"
+                  small
+                  text
+                  @click="addSection(pageIndex)"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  class="mb-2"
+                >
+                  <v-icon left small>mdi-plus</v-icon>Tambah Bagian
+                </v-btn>
+                <hr class="primary--text" />
+              </div>
+              <v-flex xs12 class="my-6 form-actions">
+                <v-card outlined>
+                  <v-card-text>
+                    <v-row justify="space-between" class="ma-0 pa-0">
+                      <v-layout wrap>
                         <v-btn
                           rounded
                           color="primary"
@@ -340,46 +352,56 @@
                           @click="openAddQuestionDialog"
                           :disabled="isLoading"
                           :loading="isLoading"
-                          class="mt-4"
                         >
                           <v-icon left>mdi-plus</v-icon>Tambah Pertanyaan
                         </v-btn>
-                      </v-flex>
-                    </v-layout>
-                    <v-spacer />
-                    <v-layout wrap>
-                      <v-flex xs12 class="ma-auto">
-                        <v-switch
-                          v-if="formStateType === 'edit'"
-                          v-model="status"
-                          label="Status"
-                          class="mt-0 mb-4 pt-1 pr-5"
-                          hide-details
-                        />
                         <v-btn
-                          v-if="formStateType === 'edit'"
-                          rounded
                           color="primary"
-                          @click="editForm"
+                          small
+                          text
+                          @click="addPage"
                           :disabled="isLoading"
                           :loading="isLoading"
-                          >Perbarui Form</v-btn
+                          class="ml-2 mt-1"
                         >
-                        <v-btn
-                          v-else
-                          rounded
-                          color="primary"
-                          @click="saveForm"
-                          :disabled="isLoading"
-                          :loading="isLoading"
-                          >Simpan Form</v-btn
-                        >
-                      </v-flex>
-                    </v-layout>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-flex>
+                          <v-icon left small>mdi-plus</v-icon>Tambah Halaman
+                        </v-btn>
+                      </v-layout>
+                      <v-spacer />
+                      <v-layout wrap>
+                        <v-flex xs12 class="ma-auto">
+                          <v-switch
+                            v-if="formStateType === 'edit'"
+                            v-model="status"
+                            label="Status"
+                            class="mt-0 mb-4 pt-1 pr-5"
+                            hide-details
+                          />
+                          <v-btn
+                            v-if="formStateType === 'edit'"
+                            rounded
+                            color="primary"
+                            @click="editForm"
+                            :disabled="isLoading"
+                            :loading="isLoading"
+                            >Perbarui Form</v-btn
+                          >
+                          <v-btn
+                            v-else
+                            rounded
+                            color="primary"
+                            @click="saveForm"
+                            :disabled="isLoading"
+                            :loading="isLoading"
+                            >Simpan Form</v-btn
+                          >
+                        </v-flex>
+                      </v-layout>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+            </v-layout>
           </v-layout>
         </v-form>
       </v-flex>
@@ -504,6 +526,10 @@ export default class AddFormPage extends Vue {
 
   get formList(): Form[] {
     return this.$store.state.form.formList;
+  }
+
+  get isHideQuestions(): boolean {
+    return this.getQuestionCount() === 0;
   }
 
   /* ------------------------------------
@@ -723,7 +749,6 @@ export default class AddFormPage extends Vue {
     });
     this.formData.questions = newQuestionPage;
   }
-
   async saveImageBanner(file: any): Promise<void> {
     if (file) {
       const reader = new FileReader();
@@ -735,7 +760,6 @@ export default class AddFormPage extends Vue {
       this.formData.imageBanner = undefined;
     }
   }
-
   deletePoster(): void {
     this.posterProvided = false;
     this.formData.imageBanner = undefined;
