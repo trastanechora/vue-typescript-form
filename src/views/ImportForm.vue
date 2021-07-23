@@ -281,10 +281,10 @@ export default class FormPage extends Vue {
         link: `${process.env.VUE_APP_URL}/questionnaire/${formId}`,
         questions: [
           {
-            title: '',
+            title: 'Halaman ',
             sectionList: [
               {
-                title: '',
+                title: 'Bagian ',
                 questionList: this.questions
               }
             ]

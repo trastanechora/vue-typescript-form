@@ -603,6 +603,14 @@ export default class AddFormPage extends Vue {
     this.formData.questions[pageIndex].sectionList.splice(sectionIndex, 1);
   }
   saveForm(): void {
+    if (this.checkAnyEmptySection()) {
+      this.$store.dispatch('ui/showSnackbar', {
+        message: 'Mohon hapus "Bagian" atau "Halaman" yang kosong terlebih dahulu',
+        color: 'error',
+        timeout: 4000
+      });
+      return;
+    }
     const addForm = this.$refs.addForm as VForm;
     if (addForm.validate()) {
       const data = { ...this.formData };
@@ -700,6 +708,17 @@ export default class AddFormPage extends Vue {
       });
     });
     return newQuestionCount;
+  }
+  checkAnyEmptySection(): boolean {
+    let isEmpty = false;
+    this.formData.questions.forEach((questionPage: QuestionPage) => {
+      questionPage.sectionList.forEach((questionSection: QuestionSection) => {
+        if (questionSection.questionList.length === 0) {
+          isEmpty = true;
+        }
+      });
+    });
+    return isEmpty;
   }
   deleteQuestion(selectedQuestion: Question): void {
     const newQuestionPage = this.formData.questions.map((questionPage: QuestionPage) => {
