@@ -58,9 +58,6 @@
       <v-layout column>
         <!-- REGISTER FORM -->
         <v-card v-if="isRegister" class="mx-auto py-5 mt-10" max-width="600" flat>
-          <!-- <v-card-title class="primary--text px-7">
-        Register
-      </v-card-title> -->
           <v-card-title class="primary--text center px-7 display-1">
             Register
           </v-card-title>
@@ -331,16 +328,24 @@ export default class HomePage extends Vue {
   doRegister(): void {
     const form = this.$refs.registerForm as VForm;
     if (form.validate()) {
-      this.$store
-        .dispatch('auth/register', {
-          username: this.registerUsername,
-          displayName: this.registerDisplayName,
-          password: this.registerPassword
-        })
-        .then(async () => {
-          this.isRegister = false;
-          form.reset();
+      if (this.registerPassword === this.confirmPassword) {
+        this.$store
+          .dispatch('auth/register', {
+            username: this.registerUsername,
+            displayName: this.registerDisplayName,
+            password: this.registerPassword
+          })
+          .then(async () => {
+            this.isRegister = false;
+            form.reset();
+          });
+      } else {
+        this.$store.dispatch('ui/showSnackbar', {
+          message: 'Pastikan password dan konfirmasi password Anda sudah sama',
+          color: 'error',
+          timeout: 4000
         });
+      }
     }
   }
   changeFormType(type: string): void {
