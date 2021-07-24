@@ -368,15 +368,17 @@
                         </v-btn>
                       </v-layout>
                       <v-spacer />
-                      <v-layout wrap>
-                        <v-flex xs12 class="ma-auto">
+                      <v-layout>
+                        <v-flex xs6 class="ma-auto">
                           <v-switch
                             v-if="formStateType === 'edit'"
                             v-model="status"
                             label="Status"
-                            class="mt-0 mb-4 pt-1 pr-5"
+                            class="mt-1 mb-2"
                             hide-details
                           />
+                        </v-flex>
+                        <v-flex xs6 class="ma-auto">
                           <v-btn
                             v-if="formStateType === 'edit'"
                             rounded
