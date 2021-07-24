@@ -9,6 +9,7 @@
             v-model="searchString"
             append-icon="mdi-magnify"
             label="Cari berdasarkan label"
+            autocomplete="off"
             clearable
           ></v-text-field>
           <v-btn small rounded color="primary" outlined @click="importForm" class="ml-2">

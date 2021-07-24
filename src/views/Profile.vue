@@ -25,7 +25,7 @@
       <v-list>
         <v-list-item>
           <v-list-item-action>
-            <v-switch v-model="$vuetify.theme.dark"></v-switch>
+            <v-switch v-model="isDark"></v-switch>
           </v-list-item-action>
           <v-list-item-title>Mode Gelap</v-list-item-title>
         </v-list-item>
@@ -52,6 +52,15 @@ export default class ProfilePage extends Vue {
   ------------------------------------ */
   get profile(): User {
     return this.$store.state.user.currentUser;
+  }
+
+  get isDark(): boolean {
+    return this.$store.state.ui.isDark;
+  }
+
+  set isDark(value: boolean) {
+    this.$vuetify.theme.dark = value;
+    this.$store.dispatch('ui/changeIsDark', value);
   }
 }
 </script>
