@@ -3,7 +3,7 @@
     <v-flex xs12 class="mb-4">
       <v-btn rounded color="primary" outlined @click="addForm"> <v-icon left>mdi-plus</v-icon>Tambah Form </v-btn>
       <v-btn rounded color="primary" outlined @click="importForm" class="ml-2">
-        <v-icon left>mdi-upload-outline</v-icon>Import</v-btn
+        <v-icon left small>mdi-upload</v-icon>Import</v-btn
       >
     </v-flex>
     <v-flex xs12>

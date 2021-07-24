@@ -179,6 +179,12 @@ export default class FormPage extends Vue {
                   text: 'Bebas',
                   value: TextfieldType.FREETEXT
                 },
+                options: [
+                  {
+                    text: '',
+                    value: ''
+                  }
+                ],
                 required: false,
                 isImport: true
               });
@@ -198,6 +204,12 @@ export default class FormPage extends Vue {
                   text: 'Bebas',
                   value: TextfieldType.FREETEXT
                 },
+                options: [
+                  {
+                    text: '',
+                    value: ''
+                  }
+                ],
                 required: false,
                 isImport: true
               });
@@ -219,6 +231,12 @@ export default class FormPage extends Vue {
                 text: 'Bebas',
                 value: TextfieldType.FREETEXT
               },
+              options: [
+                {
+                  text: '',
+                  value: ''
+                }
+              ],
               required: false,
               isImport: true
             });
