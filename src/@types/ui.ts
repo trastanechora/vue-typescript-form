@@ -38,4 +38,5 @@ export type VForm = Vue & { validate: () => boolean; reset: () => void; resetVal
 ------------------------------------ */
 export interface UiState {
   snackbar: Snackbar;
+  isDark: boolean;
 }

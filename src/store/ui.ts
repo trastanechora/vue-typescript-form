@@ -9,7 +9,8 @@ const state = (): UiState => ({
     message: '',
     color: 'success',
     timeout: 4000
-  }
+  },
+  isDark: false
 });
 
 /* ----------------------------------------------
@@ -24,6 +25,9 @@ const mutations = {
     state.snackbar.message = params.message;
     state.snackbar.color = params.color;
     state.snackbar.timeout = params.timeout;
+  },
+  setIsDark(state: UiState, param: boolean): void {
+    state.isDark = param;
   }
 };
 
@@ -36,6 +40,9 @@ const actions = {
   },
   showSnackbar(store: Store<UiState> | any, params: Snackbar): void {
     store.commit('setSnackbar', params);
+  },
+  changeIsDark(store: Store<UiState> | any, param: boolean): void {
+    store.commit('setIsDark', param);
   }
 };
 

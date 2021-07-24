@@ -11,7 +11,7 @@ import board from './board';
 Vue.use(Vuex);
 
 const dataState = createPersistedState({
-  paths: ['auth.isLogin', 'form', 'user.currentUser']
+  paths: ['auth.isLogin', 'form', 'user.currentUser', 'ui.isDark']
 });
 
 export default new Vuex.Store({

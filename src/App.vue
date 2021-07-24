@@ -14,9 +14,11 @@ Vue.component('vueJsonToCsv', VueJsonToCsv);
 
 export default Vue.extend({
   name: 'App',
-
   components: {
     Snackbar
+  },
+  created() {
+    this.$vuetify.theme.dark = this.$store.state.ui.isDark;
   }
 });
 </script>

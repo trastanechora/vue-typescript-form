@@ -72,10 +72,7 @@ export default class AppBar extends Vue {
   ------------------------------------ */
   switchTheme(): void {
     this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
-  }
-
-  switchLanguage(param: string): void {
-    this.$store.dispatch('i18n/changeLanguage', param);
+    this.$store.dispatch('ui/changeIsDark', this.$vuetify.theme.dark);
   }
 
   logout(): void {
