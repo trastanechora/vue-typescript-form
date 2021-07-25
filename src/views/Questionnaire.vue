@@ -77,7 +77,9 @@
                       <v-chip v-if="sectionItem && sectionItem.customTitle" color="primary" class="mb-2">{{
                         sectionItem.title
                       }}</v-chip>
-                      <v-chip v-else color="primary" class="mb-2">Bagian {{ sectionIndex + 1 }}</v-chip>
+                      <v-chip v-else-if="questionPage.sectionList.length > 1" color="primary" class="mb-2"
+                        >Bagian {{ sectionIndex + 1 }}</v-chip
+                      >
                       <v-card v-for="item in sectionItem.questionList" :key="item.key" class="ma-1 mb-3">
                         <v-card-text :class="item.required ? 'required' : ''">
                           <v-img v-if="item.image" :src="item.image"></v-img>
