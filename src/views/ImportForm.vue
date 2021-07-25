@@ -36,6 +36,19 @@
 
         <v-card-text class="my-2">
           <div>
+            <v-text-field
+              v-model="formLabel"
+              clearable
+              type="text"
+              autocomplete="off"
+              persistent-hint
+              label="Label form"
+              hint="Label form akan tampil sebagai nama form"
+              :rules="textfieldRules('Label form')"
+              class="my-4"
+            ></v-text-field>
+          </div>
+          <div>
             Atur pertanyaan untuk setiap kolom atau Anda bisa langsung dengan pertanyaan seperti judul kolom dari tabel
             pratinjau
           </div>
@@ -43,15 +56,30 @@
             <v-form ref="importForm" v-model="valid" lazy-validation>
               <div v-for="(questionItem, index) in questions" :key="`${index + 1}-column`">
                 <!-- {{ questionItem }} -->
-                <v-text-field
-                  v-model="questions[index].text"
-                  clearable
-                  type="text"
-                  autocomplete="off"
-                  persistent-hint
-                  :hint="`Kolom nomor ${index + 1}.`"
-                  :rules="textfieldRules()"
-                ></v-text-field>
+                <v-layout>
+                  <v-flex xs9>
+                    <v-text-field
+                      v-model="questions[index].text"
+                      clearable
+                      type="text"
+                      autocomplete="off"
+                      persistent-hint
+                      :hint="`Kolom nomor ${index + 1}.`"
+                      :rules="textfieldRules(index + 1)"
+                      class="mx-2 required"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs3>
+                    <v-select
+                      v-model="questions[index].validation"
+                      :items="textfieldType"
+                      item-text="text"
+                      item-value="value"
+                      label="Tipe Data"
+                      return-object
+                    ></v-select>
+                  </v-flex>
+                </v-layout>
               </div>
             </v-form>
           </div>
@@ -92,7 +120,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { dateFormatter } from '@/@utils';
-import { VForm, Question, QuestionType, FormStatus, TextfieldType, Respondent } from '@/@types';
+import { VForm, Question, QuestionType, FormStatus, TextfieldType, Respondent, Option } from '@/@types';
 import { notEmptyRules } from '@/@utils';
 import { uuid } from 'vue-uuid';
 import XLSX from 'xlsx';
@@ -114,8 +142,19 @@ export default class FormPage extends Vue {
   questions: Question[] = [];
   items: any = [];
   isImportLoading: boolean = false;
+  formLabel: string = '';
   importProgression: number = 0;
   importPercentage: number = 0;
+  textfieldType: Option[] = [
+    {
+      text: 'Bebas',
+      value: TextfieldType.FREETEXT
+    },
+    {
+      text: 'Numerik',
+      value: TextfieldType.NUMERIC
+    }
+  ];
 
   /* ------------------------------------
   => Setter and Getter
@@ -137,6 +176,7 @@ export default class FormPage extends Vue {
       console.warn('event', event);
       const file = event;
       this.file = file;
+      this.formLabel = file.name;
       const reader = new FileReader();
 
       reader.onload = (e: any) => {
@@ -255,10 +295,6 @@ export default class FormPage extends Vue {
         console.warn('this.headers', this.headers);
         console.warn('this.data', this.data);
         console.warn('dataRows', dataRows);
-
-        workbook.SheetNames.forEach(function(sheetName) {
-          console.warn('sheetName', sheetName);
-        });
       };
 
       reader.readAsBinaryString(file);
@@ -289,7 +325,7 @@ export default class FormPage extends Vue {
       const form = {
         uuid: formId,
         authorUuid: this.$store.state.user.currentUser.uuid,
-        label: this.file.name,
+        label: this.formLabel,
         description: '',
         imageBanner: undefined,
         createdAt: updatedAt,
@@ -349,8 +385,8 @@ export default class FormPage extends Vue {
     }
   }
 
-  textfieldRules(): any {
-    notEmptyRules('Pertanyaan ini');
+  textfieldRules(questionNumber: number): any {
+    return notEmptyRules(`Pertanyaan ${questionNumber}`);
   }
 }
 </script>
@@ -359,5 +395,9 @@ export default class FormPage extends Vue {
 .v-btn {
   letter-spacing: normal;
   text-transform: none;
+}
+.required >>> .v-messages__message::after {
+  content: ' *';
+  color: red;
 }
 </style>
