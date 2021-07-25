@@ -645,6 +645,14 @@ export default class AddFormPage extends Vue {
     }
   }
   editForm(): void {
+    if (this.checkAnyEmptySection()) {
+      this.$store.dispatch('ui/showSnackbar', {
+        message: 'Mohon hapus "Bagian" atau "Halaman" yang kosong terlebih dahulu',
+        color: 'error',
+        timeout: 4000
+      });
+      return;
+    }
     const addForm = this.$refs.addForm as VForm;
     if (addForm.validate()) {
       const data = { ...this.formData };
