@@ -2,7 +2,7 @@
   <v-layout wrap class="full-width pa-10">
     <v-flex xs12 class="mb-4 mx-2">
       <v-layout class="mb-2">
-        <v-flex xs10>
+        <v-flex xs6>
           <div>
             <small>Daftar Responden</small>
           </div>
@@ -14,13 +14,13 @@
             >Jumlah Tanggapan: <span class="primary--text">{{ selectedForm.respondentCount }} </span></small
           >
         </v-flex>
-        <v-flex xs2 class="text-right mt-5">
+        <v-flex xs6 class="text-right mt-5">
           <vue-json-to-csv
             :json-data="respondentBody"
             :labels="respondentCSVHeader"
             :csv-title="`Daftar Responden ${selectedForm.label}`"
           >
-            <v-btn rounded color="primary" outlined> <v-icon left>mdi-download</v-icon>Export CSV</v-btn>
+            <v-btn rounded small color="primary" outlined> <v-icon small left>mdi-download</v-icon>Export CSV</v-btn>
           </vue-json-to-csv>
         </v-flex>
       </v-layout>
