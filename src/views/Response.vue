@@ -2,7 +2,7 @@
   <v-layout wrap class="full-width pa-10">
     <v-flex xs12 class="mb-4 mx-2">
       <v-layout class="mb-2">
-        <v-flex xs6>
+        <v-flex xs8>
           <div>
             <small>Daftar Responden</small>
           </div>
@@ -14,14 +14,50 @@
             >Jumlah Tanggapan: <span class="primary--text">{{ selectedForm.respondentCount }} </span></small
           >
         </v-flex>
-        <v-flex xs6 class="text-right mt-5">
-          <vue-json-to-csv
-            :json-data="respondentBody"
-            :labels="respondentCSVHeader"
-            :csv-title="`Daftar Responden ${selectedForm.label}`"
-          >
-            <v-btn rounded small color="primary" outlined> <v-icon small left>mdi-download</v-icon>Export CSV</v-btn>
-          </vue-json-to-csv>
+        <v-flex xs4 class="text-right mt-5">
+          <v-layout wrap>
+            <v-flex xs12>
+              <v-btn v-if="!isFilter" rounded small color="primary" outlined class="ml-2" @click="isFilter = true">
+                <v-icon small left>mdi-filter</v-icon>Filter
+              </v-btn>
+              <v-btn v-else rounded small color="primary" outlined class="ml-2" @click="clearFilter">
+                <v-icon small left>mdi-close</v-icon>Kosongkan Filter
+              </v-btn>
+              <vue-json-to-csv
+                :json-data="respondentBody"
+                :labels="respondentCSVHeader"
+                :csv-title="`Daftar Responden ${selectedForm.label}`"
+              >
+                <v-btn rounded small color="primary" outlined class="ml-2">
+                  <v-icon small left>mdi-download</v-icon>Export CSV</v-btn
+                >
+              </vue-json-to-csv>
+            </v-flex>
+            <v-flex xs12 v-if="isFilter" class="mt-6">
+              <v-select
+                v-model="activeFilterColumn"
+                dense
+                :items="respondentHeader"
+                item-text="text"
+                item-value="value"
+                label="Filter berdasarkan"
+                :disabled="isLoading"
+                return-object
+                :loading="isLoading"
+              />
+              <v-text-field
+                v-model="filterString"
+                dense
+                clearable
+                label="Teks filter"
+                type="text"
+                autocomplete="off"
+                append-icon="mdi-magnify"
+                :disabled="isLoading"
+                :loading="isLoading"
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
         </v-flex>
       </v-layout>
     </v-flex>
@@ -31,8 +67,9 @@
         :items="respondentBody"
         :items-per-page="10"
         :loading="isLoading"
-        class="elevation-1 full-width"
+        :search="filterString"
         @click:row="onRowClick"
+        class="elevation-1 full-width"
       >
       </v-data-table>
     </v-flex>
@@ -40,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TableHeader, Form, Question, QuestionSection, QuestionPage } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
@@ -52,9 +89,12 @@ export default class ResponsePage extends Vue {
   /* ------------------------------------
   => Local State Declaration
   ------------------------------------ */
+  isFilter: boolean = false;
   respondentHeader: TableHeader[] = [];
   respondentBody: any = [];
   respondentCSVHeader: any = {};
+  activeFilterColumn: any = null;
+  filterString: string = '';
 
   /* ------------------------------------
   => Setter and Getter
@@ -75,6 +115,7 @@ export default class ResponsePage extends Vue {
     await this.createHeader();
     await this.createCSVHeader();
     await this.createBody();
+    this.activeFilterColumn = this.respondentHeader[0];
   }
 
   /* ------------------------------------
@@ -86,7 +127,6 @@ export default class ResponsePage extends Vue {
   }
   createHeader(): void {
     const newHeader: any = [];
-    console.warn('this.selectedForm.questions', this.selectedForm.questions);
     this.selectedForm.questions.forEach((questionPage: QuestionPage) => {
       questionPage.sectionList.forEach((questionSection: QuestionSection) => {
         questionSection.questionList.forEach((question: Question) => {
@@ -94,7 +134,8 @@ export default class ResponsePage extends Vue {
             text: question.text,
             value: question.key,
             width: 250,
-            align: 'center'
+            align: 'center',
+            filterable: false
           });
         });
       });
@@ -138,6 +179,24 @@ export default class ResponsePage extends Vue {
   }
   getSlotName(headerItem: any): string {
     return headerItem.value;
+  }
+  clearFilter(): void {
+    this.isFilter = false;
+    this.filterString = '';
+  }
+
+  /* ------------------------------------
+  => Watcher
+  ------------------------------------ */
+  @Watch('activeFilterColumn')
+  async handleFilterColumnChange(newValue: any): Promise<void> {
+    this.respondentHeader.forEach((header: any, index: number) => {
+      if (header.value === newValue.value) {
+        this.respondentHeader[index].filterable = true;
+      } else {
+        this.respondentHeader[index].filterable = false;
+      }
+    });
   }
 }
 </script>
