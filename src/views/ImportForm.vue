@@ -92,7 +92,7 @@
           <v-btn color="error" text @click="dialog = false">
             Batal
           </v-btn>
-          <v-btn color="primary" @click="doImport()">
+          <v-btn color="primary" @click="doImport">
             Import
           </v-btn>
         </v-card-actions>
@@ -171,9 +171,16 @@ export default class FormPage extends Vue {
   //   console.warn('Ready to rock!');
   // }
 
+  doEmptyTable() {
+    this.file = null;
+    this.excelFile = null;
+    this.data = [];
+    this.headers = [];
+    this.items = [];
+  }
+
   onChange(event: any) {
     if (event) {
-      console.warn('event', event);
       const file = event;
       this.file = file;
       this.formLabel = file.name;
@@ -185,103 +192,44 @@ export default class FormPage extends Vue {
           type: 'binary'
         });
 
-        const parsedXlsx = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1, { header: 1 });
+        const parsedXlsx: any = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1, { header: 1 });
         const parsedXlsxLength = parsedXlsx.length;
-        const headerRows: any[] = parsedXlsx.slice(0, 2);
-        const dataRows = parsedXlsx.slice(2, parsedXlsxLength);
+        const headerRow: any = parsedXlsx[0];
+        const dataRows = parsedXlsx.slice(1, parsedXlsxLength);
+        const duplicateChecker: any = {};
+        const duplicateKeys: string[] = [];
 
-        let currentHeader = '';
-        let totalLength = 0;
-
-        if (headerRows[0].length > headerRows[1].length) {
-          totalLength = headerRows[0].length;
-        } else {
-          totalLength = headerRows[1].length;
-        }
-
-        for (let index = 0; index < totalLength; index++) {
-          if (headerRows[0][index]) {
-            currentHeader = headerRows[0][index];
-            if (headerRows[1][index]) {
-              const modifiedHeader = `[${currentHeader}] ${headerRows[1][index]}`;
-              const modifiedKey = modifiedHeader.toLowerCase().replace(/\s/g, '');
-              this.headers.push({ text: modifiedHeader, value: modifiedKey });
-              this.questions.push({
-                key: modifiedKey,
-                text: modifiedHeader,
-                tableHeader: modifiedHeader,
-                type: {
-                  icon: 'mdi-format-text',
-                  label: 'Jawaban Singkat',
-                  value: QuestionType.TEXT_FIELD
-                },
-                validation: {
-                  text: 'Bebas',
-                  value: TextfieldType.FREETEXT
-                },
-                options: [
-                  {
-                    text: '',
-                    value: ''
-                  }
-                ],
-                required: false,
-                isImport: true
-              });
-            } else {
-              const modifiedKey = currentHeader.toLowerCase().replace(/\s/g, '');
-              this.headers.push({ text: currentHeader, value: modifiedKey });
-              this.questions.push({
-                key: modifiedKey,
-                text: currentHeader,
-                tableHeader: currentHeader,
-                type: {
-                  icon: 'mdi-format-text',
-                  label: 'Jawaban Singkat',
-                  value: QuestionType.TEXT_FIELD
-                },
-                validation: {
-                  text: 'Bebas',
-                  value: TextfieldType.FREETEXT
-                },
-                options: [
-                  {
-                    text: '',
-                    value: ''
-                  }
-                ],
-                required: false,
-                isImport: true
-              });
-            }
-          } else {
-            const modifiedHeader = `[${currentHeader}] ${headerRows[1][index]}`;
-            const modifiedKey = modifiedHeader.toLowerCase().replace(/\s/g, '');
-            this.headers.push({ text: modifiedHeader, value: modifiedKey });
-            this.questions.push({
-              key: modifiedKey,
-              text: modifiedHeader,
-              tableHeader: modifiedHeader,
-              type: {
-                icon: 'mdi-format-text',
-                label: 'Jawaban Singkat',
-                value: QuestionType.TEXT_FIELD
-              },
-              validation: {
-                text: 'Bebas',
-                value: TextfieldType.FREETEXT
-              },
-              options: [
-                {
-                  text: '',
-                  value: ''
-                }
-              ],
-              required: false,
-              isImport: true
-            });
+        headerRow.forEach((currentHeader: string) => {
+          const modifiedKey = currentHeader.toLowerCase().replace(/\s/g, '');
+          if (duplicateChecker[`${modifiedKey}`]) {
+            duplicateKeys.push(currentHeader);
           }
-        }
+
+          duplicateChecker[`${modifiedKey}`] = modifiedKey;
+          this.headers.push({ text: currentHeader, value: modifiedKey });
+          this.questions.push({
+            key: modifiedKey,
+            text: currentHeader,
+            tableHeader: currentHeader,
+            type: {
+              icon: 'mdi-format-text',
+              label: 'Jawaban Singkat',
+              value: QuestionType.TEXT_FIELD
+            },
+            validation: {
+              text: 'Bebas',
+              value: TextfieldType.FREETEXT
+            },
+            options: [
+              {
+                text: '',
+                value: ''
+              }
+            ],
+            required: false,
+            isImport: true
+          });
+        });
 
         this.dataLength = dataRows.length;
         this.data = dataRows.map((row: any) => {
@@ -292,18 +240,19 @@ export default class FormPage extends Vue {
           return result;
         });
 
-        console.warn('this.headers', this.headers);
-        console.warn('this.data', this.data);
-        console.warn('dataRows', dataRows);
+        if (duplicateKeys.length > 0) {
+          this.doEmptyTable();
+          this.$store.dispatch('ui/showSnackbar', {
+            message: `Gagal. Terdapat duplikasi nama kolom: ${duplicateKeys}`,
+            color: 'error',
+            timeout: 0
+          });
+        }
       };
 
       reader.readAsBinaryString(file);
     } else {
-      this.file = null;
-      this.excelFile = null;
-      this.data = [];
-      this.headers = [];
-      this.items = [];
+      this.doEmptyTable();
     }
   }
 
