@@ -7,6 +7,7 @@ import auth from './auth';
 import form from './form';
 import user from './user';
 import board from './board';
+import chart from './chart';
 
 Vue.use(Vuex);
 
@@ -36,6 +37,10 @@ export default new Vuex.Store({
     user: {
       namespaced: true,
       ...user
+    },
+    chart: {
+      namespaced: true,
+      ...chart
     }
   }
 });
