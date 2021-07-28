@@ -4,3 +4,4 @@
 ------------------------------------------------- */
 export * from './validator';
 export * from './formatter';
+export * from './generator';
