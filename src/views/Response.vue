@@ -101,7 +101,8 @@
       </v-btn>
     </v-flex>
     <v-flex xs12>
-      <ChartPie />
+      <ChartPie v-if="selectedChart && selectedChart.value === 'pie-chart'" />
+      <ChartBar v-if="selectedChart && selectedChart.value === 'bar-chart'" />
     </v-flex>
   </v-layout>
 </template>
@@ -112,9 +113,10 @@ import { TableHeader, Form, Question, QuestionSection, QuestionPage } from '@/@t
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 import ChartPie from '@/components/charts/ChartPie.vue';
+import ChartBar from '@/components/charts/ChartBar.vue';
 
 @Component({
-  components: { AppBar, ChartPie }
+  components: { AppBar, ChartPie, ChartBar }
 })
 export default class ResponsePage extends Vue {
   /* ------------------------------------
@@ -242,9 +244,10 @@ export default class ResponsePage extends Vue {
       return row[`${columnName}`];
     });
     const uniqueChartKeys: (string | number)[] = [...new Set(chartKeys)] as (string | number)[];
+    const sortedUniqueChartKeys: (string | number)[] = uniqueChartKeys.sort();
     console.warn('chartKeys', chartKeys);
-    console.warn('uniqueChartKeys', uniqueChartKeys);
-    const chartData: any = uniqueChartKeys.map((key: string | number) => {
+    console.warn('sortedUniqueChartKeys', sortedUniqueChartKeys);
+    const chartData: any = sortedUniqueChartKeys.map((key: string | number) => {
       result[`${key}`] = 0;
       chartKeys.forEach((item: string | number) => {
         if (key === item) {
