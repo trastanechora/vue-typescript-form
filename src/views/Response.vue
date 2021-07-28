@@ -73,6 +73,36 @@
       >
       </v-data-table>
     </v-flex>
+    <v-flex xs12 class="mt-6">
+      <v-select
+        v-model="currentColumnChart"
+        :items="respondentHeader"
+        item-text="text"
+        item-value="value"
+        label="Pilih Kolom"
+        :disabled="isLoading"
+        return-object
+        :loading="isLoading"
+      />
+      <v-select
+        v-model="selectedChart"
+        :items="chartOptions"
+        item-text="text"
+        item-value="value"
+        label="Pilih Model Chart"
+        :disabled="isLoading"
+        return-object
+        :loading="isLoading"
+      />
+    </v-flex>
+    <v-flex xs12 class="mt-2">
+      <v-btn small rounded color="primary" outlined @click="generateChart" class="ml-2">
+        <v-icon left small>mdi-plus</v-icon>Generate Chart
+      </v-btn>
+    </v-flex>
+    <v-flex xs12>
+      <ChartPie />
+    </v-flex>
   </v-layout>
 </template>
 
@@ -81,9 +111,10 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TableHeader, Form, Question, QuestionSection, QuestionPage } from '@/@types';
 import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
+import ChartPie from '@/components/charts/ChartPie.vue';
 
 @Component({
-  components: { AppBar }
+  components: { AppBar, ChartPie }
 })
 export default class ResponsePage extends Vue {
   /* ------------------------------------
@@ -95,6 +126,26 @@ export default class ResponsePage extends Vue {
   respondentCSVHeader: any = {};
   activeFilterColumn: any = null;
   filterString: string = '';
+  currentColumnChart: any = null;
+  selectedChart: any = null;
+  chartOptions: any = [
+    {
+      text: 'Area Chart',
+      value: 'area-chart'
+    },
+    {
+      text: 'Bar Chart',
+      value: 'bar-chart'
+    },
+    {
+      text: 'Line Chart',
+      value: 'line-chart'
+    },
+    {
+      text: 'Pie Chart',
+      value: 'pie-chart'
+    }
+  ];
 
   /* ------------------------------------
   => Setter and Getter
@@ -183,6 +234,30 @@ export default class ResponsePage extends Vue {
   clearFilter(): void {
     this.isFilter = false;
     this.filterString = '';
+  }
+  generateChart(): void {
+    const result: any = {};
+    const columnName: string = this.currentColumnChart.value;
+    const chartKeys = this.respondentBody.map((row: any) => {
+      return row[`${columnName}`];
+    });
+    const uniqueChartKeys: (string | number)[] = [...new Set(chartKeys)] as (string | number)[];
+    console.warn('chartKeys', chartKeys);
+    console.warn('uniqueChartKeys', uniqueChartKeys);
+    const chartData: any = uniqueChartKeys.map((key: string | number) => {
+      result[`${key}`] = 0;
+      chartKeys.forEach((item: string | number) => {
+        if (key === item) {
+          result[`${key}`]++;
+        }
+      });
+      return {
+        label: `${key}`,
+        value: result[`${key}`]
+      };
+    });
+    console.warn('chartData', chartData);
+    this.$store.dispatch('chart/updateChartData', chartData);
   }
 
   /* ------------------------------------
