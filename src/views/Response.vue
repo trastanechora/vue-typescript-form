@@ -103,6 +103,7 @@
     <v-flex xs12>
       <ChartPie v-if="selectedChart && selectedChart.value === 'pie-chart'" />
       <ChartBar v-if="selectedChart && selectedChart.value === 'bar-chart'" />
+      <ChartLine v-if="selectedChart && selectedChart.value === 'line-chart'" />
     </v-flex>
   </v-layout>
 </template>
@@ -114,9 +115,10 @@ import { dateFormatter } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 import ChartPie from '@/components/charts/ChartPie.vue';
 import ChartBar from '@/components/charts/ChartBar.vue';
+import ChartLine from '@/components/charts/ChartLine.vue';
 
 @Component({
-  components: { AppBar, ChartPie, ChartBar }
+  components: { AppBar, ChartPie, ChartBar, ChartLine }
 })
 export default class ResponsePage extends Vue {
   /* ------------------------------------
