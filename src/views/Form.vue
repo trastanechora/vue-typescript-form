@@ -144,6 +144,21 @@
                   :disabled="isLoading"
                   v-bind="attrs"
                   v-on="on"
+                  @click="downloadFormTemplate(item)"
+                >
+                  <v-icon>mdi-cloud-download-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Simpan Template Pertanyaan</span>
+            </v-tooltip>
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  :loading="isLoading"
+                  :disabled="isLoading"
+                  v-bind="attrs"
+                  v-on="on"
                   @click="showDeleteDialog(item)"
                 >
                   <v-icon>mdi-trash-can</v-icon>
@@ -187,7 +202,7 @@ export default class FormPage extends Vue {
     {
       text: 'Tindakan',
       value: 'userAction',
-      width: 150,
+      width: 200,
       align: 'center',
       sortable: false
     }
@@ -289,6 +304,24 @@ export default class FormPage extends Vue {
   }
   closeDeleteDialog(): void {
     this.dialog = false;
+  }
+  downloadFormTemplate(item: Form): void {
+    const jsonObject: any = {
+      label: item.label,
+      description: item.description,
+      questionCount: item.questionCount,
+      questions: item.questions
+    };
+    const data = JSON.stringify(jsonObject, undefined, 2);
+    const blob = new Blob([data], { type: 'text/json' });
+    const link = window.URL.createObjectURL(blob);
+    // window.open(link, '_blank'); // -> To preview
+    const e = document.createElement('a');
+    e.href = link;
+    e.download = item.label + '.json';
+    document.body.appendChild(e);
+    e.click();
+    document.body.removeChild(e);
   }
 }
 </script>
