@@ -26,6 +26,26 @@
           :items-per-page="10"
           class="elevation-1"
         ></v-data-table>
+        <div v-else class="mt-4">
+          <v-card>
+            <v-card-text>
+              <div class="font-weight-bold ml-8 mb-2">
+                Kriteria file Excel yang diterima:
+              </div>
+
+              <v-timeline align-top dense>
+                <v-timeline-item v-for="message in messages" :key="message.time" :color="message.color" small>
+                  <div>
+                    <div class="font-weight-normal">
+                      <strong>#{{ message.from }}</strong> | {{ message.time }}
+                    </div>
+                    <div>{{ message.message }}</div>
+                  </div>
+                </v-timeline-item>
+              </v-timeline>
+            </v-card-text>
+          </v-card>
+        </div>
       </div>
     </v-flex>
     <v-dialog v-model="dialog" width="500">
@@ -153,6 +173,32 @@ export default class FormPage extends Vue {
     {
       text: 'Numerik',
       value: TextfieldType.NUMERIC
+    }
+  ];
+  messages: any = [
+    {
+      from: '1',
+      message: `Memiliki ekstensi .xlsx`,
+      time: 'Jenis File',
+      color: 'primary'
+    },
+    {
+      from: '2',
+      message: 'Memiliki satu baris header',
+      time: 'Format',
+      color: 'primary'
+    },
+    {
+      from: '3',
+      message: 'Tidak ada header yang bernilai sama',
+      time: 'Bebas Duplikat',
+      color: 'primary'
+    },
+    {
+      from: '4',
+      message: 'Setiap cell hanya memiliki tipe text atau angka',
+      time: 'Tipe Data',
+      color: 'primary'
     }
   ];
 
