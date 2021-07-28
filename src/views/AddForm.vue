@@ -184,17 +184,37 @@
               </v-tooltip>
             </v-row>
             <v-layout v-if="isHideQuestions">
-              <v-btn
-                rounded
-                color="primary"
-                outlined
-                @click="openAddQuestionDialog"
-                :disabled="isLoading"
-                :loading="isLoading"
-                class="mx-auto"
-              >
-                <v-icon left>mdi-plus</v-icon>Tambah Pertanyaan
-              </v-btn>
+              <v-flex class="text-center">
+                <v-btn
+                  rounded
+                  color="primary"
+                  outlined
+                  @click="openAddQuestionDialog"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  class="mx-2"
+                >
+                  <v-icon left>mdi-plus</v-icon>Tambah Pertanyaan
+                </v-btn>
+                <v-btn
+                  rounded
+                  color="primary"
+                  outlined
+                  @click="loadFromTemplate"
+                  :disabled="isLoading"
+                  :loading="isLoading"
+                  class="mx-2"
+                >
+                  <v-icon left small>mdi-cloud-upload-outline</v-icon>Unggah .json Template
+                </v-btn>
+                <input
+                  ref="uploader"
+                  class="d-none"
+                  type="file"
+                  accept="application/JSON"
+                  @change="onJSONFileChanged"
+                />
+              </v-flex>
             </v-layout>
             <v-layout v-else wrap>
               <v-flex xs12 class="mb-3 mt-6">
@@ -461,6 +481,7 @@ export default class AddFormPage extends Vue {
   dialog: boolean = false;
   nameEditDialog: boolean = false;
   isEditQuestion: boolean = false;
+  isSelecting: boolean = false;
   valid: boolean = true;
   dragState: boolean = false;
   status: boolean = true;
@@ -469,6 +490,7 @@ export default class AddFormPage extends Vue {
   startDateProvided: boolean = false;
   dueDateProvided: boolean = false;
   posterProvided: boolean = false;
+  selectedFile: any = null;
   targetPage: number = 0;
   targetSection: number = 0;
   startDate: string = '';
@@ -792,6 +814,33 @@ export default class AddFormPage extends Vue {
   deletePoster(): void {
     this.posterProvided = false;
     this.formData.imageBanner = undefined;
+  }
+  loadFromTemplate(): void {
+    this.isSelecting = true;
+    window.addEventListener(
+      'focus',
+      () => {
+        this.isSelecting = false;
+      },
+      { once: true }
+    );
+
+    const uploaderInput: any = this.$refs.uploader;
+    uploaderInput.click();
+  }
+  onJSONFileChanged(e: any): void {
+    this.selectedFile = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const data = e.target.result;
+      const parsedData = JSON.parse(data);
+      this.formData.label = parsedData.label;
+      this.formData.description = parsedData.description;
+      this.formData.questions = parsedData.questions;
+    };
+
+    reader.readAsBinaryString(this.selectedFile);
   }
 }
 </script>
