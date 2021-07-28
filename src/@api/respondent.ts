@@ -1,5 +1,6 @@
 // import { uuid } from 'vue-uuid';
 import { convertBlobToByteArray } from '../@utils';
+import { FORM_ENDPOINT } from '@/@api';
 
 const DB_NAME = 'respondentdb';
 const DB_VERSION = 1;
@@ -79,7 +80,8 @@ export const RESPONDENT_ENDPOINT: any = {
       const trans = db.transaction(['respondents'], 'readwrite');
       const store = trans.objectStore('respondents');
       store.put(processedRespondent);
-      trans.oncomplete = () => {
+      trans.oncomplete = async () => {
+        await FORM_ENDPOINT.updateLastReceived(processedRespondent.formId, processedRespondent.submitDate);
         resolve();
       };
       trans.onerror = () => {

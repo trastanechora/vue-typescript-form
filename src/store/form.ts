@@ -79,7 +79,6 @@ const actions: any = {
   async getForms(store: Store<FormState> | any): Promise<void> {
     await store.commit('setLoading', true);
     const forms = await FORM_ENDPOINT.getForms(store.rootState.user.currentUser.uuid);
-    console.warn('forms', forms);
     await store.commit('setFormList', forms);
     await store.commit('setLoading', false);
   },

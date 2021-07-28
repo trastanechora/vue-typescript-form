@@ -68,6 +68,9 @@
               {{ statusTextFormatter(item.status) }}
             </v-chip>
           </template>
+          <template v-slot:[`item.lastReceived`]="{ item }">
+            {{ item.lastReceived ? `${formatDate(item.lastReceived)} | ${formatTime(item.lastReceived)}` : '-' }}
+          </template>
           <template v-slot:[`item.startDate`]="{ item }">
             {{ item.startDate ? formatDate(item.startDate) : '-' }}
           </template>
@@ -177,7 +180,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { TableHeader, Form, FormStatus, FormStateType } from '@/@types';
-import { dateFormatter, statusFormatter } from '@/@utils';
+import { dateFormatter, statusFormatter, timeFormatter } from '@/@utils';
 import DialogConfirmation from '@/components/DialogConfirmation.vue';
 
 @Component({
@@ -194,6 +197,7 @@ export default class FormPage extends Vue {
     { text: 'Jumlah Pertanyaan', value: 'questionCount', align: 'center' },
     { text: 'Jumlah Responden', value: 'respondentCount', align: 'center' },
     { text: 'Status', value: 'status', align: 'center' },
+    { text: 'Response Masuk Terakhir', value: 'lastReceived', width: 200, align: 'center' },
     { text: 'Tanggal Mulai', value: 'startDate', width: 150, align: 'center' },
     { text: 'Batas Waktu', value: 'dueDate', width: 150, align: 'center' },
     { text: 'Tanggal Dibuat', value: 'createdAt', width: 150, align: 'center' },
@@ -233,6 +237,10 @@ export default class FormPage extends Vue {
   formatDate(dateIsoString: string): string {
     const parsedDate = new Date(dateIsoString);
     return dateFormatter(parsedDate);
+  }
+  formatTime(dateIsoString: string): string {
+    const parsedDate = new Date(dateIsoString);
+    return timeFormatter(parsedDate);
   }
   statusTextFormatter(status: FormStatus): string {
     return statusFormatter(status).text;

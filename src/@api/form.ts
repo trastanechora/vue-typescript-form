@@ -172,6 +172,34 @@ export const FORM_ENDPOINT: any = {
     });
   },
   /* ------------------------------------
+  => [PUT] Update Form Last Received Response
+  ------------------------------------ */
+  async updateLastReceived(uuid: string, dateString: string): Promise<Form> {
+    const db: any = await this.getDb();
+    return new Promise((resolve, reject) => {
+      const trans = db.transaction(['forms'], 'readwrite');
+      const formStore = trans.objectStore('forms');
+      const getFormRequest = formStore.openCursor();
+      getFormRequest.onsuccess = (e: any) => {
+        const result = e.target.result;
+        if (result) {
+          if (result.value.uuid === uuid) {
+            const currentForm = result.value;
+            const updatedForm = {
+              ...currentForm,
+              lastReceived: dateString
+            };
+            formStore.put(updatedForm);
+            resolve(updatedForm);
+          }
+          result.continue();
+        } else {
+          reject('Form tidak dapat ditemukan!');
+        }
+      };
+    });
+  },
+  /* ------------------------------------
   => [DELETE] Delete Form
   ------------------------------------ */
   async deleteForm(form: any): Promise<void> {

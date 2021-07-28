@@ -101,6 +101,7 @@ export interface Form {
   updatedAt: string;
   startDate?: string;
   dueDate?: string;
+  lastReceived?: string;
   questionCount: number;
   status: FormStatus;
   link: string;

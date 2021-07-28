@@ -6,6 +6,11 @@ export const dateFormatter = (date: Date, monthFormat: string = 'long'): string 
   return newDate.toLocaleDateString('id-ID', options);
 };
 
+export const timeFormatter = (date: Date): string => {
+  const newDate = new Date(date);
+  return newDate.toLocaleTimeString('en-US', { hour12: false });
+};
+
 export const statusFormatter = (status: FormStatus): any => {
   switch (status) {
     case FormStatus.UNSTARTED:
