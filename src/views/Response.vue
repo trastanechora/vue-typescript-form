@@ -134,10 +134,6 @@ export default class ResponsePage extends Vue {
   selectedChart: any = null;
   chartOptions: any = [
     {
-      text: 'Area Chart',
-      value: 'area-chart'
-    },
-    {
       text: 'Bar Chart',
       value: 'bar-chart'
     },
