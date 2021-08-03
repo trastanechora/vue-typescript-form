@@ -142,7 +142,11 @@
                 </v-layout>
               </v-form>
               <v-form
-                v-if="currentQuestion.type.value === 'radio' || currentQuestion.type.value === 'checkbox'"
+                v-if="
+                  currentQuestion.type.value === 'radio' ||
+                    currentQuestion.type.value === 'checkbox' ||
+                    currentQuestion.type.value === 'select'
+                "
                 ref="radioCheckboxForm"
                 v-model="valid"
                 lazy-validation
@@ -328,6 +332,11 @@ export default class DialogQuestion extends Vue {
       label: 'Jawaban Paragraf',
       value: QuestionType.TEXT_AREA,
       icon: 'mdi-text'
+    },
+    {
+      label: 'Pilihan',
+      value: QuestionType.SELECT,
+      icon: 'mdi-arrow-down-drop-circle-outline'
     },
     {
       label: 'Pilihan Ganda',

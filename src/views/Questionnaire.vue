@@ -226,6 +226,17 @@
                               ></v-file-input>
                             </v-container>
                           </v-layout>
+                          <v-layout v-else-if="item.type.value === 'select'">
+                            <v-container fluid>
+                              <v-autocomplete
+                                v-model="answerSkeleton[`${item.key}`]"
+                                :items="item.options"
+                                item-text="text"
+                                item-value="text"
+                                :rules="item.required ? notEmptyOptionRules(false) : []"
+                              ></v-autocomplete>
+                            </v-container>
+                          </v-layout>
                         </v-card-text>
                       </v-card>
                     </div>
