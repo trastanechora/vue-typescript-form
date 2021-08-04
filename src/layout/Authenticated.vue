@@ -12,5 +12,14 @@ import AppBar from '@/components/AppBar.vue';
 @Component({
   components: { AppBar }
 })
-export default class AuthenticatedLayout extends Vue {}
+export default class AuthenticatedLayout extends Vue {
+  /* ------------------------------------
+  => Mounted (Lifecycle)
+  ------------------------------------ */
+  async mounted(): Promise<void> {
+    if (this.$store.state.user.currentUser.role !== 'admin') {
+      this.$router.push('/forbidden');
+    }
+  }
+}
 </script>

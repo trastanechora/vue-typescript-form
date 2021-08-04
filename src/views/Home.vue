@@ -1,6 +1,6 @@
 <template>
   <v-layout justify-center row wrap>
-    <v-flex :class="`.d-xs-${isLoggedIn ? '12' : '6'}`">
+    <v-flex v-if="isLoggedIn">
       <div class="banner"></div>
       <v-card class="main-box py-10">
         <v-card-text>
@@ -38,17 +38,36 @@
                 Cari Form
               </v-btn>
             </v-flex>
-            <v-flex v-if="isLoggedIn" xs10 class="my-2 mx-auto text-end">
-              <v-btn
-                text
-                small
-                color="secondary"
-                :disabled="isLoading"
-                :loading="isLoading"
-                class="ml-2"
-                @click="checkAuth"
-                ><v-icon small>mdi-plus</v-icon>Buat Form</v-btn
-              >
+            <v-flex xs10 class="my-2 mx-auto">
+              <v-layout v-if="isLoggedIn">
+                <v-flex xs6 class="my-2 mx-auto">
+                  <v-btn text small disabled :loading="isLoading" class="ml-2">{{ userRole }}: {{ displayName }}</v-btn>
+                </v-flex>
+                <v-flex xs6 class="my-2 mx-auto text-end">
+                  <v-btn
+                    v-if="userRole === 'admin'"
+                    text
+                    small
+                    color="secondary"
+                    :disabled="isLoading"
+                    :loading="isLoading"
+                    class="ml-2"
+                    @click="checkAuth"
+                    ><v-icon small>mdi-plus</v-icon>Buat Form</v-btn
+                  >
+                  <v-btn
+                    v-else
+                    text
+                    small
+                    color="secondary"
+                    :disabled="isLoading"
+                    :loading="isLoading"
+                    class="ml-2"
+                    @click="logout"
+                    ><v-icon small left>mdi-power</v-icon>Keluar</v-btn
+                  >
+                </v-flex>
+              </v-layout>
             </v-flex>
           </v-layout>
         </v-card-actions>
@@ -293,6 +312,14 @@ export default class HomePage extends Vue {
     return this.$store.state.auth.isLogin;
   }
 
+  get userRole(): string {
+    return this.$store.state.user.currentUser.role;
+  }
+
+  get displayName(): string {
+    return this.$store.state.user.currentUser.displayName;
+  }
+
   /* ------------------------------------
   => Methods
   ------------------------------------ */
@@ -320,10 +347,17 @@ export default class HomePage extends Vue {
           password: this.loginPassword
         })
         .then(async () => {
-          await this.$router.push('/dashboard');
           form.reset();
+          if (this.userRole === 'admin') {
+            await this.$router.push('/dashboard');
+          }
         });
     }
+  }
+  logout(): void {
+    this.$store.dispatch('auth/logout').then(() => {
+      this.$router.go(0);
+    });
   }
   doRegister(): void {
     const form = this.$refs.registerForm as VForm;
