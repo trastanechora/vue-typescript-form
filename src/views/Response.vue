@@ -73,6 +73,11 @@
       >
       </v-data-table>
     </v-flex>
+    <v-flex xs12 class="mt-10">
+      <span class="display-1 primary--text">
+        Visualisasi dengan Grafik
+      </span>
+    </v-flex>
     <v-flex xs12 class="mt-6">
       <v-select
         v-model="currentColumnChart"
@@ -95,12 +100,90 @@
         :loading="isLoading"
       />
     </v-flex>
+    <v-flex xs12 v-if="isNumericGrouping">
+      <v-flex v-for="(group, index) in generatedNumericGroup" :key="index" xs12>
+        <v-row no-gutters>
+          <v-col cols="5" class="pr-1">
+            <v-text-field
+              v-model="group.name"
+              filled
+              clearable
+              :label="`Nama kelompok ${index + 1}`"
+              type="text"
+              autocomplete="off"
+              class="required"
+              :rules="notEmpty(`Nama kelompok ${index + 1}`)"
+              :disabled="isLoading"
+              :loading="isLoading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="3" class="px-1">
+            <v-text-field
+              v-model="group.minValue"
+              filled
+              clearable
+              :label="`Nilai minimal ${index + 1}`"
+              type="text"
+              autocomplete="off"
+              class="required"
+              :rules="notEmpty(`Nilai minimal ${index + 1}`)"
+              :disabled="isLoading"
+              :loading="isLoading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="3" class="px-1">
+            <v-text-field
+              v-model="group.maxValue"
+              filled
+              clearable
+              :label="`Nilai maksimal ${index + 1}`"
+              type="text"
+              autocomplete="off"
+              class="required"
+              :rules="notEmpty(`Nilai maksimal ${index + 1}`)"
+              :disabled="isLoading"
+              :loading="isLoading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="1" class="my-2 pl-1">
+            <v-btn v-if="generatedNumericGroup.length === index + 1" color="primary" text @click="addGroup()">
+              <v-icon left>mdi-plus</v-icon> Tambah
+            </v-btn>
+            <v-btn v-else color="primary" text @click="deleteGroup(group)">
+              <v-icon left>mdi-delete</v-icon> Hapus
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-flex>
+    </v-flex>
     <v-flex xs12 class="mt-2">
       <v-btn small rounded color="primary" outlined @click="generateChart" class="ml-2">
-        <v-icon left small>mdi-plus</v-icon>Generate Chart
+        <v-icon left small>mdi-plus</v-icon>Proses Grafik
       </v-btn>
+      <v-btn
+        v-if="!isNumericGrouping"
+        text
+        small
+        color="secondary"
+        @click="isNumericGrouping = true"
+        :disabled="isLoading"
+        :loading="isLoading"
+        class="ml-2"
+        ><v-icon small left>mdi-plus</v-icon>Pengelompokan Angka</v-btn
+      >
+      <v-btn
+        v-if="isNumericGrouping"
+        text
+        small
+        color="secondary"
+        @click="isNumericGrouping = false"
+        :disabled="isLoading"
+        :loading="isLoading"
+        class="ml-2"
+        ><v-icon small left>mdi-minus</v-icon>Hapus Pengelompokan Angka</v-btn
+      >
     </v-flex>
-    <v-flex xs12>
+    <v-flex xs12 v-if="isGenerated">
       <ChartPie v-if="selectedChart && selectedChart.value === 'pie-chart'" />
       <ChartBar v-if="selectedChart && selectedChart.value === 'bar-chart'" />
       <ChartLine v-if="selectedChart && selectedChart.value === 'line-chart'" />
@@ -111,7 +194,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TableHeader, Form, Question, QuestionSection, QuestionPage } from '@/@types';
-import { dateFormatter } from '@/@utils';
+import { dateFormatter, notEmptyRules } from '@/@utils';
 import AppBar from '@/components/AppBar.vue';
 import ChartPie from '@/components/charts/ChartPie.vue';
 import ChartBar from '@/components/charts/ChartBar.vue';
@@ -132,6 +215,15 @@ export default class ResponsePage extends Vue {
   filterString: string = '';
   currentColumnChart: any = null;
   selectedChart: any = null;
+  isGenerated: boolean = false;
+  isNumericGrouping: boolean = false;
+  generatedNumericGroup: any = [
+    {
+      name: '',
+      minValue: 0,
+      maxValue: 0
+    }
+  ];
   chartOptions: any = [
     {
       text: 'Bar Chart',
@@ -236,15 +328,46 @@ export default class ResponsePage extends Vue {
     this.filterString = '';
   }
   generateChart(): void {
+    if (this.isNumericGrouping) {
+      this.generateChartWithNumericGroupings();
+    } else {
+      this.generateChartWithoutGroupings();
+    }
+  }
+  generateChartWithNumericGroupings(): void {
+    this.isGenerated = true;
     const result: any = {};
     const columnName: string = this.currentColumnChart.value;
     const chartKeys = this.respondentBody.map((row: any) => {
       return row[`${columnName}`];
     });
-    const uniqueChartKeys: (string | number)[] = [...new Set(chartKeys)] as (string | number)[];
-    const sortedUniqueChartKeys: (string | number)[] = uniqueChartKeys.sort();
-    console.warn('chartKeys', chartKeys);
-    console.warn('sortedUniqueChartKeys', sortedUniqueChartKeys);
+
+    const chartData: any = this.generatedNumericGroup.map((groupObject: any) => {
+      result[`${groupObject.name}`] = 0;
+      chartKeys.forEach((item: string) => {
+        if (groupObject.minValue <= item && groupObject.maxValue >= item) {
+          result[`${groupObject.name}`]++;
+        }
+      });
+      return {
+        label: `${groupObject.name}`,
+        value: result[`${groupObject.name}`]
+      };
+    });
+    console.warn('chartData', chartData);
+    this.$store.dispatch('chart/updateChartData', chartData);
+  }
+  generateChartWithoutGroupings(): void {
+    this.isGenerated = true;
+    const result: any = {};
+    const columnName: string = this.currentColumnChart.value;
+    const chartKeys = this.respondentBody.map((row: any) => {
+      return row[`${columnName}`];
+    });
+    const uniqueChartKeys: string[] = [...new Set(chartKeys)] as string[];
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+    const sortedUniqueChartKeys: string[] = uniqueChartKeys.sort(collator.compare);
+
     const chartData: any = sortedUniqueChartKeys.map((key: string | number) => {
       result[`${key}`] = 0;
       chartKeys.forEach((item: string | number) => {
@@ -260,6 +383,16 @@ export default class ResponsePage extends Vue {
     console.warn('chartData', chartData);
     this.$store.dispatch('chart/updateChartData', chartData);
   }
+  notEmpty(identifier: string): any[] {
+    return notEmptyRules(identifier);
+  }
+  addGroup(): void {
+    this.generatedNumericGroup.push({
+      name: '',
+      minValue: 0,
+      maxValue: 0
+    });
+  }
 
   /* ------------------------------------
   => Watcher
@@ -273,6 +406,14 @@ export default class ResponsePage extends Vue {
         this.respondentHeader[index].filterable = false;
       }
     });
+  }
+  @Watch('currentColumnChart')
+  async handleCurrentColumnChartChange(): Promise<void> {
+    this.isGenerated = false;
+  }
+  @Watch('selectedChart')
+  async handleSelectedChartChange(): Promise<void> {
+    this.isGenerated = false;
   }
 }
 </script>
