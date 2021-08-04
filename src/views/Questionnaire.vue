@@ -237,6 +237,18 @@
                               ></v-autocomplete>
                             </v-container>
                           </v-layout>
+                          <v-layout v-else-if="item.type.value === 'scale'" class="ma-auto">
+                            <v-flex xs2 class="ma-auto text-center">{{ item.options[1].text }}</v-flex>
+                            <v-flex xs8
+                              ><v-radio-group v-model="answerSkeleton[`${item.key}`]" row>
+                                <v-radio
+                                  v-for="n in item.options[0].value"
+                                  :key="n"
+                                  :value="n"
+                                ></v-radio> </v-radio-group
+                            ></v-flex>
+                            <v-flex xs2 class="ma-auto text-center">{{ item.options[2].text }}</v-flex>
+                          </v-layout>
                         </v-card-text>
                       </v-card>
                     </div>
@@ -536,5 +548,8 @@ export default class QuestionnairePage extends Vue {
   margin-right: 16px;
   font-size: small;
   font-weight: bold;
+}
+.v-input >>> .v-input--radio-group__input {
+  justify-content: center;
 }
 </style>

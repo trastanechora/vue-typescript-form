@@ -196,7 +196,7 @@
                 </v-layout>
               </v-form>
               <v-form
-                v-if="currentQuestion.type.value === 'radio_row'"
+                v-if="currentQuestion.type.value === 'scale'"
                 ref="radioRowForm"
                 v-model="valid"
                 lazy-validation
@@ -206,40 +206,60 @@
                   <v-flex xs12>
                     <hr class="my-6" />
                     <v-layout wrap>
-                      <v-flex v-for="(option, index) in currentQuestion.options" :key="index" xs12>
+                      <v-flex xs12>
                         <v-row no-gutters>
-                          <v-col cols="10">
+                          <v-col cols="12">
+                            <v-select
+                              v-model="currentQuestion.options[0]"
+                              filled
+                              :items="scaleOptions"
+                              item-text="text"
+                              item-value="value"
+                              label="Jumlah skala"
+                              class="required"
+                              :rules="notEmpty('Jumlah skala')"
+                              return-object
+                              :disabled="isLoading"
+                              :loading="isLoading"
+                            />
+                          </v-col>
+                        </v-row>
+                      </v-flex>
+                      <v-flex xs12>
+                        <v-row no-gutters>
+                          <v-col cols="12">
                             <v-text-field
-                              v-model="option.text"
+                              v-model="currentQuestion.options[1].text"
                               filled
                               clearable
-                              :label="`Pilihan ${index + 1}`"
+                              :label="`Label Minimum`"
                               type="text"
                               autocomplete="off"
                               class="required"
-                              :rules="notEmpty(`Pilihan ${index + 1}`)"
+                              :rules="notEmpty(`Label Minimum`)"
                               :disabled="isLoading"
                               :loading="isLoading"
                             ></v-text-field>
                           </v-col>
-                          <v-col cols="2" class="my-2 px-1"
-                            ><v-btn color="primary" text @click="deleteOption(option)">
-                              <v-icon left>mdi-delete</v-icon> Hapus
-                            </v-btn></v-col
-                          >
                         </v-row>
                       </v-flex>
                       <v-flex xs12>
-                        <v-btn
-                          text
-                          small
-                          color="secondary"
-                          @click="addOption"
-                          :disabled="isLoading"
-                          :loading="isLoading"
-                          class="ml-2"
-                          ><v-icon small>mdi-plus</v-icon>Tambah Pilihan</v-btn
-                        >
+                        <v-row no-gutters>
+                          <v-col cols="12">
+                            <v-text-field
+                              v-model="currentQuestion.options[2].text"
+                              filled
+                              clearable
+                              :label="`Label Maksimum`"
+                              type="text"
+                              autocomplete="off"
+                              class="required"
+                              :rules="notEmpty(`Label Maksimum`)"
+                              :disabled="isLoading"
+                              :loading="isLoading"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
                       </v-flex>
                     </v-layout>
                   </v-flex>
@@ -349,6 +369,11 @@ export default class DialogQuestion extends Vue {
       icon: 'mdi-checkbox-marked'
     },
     {
+      label: 'Skala',
+      value: QuestionType.SCALE,
+      icon: 'mdi-dots-horizontal'
+    },
+    {
       label: 'Tanggal',
       value: QuestionType.DATE,
       icon: 'mdi-calendar-range'
@@ -402,6 +427,28 @@ export default class DialogQuestion extends Vue {
     {
       text: 'Lain-lain',
       value: FileType.OTHER
+    }
+  ];
+  scaleOptions: Option[] = [
+    {
+      text: '3',
+      value: 3
+    },
+    {
+      text: '4',
+      value: 4
+    },
+    {
+      text: '5',
+      value: 5
+    },
+    {
+      text: '6',
+      value: 6
+    },
+    {
+      text: '10',
+      value: 10
     }
   ];
 
@@ -553,6 +600,32 @@ export default class DialogQuestion extends Vue {
       this.currentQuestion.image = undefined;
       this.descriptionProvided = false;
       this.currentQuestion.description = '';
+    }
+  }
+  @Watch('currentQuestion.type.value')
+  async handleScaleOptions(newValue: string): Promise<void> {
+    if (newValue === 'scale') {
+      this.currentQuestion.options = [
+        {
+          text: '3',
+          value: 3
+        },
+        {
+          text: '',
+          value: ''
+        },
+        {
+          text: '',
+          value: ''
+        }
+      ];
+    } else {
+      this.currentQuestion.options = [
+        {
+          text: '',
+          value: ''
+        }
+      ];
     }
   }
 }
