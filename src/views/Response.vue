@@ -301,6 +301,9 @@ export default class ResponsePage extends Vue {
     this.respondentCSVHeader[`_formId`] = {
       title: '_formId'
     };
+    this.respondentCSVHeader[`_submitDate`] = {
+      title: '_submitDate'
+    };
   }
   createBody(): void {
     const newBody: any = [];
@@ -319,6 +322,7 @@ export default class ResponsePage extends Vue {
       });
       parsedBody._formId = this.selectedForm.uuid;
       parsedBody._respondentId = respondent.uuid;
+      parsedBody._submitDate = respondent.submitDate;
       newBody.push(parsedBody);
     });
     this.respondentBody = newBody;
