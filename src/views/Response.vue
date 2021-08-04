@@ -295,6 +295,12 @@ export default class ResponsePage extends Vue {
         });
       });
     });
+    this.respondentCSVHeader[`_respondentId`] = {
+      title: '_respondentId'
+    };
+    this.respondentCSVHeader[`_formId`] = {
+      title: '_formId'
+    };
   }
   createBody(): void {
     const newBody: any = [];
@@ -311,14 +317,14 @@ export default class ResponsePage extends Vue {
           parsedBody[`${key}`] = '-';
         }
       });
-      parsedBody.formId = this.selectedForm.uuid;
-      parsedBody.respondentId = respondent.uuid;
+      parsedBody._formId = this.selectedForm.uuid;
+      parsedBody._respondentId = respondent.uuid;
       newBody.push(parsedBody);
     });
     this.respondentBody = newBody;
   }
   onRowClick(response: any): void {
-    this.$router.push(`/dashboard/form/${response.formId}/${response.respondentId}`);
+    this.$router.push(`/dashboard/form/${response._formId}/${response._respondentId}`);
   }
   getSlotName(headerItem: any): string {
     return headerItem.value;
@@ -354,7 +360,6 @@ export default class ResponsePage extends Vue {
         value: result[`${groupObject.name}`]
       };
     });
-    console.warn('chartData', chartData);
     this.$store.dispatch('chart/updateChartData', chartData);
   }
   generateChartWithoutGroupings(): void {
@@ -380,7 +385,6 @@ export default class ResponsePage extends Vue {
         value: result[`${key}`]
       };
     });
-    console.warn('chartData', chartData);
     this.$store.dispatch('chart/updateChartData', chartData);
   }
   notEmpty(identifier: string): any[] {
