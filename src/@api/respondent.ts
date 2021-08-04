@@ -81,7 +81,9 @@ export const RESPONDENT_ENDPOINT: any = {
       const store = trans.objectStore('respondents');
       store.put(processedRespondent);
       trans.oncomplete = async () => {
-        await FORM_ENDPOINT.updateLastReceived(processedRespondent.formId, processedRespondent.submitDate);
+        if (!respondent.isImport) {
+          await FORM_ENDPOINT.updateLastReceived(processedRespondent.formId, processedRespondent.submitDate);
+        }
         resolve();
       };
       trans.onerror = () => {
